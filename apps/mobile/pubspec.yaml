@@ -1,0 +1,22 @@
+name: cop4331_mobile
+description: Mobile client (Flutter) for the COP4331 large project. Talks to the same REST API as the web app.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  flutter_secure_storage: ^9.2.2
+  jwt_decoder: ^2.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

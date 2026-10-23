@@ -1,0 +1,33 @@
+{
+  "name": "@cop4331/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@cop4331/shared": "workspace:*",
+    "@t3-oss/env-core": "^0.13.0",
+    "jwt-decode": "^4.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.0.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "oxlint": "^1.88.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.4"
+  }
+}
