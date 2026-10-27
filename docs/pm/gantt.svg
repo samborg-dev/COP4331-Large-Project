@@ -1,0 +1,284 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1244 1510" width="1244" height="1510" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#f1f5f9"/><line x1="0" y1="0" x2="0" y2="6" stroke="#94a3b8" stroke-width="2"/></pattern></defs>
+<rect width="1244" height="1510" fill="#ffffff"/>
+<text x="24" y="46" font-size="20" font-weight="700" fill="#1e293b">Country Distance Guessing Game: COP4331 Large Project</text>
+<text x="24" y="66" font-size="12" fill="#64748b">Team 18 · Oct 26 – Nov 22, 2026 · due Sun Nov 15, 11:59 pm · status as of Oct 27</text>
+<rect x="356" y="80" width="160" height="22" fill="#e2e8f0"/>
+<text x="436" y="95" font-size="11" font-weight="600" text-anchor="middle" fill="#1e293b">P0 Foundations</text>
+<rect x="516" y="80" width="128" height="22" fill="#ddd6fe"/>
+<text x="580" y="95" font-size="11" font-weight="600" text-anchor="middle" fill="#1e293b">P1 Auth + data</text>
+<rect x="644" y="80" width="128" height="22" fill="#bfdbfe"/>
+<text x="708" y="95" font-size="11" font-weight="600" text-anchor="middle" fill="#1e293b">P2 Gameplay</text>
+<rect x="772" y="80" width="96" height="22" fill="#bbf7d0"/>
+<text x="820" y="95" font-size="11" font-weight="600" text-anchor="middle" fill="#1e293b">P3 Finish</text>
+<rect x="868" y="80" width="128" height="22" fill="#fde68a"/>
+<text x="932" y="95" font-size="11" font-weight="600" text-anchor="middle" fill="#1e293b">P4 Docs + submit</text>
+<rect x="996" y="80" width="160" height="22" fill="#fecaca"/>
+<text x="1076" y="95" font-size="11" font-weight="600" text-anchor="middle" fill="#1e293b">Presentations (TBD)</text>
+<text x="328" y="119" font-size="11" font-weight="600" fill="#334155">Week of Oct 26</text>
+<line x1="324" y1="104" x2="324" y2="1446" stroke="#cbd5e1"/>
+<text x="340" y="140" font-size="10" text-anchor="middle" fill="#64748b">26</text>
+<line x1="356" y1="126" x2="356" y2="1446" stroke="#f1f5f9"/>
+<text x="372" y="140" font-size="10" text-anchor="middle" fill="#64748b">27</text>
+<line x1="388" y1="126" x2="388" y2="1446" stroke="#f1f5f9"/>
+<text x="404" y="140" font-size="10" text-anchor="middle" fill="#64748b">28</text>
+<line x1="420" y1="126" x2="420" y2="1446" stroke="#f1f5f9"/>
+<text x="436" y="140" font-size="10" text-anchor="middle" fill="#64748b">29</text>
+<line x1="452" y1="126" x2="452" y2="1446" stroke="#f1f5f9"/>
+<text x="468" y="140" font-size="10" text-anchor="middle" fill="#64748b">30</text>
+<rect x="484" y="126" width="32" height="1320" fill="#f8fafc"/>
+<line x1="484" y1="126" x2="484" y2="1446" stroke="#f1f5f9"/>
+<text x="500" y="140" font-size="10" text-anchor="middle" fill="#64748b">31</text>
+<rect x="516" y="126" width="32" height="1320" fill="#f8fafc"/>
+<line x1="516" y1="126" x2="516" y2="1446" stroke="#f1f5f9"/>
+<text x="532" y="140" font-size="10" text-anchor="middle" fill="#64748b">1</text>
+<text x="552" y="119" font-size="11" font-weight="600" fill="#334155">Week of Nov 2</text>
+<line x1="548" y1="104" x2="548" y2="1446" stroke="#cbd5e1"/>
+<text x="564" y="140" font-size="10" text-anchor="middle" fill="#64748b">2</text>
+<line x1="580" y1="126" x2="580" y2="1446" stroke="#f1f5f9"/>
+<text x="596" y="140" font-size="10" text-anchor="middle" fill="#64748b">3</text>
+<line x1="612" y1="126" x2="612" y2="1446" stroke="#f1f5f9"/>
+<text x="628" y="140" font-size="10" text-anchor="middle" fill="#64748b">4</text>
+<line x1="644" y1="126" x2="644" y2="1446" stroke="#f1f5f9"/>
+<text x="660" y="140" font-size="10" text-anchor="middle" fill="#64748b">5</text>
+<line x1="676" y1="126" x2="676" y2="1446" stroke="#f1f5f9"/>
+<text x="692" y="140" font-size="10" text-anchor="middle" fill="#64748b">6</text>
+<rect x="708" y="126" width="32" height="1320" fill="#f8fafc"/>
+<line x1="708" y1="126" x2="708" y2="1446" stroke="#f1f5f9"/>
+<text x="724" y="140" font-size="10" text-anchor="middle" fill="#64748b">7</text>
+<rect x="740" y="126" width="32" height="1320" fill="#f8fafc"/>
+<line x1="740" y1="126" x2="740" y2="1446" stroke="#f1f5f9"/>
+<text x="756" y="140" font-size="10" text-anchor="middle" fill="#64748b">8</text>
+<text x="776" y="119" font-size="11" font-weight="600" fill="#334155">Week of Nov 9</text>
+<line x1="772" y1="104" x2="772" y2="1446" stroke="#cbd5e1"/>
+<text x="788" y="140" font-size="10" text-anchor="middle" fill="#64748b">9</text>
+<line x1="804" y1="126" x2="804" y2="1446" stroke="#f1f5f9"/>
+<text x="820" y="140" font-size="10" text-anchor="middle" fill="#64748b">10</text>
+<line x1="836" y1="126" x2="836" y2="1446" stroke="#f1f5f9"/>
+<text x="852" y="140" font-size="10" text-anchor="middle" fill="#64748b">11</text>
+<line x1="868" y1="126" x2="868" y2="1446" stroke="#f1f5f9"/>
+<text x="884" y="140" font-size="10" text-anchor="middle" fill="#64748b">12</text>
+<line x1="900" y1="126" x2="900" y2="1446" stroke="#f1f5f9"/>
+<text x="916" y="140" font-size="10" text-anchor="middle" fill="#64748b">13</text>
+<rect x="932" y="126" width="32" height="1320" fill="#f8fafc"/>
+<line x1="932" y1="126" x2="932" y2="1446" stroke="#f1f5f9"/>
+<text x="948" y="140" font-size="10" text-anchor="middle" fill="#64748b">14</text>
+<rect x="964" y="126" width="32" height="1320" fill="#f8fafc"/>
+<line x1="964" y1="126" x2="964" y2="1446" stroke="#f1f5f9"/>
+<text x="980" y="140" font-size="10" text-anchor="middle" fill="#64748b">15</text>
+<text x="1000" y="119" font-size="11" font-weight="600" fill="#334155">Week of Nov 16</text>
+<line x1="996" y1="104" x2="996" y2="1446" stroke="#cbd5e1"/>
+<text x="1012" y="140" font-size="10" text-anchor="middle" fill="#64748b">16</text>
+<line x1="1028" y1="126" x2="1028" y2="1446" stroke="#f1f5f9"/>
+<text x="1044" y="140" font-size="10" text-anchor="middle" fill="#64748b">17</text>
+<line x1="1060" y1="126" x2="1060" y2="1446" stroke="#f1f5f9"/>
+<text x="1076" y="140" font-size="10" text-anchor="middle" fill="#64748b">18</text>
+<line x1="1092" y1="126" x2="1092" y2="1446" stroke="#f1f5f9"/>
+<text x="1108" y="140" font-size="10" text-anchor="middle" fill="#64748b">19</text>
+<line x1="1124" y1="126" x2="1124" y2="1446" stroke="#f1f5f9"/>
+<text x="1140" y="140" font-size="10" text-anchor="middle" fill="#64748b">20</text>
+<rect x="1156" y="126" width="32" height="1320" fill="#f8fafc"/>
+<line x1="1156" y1="126" x2="1156" y2="1446" stroke="#f1f5f9"/>
+<text x="1172" y="140" font-size="10" text-anchor="middle" fill="#64748b">21</text>
+<rect x="1188" y="126" width="32" height="1320" fill="#f8fafc"/>
+<line x1="1188" y1="126" x2="1188" y2="1446" stroke="#f1f5f9"/>
+<text x="1204" y="140" font-size="10" text-anchor="middle" fill="#64748b">22</text>
+<line x1="324" y1="146" x2="1220" y2="146" stroke="#cbd5e1"/>
+<rect x="24" y="147" width="292" height="24" rx="3" fill="#7c3aed"/>
+<text x="34" y="163" font-size="12" font-weight="700" fill="#ffffff">Sam: PM + Infrastructure</text>
+<rect x="324" y="146" width="896" height="26" fill="#7c3aed" fill-opacity="0.06"/>
+<text x="34" y="189" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S1</tspan>  Push repo, protect main, issue board</text>
+<line x1="24" y1="198" x2="1220" y2="198" stroke="#f1f5f9"/>
+<rect x="358" y="177" width="60" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<text x="424" y="189" font-size="10" fill="#475569">Oct 27–28</text>
+<text x="34" y="215" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S2</tspan>  Droplet, domain, DNS, HTTPS</text>
+<line x1="24" y1="224" x2="1220" y2="224" stroke="#f1f5f9"/>
+<rect x="358" y="203" width="124" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<text x="488" y="215" font-size="10" fill="#475569">Oct 27–30</text>
+<text x="34" y="241" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S3</tspan>  nginx + pm2 deploy, deploy.md</text>
+<line x1="24" y1="250" x2="1220" y2="250" stroke="#f1f5f9"/>
+<rect x="486" y="229" width="92" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<text x="584" y="241" font-size="10" fill="#475569">Oct 31 – Nov 2</text>
+<text x="34" y="267" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S4</tspan>  CI on PRs (typecheck/build/test)</text>
+<line x1="24" y1="276" x2="1220" y2="276" stroke="#f1f5f9"/>
+<rect x="518" y="255" width="92" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<text x="616" y="267" font-size="10" fill="#475569">Nov 1–3</text>
+<text x="34" y="293" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S5</tspan>  Use case diagram</text>
+<line x1="24" y1="302" x2="1220" y2="302" stroke="#f1f5f9"/>
+<rect x="518" y="281" width="124" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<text x="648" y="293" font-size="10" fill="#475569">Nov 1–4</text>
+<text x="34" y="319" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S6</tspan>  Sequence diagram (register/verify)</text>
+<line x1="24" y1="328" x2="1220" y2="328" stroke="#f1f5f9"/>
+<rect x="646" y="307" width="124" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<text x="776" y="319" font-size="10" fill="#475569">Nov 5–8</text>
+<text x="34" y="345" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S7</tspan>  Slide deck</text>
+<line x1="24" y1="354" x2="1220" y2="354" stroke="#f1f5f9"/>
+<rect x="678" y="333" width="252" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<text x="936" y="345" font-size="10" fill="#475569">Nov 6–13</text>
+<text x="34" y="371" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S8</tspan>  Rehearsals, USB, campus domain check</text>
+<line x1="24" y1="380" x2="1220" y2="380" stroke="#f1f5f9"/>
+<rect x="870" y="359" width="124" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<text x="1000" y="371" font-size="10" fill="#475569">Nov 12–15</text>
+<text x="34" y="397" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S9</tspan>  Standups, Gantt upkeep, commit checks</text>
+<line x1="24" y1="406" x2="1220" y2="406" stroke="#f1f5f9"/>
+<rect x="358" y="385" width="636" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<text x="1000" y="397" font-size="10" fill="#475569">Oct 27 – Nov 15</text>
+<rect x="24" y="407" width="292" height="24" rx="3" fill="#0891b2"/>
+<text x="34" y="423" font-size="12" font-weight="700" fill="#ffffff">Noah: Database + Search</text>
+<rect x="324" y="406" width="896" height="26" fill="#0891b2" fill-opacity="0.06"/>
+<text x="34" y="449" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N1</tspan>  Atlas cluster, app user, allowlist</text>
+<line x1="24" y1="458" x2="1220" y2="458" stroke="#f1f5f9"/>
+<rect x="358" y="437" width="92" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<text x="456" y="449" font-size="10" fill="#475569">Oct 27–29</text>
+<text x="34" y="475" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N2</tspan>  Country dataset + seed script</text>
+<line x1="24" y1="484" x2="1220" y2="484" stroke="#f1f5f9"/>
+<rect x="454" y="463" width="124" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<text x="584" y="475" font-size="10" fill="#475569">Oct 30 – Nov 2</text>
+<text x="34" y="501" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N3</tspan>  Data model doc + indexes</text>
+<line x1="24" y1="510" x2="1220" y2="510" stroke="#f1f5f9"/>
+<rect x="454" y="489" width="156" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<text x="616" y="501" font-size="10" fill="#475569">Oct 30 – Nov 3</text>
+<text x="34" y="527" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N4</tspan>  Country search endpoint</text>
+<line x1="24" y1="536" x2="1220" y2="536" stroke="#f1f5f9"/>
+<rect x="582" y="515" width="92" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<text x="680" y="527" font-size="10" fill="#475569">Nov 3–5</text>
+<text x="34" y="553" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N5</tspan>  ERD</text>
+<line x1="24" y1="562" x2="1220" y2="562" stroke="#f1f5f9"/>
+<rect x="614" y="541" width="156" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<text x="776" y="553" font-size="10" fill="#475569">Nov 4–8</text>
+<text x="34" y="579" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N6</tspan>  OpenAPI spec + SwaggerHub live</text>
+<line x1="24" y1="588" x2="1220" y2="588" stroke="#f1f5f9"/>
+<rect x="678" y="567" width="156" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<text x="840" y="579" font-size="10" fill="#475569">Nov 6–10</text>
+<text x="34" y="605" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N7</tspan>  Search integration tests</text>
+<line x1="24" y1="614" x2="1220" y2="614" stroke="#f1f5f9"/>
+<rect x="678" y="593" width="188" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<text x="872" y="605" font-size="10" fill="#475569">Nov 6–11</text>
+<rect x="24" y="615" width="292" height="24" rx="3" fill="#ea580c"/>
+<text x="34" y="631" font-size="12" font-weight="700" fill="#ffffff">Sebastian: API + Auth</text>
+<rect x="324" y="614" width="896" height="26" fill="#ea580c" fill-opacity="0.06"/>
+<text x="34" y="657" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B1</tspan>  API contract + shared zod schemas</text>
+<line x1="24" y1="666" x2="1220" y2="666" stroke="#f1f5f9"/>
+<rect x="358" y="645" width="124" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<text x="488" y="657" font-size="10" fill="#475569">Oct 27–30</text>
+<text x="34" y="683" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B2</tspan>  Email provider + sendMail()</text>
+<line x1="24" y1="692" x2="1220" y2="692" stroke="#f1f5f9"/>
+<rect x="486" y="671" width="92" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<text x="584" y="683" font-size="10" fill="#475569">Oct 31 – Nov 2</text>
+<text x="34" y="709" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B3</tspan>  Register, verify, login, JWT</text>
+<line x1="24" y1="718" x2="1220" y2="718" stroke="#f1f5f9"/>
+<rect x="486" y="697" width="156" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<text x="648" y="709" font-size="10" fill="#475569">Oct 31 – Nov 4</text>
+<text x="34" y="735" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B4</tspan>  Forgot / reset password</text>
+<line x1="24" y1="744" x2="1220" y2="744" stroke="#f1f5f9"/>
+<rect x="582" y="723" width="124" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<text x="712" y="735" font-size="10" fill="#475569">Nov 3–6</text>
+<text x="34" y="761" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B5</tspan>  Game start + guess + scoring</text>
+<line x1="24" y1="770" x2="1220" y2="770" stroke="#f1f5f9"/>
+<rect x="646" y="749" width="124" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<text x="776" y="761" font-size="10" fill="#475569">Nov 5–8</text>
+<text x="34" y="787" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B6</tspan>  API tests (Vitest + supertest)</text>
+<line x1="24" y1="796" x2="1220" y2="796" stroke="#f1f5f9"/>
+<rect x="774" y="775" width="124" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<text x="904" y="787" font-size="10" fill="#475569">Nov 9–12</text>
+<text x="34" y="813" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B7</tspan>  Rate limits, errors, remove demo</text>
+<line x1="24" y1="822" x2="1220" y2="822" stroke="#f1f5f9"/>
+<rect x="774" y="801" width="92" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<text x="872" y="813" font-size="10" fill="#475569">Nov 9–11</text>
+<rect x="24" y="823" width="292" height="24" rx="3" fill="#2563eb"/>
+<text x="34" y="839" font-size="12" font-weight="700" fill="#ffffff">John: Web (React)</text>
+<rect x="324" y="822" width="896" height="26" fill="#2563eb" fill-opacity="0.06"/>
+<text x="34" y="865" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J1</tspan>  Figma web prototype + design tokens</text>
+<line x1="24" y1="874" x2="1220" y2="874" stroke="#f1f5f9"/>
+<rect x="358" y="853" width="156" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<text x="520" y="865" font-size="10" fill="#475569">Oct 27–31</text>
+<text x="34" y="891" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J2</tspan>  Auth pages + protected routes</text>
+<line x1="24" y1="900" x2="1220" y2="900" stroke="#f1f5f9"/>
+<rect x="518" y="879" width="156" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<text x="680" y="891" font-size="10" fill="#475569">Nov 1–5</text>
+<text x="34" y="917" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J3</tspan>  Game page (autocomplete, guesses)</text>
+<line x1="24" y1="926" x2="1220" y2="926" stroke="#f1f5f9"/>
+<rect x="678" y="905" width="156" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<text x="840" y="917" font-size="10" fill="#475569">Nov 6–10</text>
+<text x="34" y="943" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J4</tspan>  Leaderboard (paginated) + header</text>
+<line x1="24" y1="952" x2="1220" y2="952" stroke="#f1f5f9"/>
+<rect x="774" y="931" width="92" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<text x="872" y="943" font-size="10" fill="#475569">Nov 9–11</text>
+<text x="34" y="969" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J5</tspan>  Responsive, a11y, component tests</text>
+<line x1="24" y1="978" x2="1220" y2="978" stroke="#f1f5f9"/>
+<rect x="806" y="957" width="92" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<text x="904" y="969" font-size="10" fill="#475569">Nov 10–12</text>
+<text x="34" y="995" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J6</tspan>  Activity diagram (game round)</text>
+<line x1="24" y1="1004" x2="1220" y2="1004" stroke="#f1f5f9"/>
+<rect x="774" y="983" width="124" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<text x="904" y="995" font-size="10" fill="#475569">Nov 9–12</text>
+<rect x="24" y="1005" width="292" height="24" rx="3" fill="#db2777"/>
+<text x="34" y="1021" font-size="12" font-weight="700" fill="#ffffff">Arwa: Mobile (Flutter) + API</text>
+<rect x="324" y="1004" width="896" height="26" fill="#db2777" fill-opacity="0.06"/>
+<text x="34" y="1047" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A1</tspan>  Flutter SDK + emulator + scaffold</text>
+<line x1="24" y1="1056" x2="1220" y2="1056" stroke="#f1f5f9"/>
+<rect x="358" y="1035" width="124" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<text x="488" y="1047" font-size="10" fill="#475569">Oct 27–30</text>
+<text x="34" y="1073" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A2</tspan>  Figma mobile prototype</text>
+<line x1="24" y1="1082" x2="1220" y2="1082" stroke="#f1f5f9"/>
+<rect x="390" y="1061" width="156" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<text x="552" y="1073" font-size="10" fill="#475569">Oct 28 – Nov 1</text>
+<text x="34" y="1099" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A3</tspan>  API: /users/me + /leaderboard</text>
+<line x1="24" y1="1108" x2="1220" y2="1108" stroke="#f1f5f9"/>
+<rect x="646" y="1087" width="124" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<text x="776" y="1099" font-size="10" fill="#475569">Nov 5–8</text>
+<text x="34" y="1125" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A4</tspan>  Mobile auth screens + token storage</text>
+<line x1="24" y1="1134" x2="1220" y2="1134" stroke="#f1f5f9"/>
+<rect x="486" y="1113" width="188" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<text x="680" y="1125" font-size="10" fill="#475569">Oct 31 – Nov 5</text>
+<text x="34" y="1151" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A5</tspan>  Mobile game screen</text>
+<line x1="24" y1="1160" x2="1220" y2="1160" stroke="#f1f5f9"/>
+<rect x="678" y="1139" width="156" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<text x="840" y="1151" font-size="10" fill="#475569">Nov 6–10</text>
+<text x="34" y="1177" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A6</tspan>  Mobile leaderboard + class diagram</text>
+<line x1="24" y1="1186" x2="1220" y2="1186" stroke="#f1f5f9"/>
+<rect x="774" y="1165" width="124" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<text x="904" y="1177" font-size="10" fill="#475569">Nov 9–12</text>
+<text x="34" y="1203" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A7</tspan>  Widget tests + release APK</text>
+<line x1="24" y1="1212" x2="1220" y2="1212" stroke="#f1f5f9"/>
+<rect x="838" y="1191" width="92" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<text x="936" y="1203" font-size="10" fill="#475569">Nov 11–13</text>
+<rect x="24" y="1213" width="292" height="24" rx="3" fill="#1e293b"/>
+<text x="34" y="1229" font-size="12" font-weight="700" fill="#ffffff">Team milestones</text>
+<rect x="324" y="1212" width="896" height="26" fill="#1e293b" fill-opacity="0.06"/>
+<text x="34" y="1255" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">M1</tspan>  M1 Domain live on HTTPS</text>
+<line x1="24" y1="1264" x2="1220" y2="1264" stroke="#f1f5f9"/>
+<polygon points="500,1243 508,1251 500,1259 492,1251" fill="#1e293b"/>
+<text x="513" y="1255" font-size="10" fill="#475569">Oct 31</text>
+<text x="34" y="1281" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">M2</tspan>  M2 Sign-up + email verify live</text>
+<line x1="24" y1="1290" x2="1220" y2="1290" stroke="#f1f5f9"/>
+<polygon points="628,1269 636,1277 628,1285 620,1277" fill="#1e293b"/>
+<text x="641" y="1281" font-size="10" fill="#475569">Nov 4</text>
+<text x="34" y="1307" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">M3</tspan>  M3 Game API live, mobile login</text>
+<line x1="24" y1="1316" x2="1220" y2="1316" stroke="#f1f5f9"/>
+<polygon points="756,1295 764,1303 756,1311 748,1303" fill="#1e293b"/>
+<text x="769" y="1307" font-size="10" fill="#475569">Nov 8</text>
+<text x="34" y="1333" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">M4</tspan>  M4 Feature freeze</text>
+<line x1="24" y1="1342" x2="1220" y2="1342" stroke="#f1f5f9"/>
+<polygon points="852,1321 860,1329 852,1337 844,1329" fill="#1e293b"/>
+<text x="865" y="1333" font-size="10" fill="#475569">Nov 11</text>
+<text x="34" y="1359" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">M5</tspan>  M5 Deck, tests, diagrams done</text>
+<line x1="24" y1="1368" x2="1220" y2="1368" stroke="#f1f5f9"/>
+<polygon points="916,1347 924,1355 916,1363 908,1355" fill="#1e293b"/>
+<text x="929" y="1359" font-size="10" fill="#475569">Nov 13</text>
+<text x="34" y="1385" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">M6</tspan>  M6 All 5 submitted to WebCourses</text>
+<line x1="24" y1="1394" x2="1220" y2="1394" stroke="#f1f5f9"/>
+<polygon points="948,1373 956,1381 948,1389 940,1381" fill="#1e293b"/>
+<text x="961" y="1385" font-size="10" fill="#475569">Nov 14</text>
+<text x="34" y="1411" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">M7</tspan>  DUE 11:59 pm (WebCourses)</text>
+<line x1="24" y1="1420" x2="1220" y2="1420" stroke="#f1f5f9"/>
+<polygon points="980,1399 988,1407 980,1415 972,1407" fill="#1e293b"/>
+<text x="993" y="1411" font-size="10" fill="#475569">Nov 15</text>
+<text x="34" y="1437" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">PW</tspan>  Presentation window (TBD)</text>
+<line x1="24" y1="1446" x2="1220" y2="1446" stroke="#f1f5f9"/>
+<rect x="998" y="1425" width="156" height="16" rx="4" fill="url(#hatch)" stroke="#94a3b8"/>
+<text x="992" y="1437" font-size="10" text-anchor="end" fill="#475569">Nov 16–20</text>
+<line x1="372" y1="104" x2="372" y2="1446" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 3"/>
+<rect x="324" y="1466" width="28" height="14" rx="3" fill="#64748b" fill-opacity="0.28" stroke="#64748b"/><text x="360" y="1477" font-size="11" fill="#334155">Planned</text>
+<text x="24" y="1477" font-size="11" fill="#64748b">Generated by docs/pm/gantt.mjs</text>
+</svg>

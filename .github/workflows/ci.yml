@@ -1,0 +1,58 @@
+# Runs on every PR into main (and every push to main). Branch protection on main
+# requires the "Web + API" job to pass before a PR can merge. See docs/pm/ci.md.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# A new push to the same PR cancels the run that's still going
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web-api:
+    name: Web + API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Uses the pnpm version pinned in package.json ("packageManager")
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build
+      # Runs every package's "test" script; packages without one are skipped
+      - run: pnpm test
+        env:
+          NODE_ENV: test
+
+  mobile:
+    name: Mobile (Flutter)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter analyze
+      # Only runs once apps/mobile/test exists
+      - run: flutter test
+        if: hashFiles('apps/mobile/test/**') != ''

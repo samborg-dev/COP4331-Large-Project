@@ -1,0 +1,66 @@
+@startuml sequence-register-verify
+' Sequence diagram: register -> verify email -> log in. Owner: Sam; Sebastian checks it against the real API.
+' Render at https://www.plantuml.com/plantuml or with the VS Code PlantUML extension.
+title Register, verify email, and log in
+
+autonumber
+skinparam shadowing false
+skinparam sequenceMessageAlign left
+
+actor Player
+participant "Web / Mobile app" as App
+participant "Express API" as API
+database "MongoDB" as DB
+participant "Email service" as Mail
+
+== Register ==
+Player -> App : Enter name, email, password
+App -> API : POST /api/auth/register\n{ firstName, lastName, email, password }
+API -> API : Validate body (zod)
+API -> DB : users.findOne({ email })
+alt email already registered
+  DB --> API : existing user
+  API --> App : 409 { error: "Email already in use" }
+  App --> Player : Show error
+else new email
+  DB --> API : null
+  API -> API : bcrypt.hash(password)
+  API -> DB : users.insertOne({ ..., emailVerified: false })
+  API -> API : Generate random token, SHA-256 hash it
+  API -> DB : tokens.insertOne({ userId, type: "verify",\ntokenHash, expiresAt: now + 24h })
+  API -> Mail : Send link https://DOMAIN/verify-email?token=RAW_TOKEN
+  API --> App : 201 { message: "Check your email" }
+  App --> Player : "Check your inbox"
+end
+
+== Verify email ==
+Mail -> Player : Verification email
+Player -> App : Open link (web page /verify-email?token=...)
+App -> API : POST /api/auth/verify-email { token }
+API -> DB : tokens.findOne({ tokenHash, type: "verify",\nexpiresAt > now })
+alt token valid
+  API -> DB : users.updateOne({ emailVerified: true })
+  API -> DB : tokens.deleteOne()
+  API --> App : 200 { message: "Email verified" }
+  App --> Player : "Verified, you can log in"
+else missing or expired
+  API --> App : 400 { error: "Link invalid or expired" }
+  App --> Player : Offer "Resend verification email"
+end
+
+== Log in ==
+Player -> App : Enter email, password
+App -> API : POST /api/auth/login { email, password }
+API -> DB : users.findOne({ email })
+API -> API : bcrypt.compare(password, passwordHash)
+alt no user or wrong password
+  API --> App : 401 { error: "Invalid email or password" }
+else not verified
+  API --> App : 403 { error: "Verify your email first" }
+else success
+  API -> API : Sign JWT { userId } (expires in 30 min)
+  API --> App : 200 { accessToken, user }
+  App -> App : Store token (localStorage / flutter_secure_storage)
+  App --> Player : Show game screen
+end
+@enduml
