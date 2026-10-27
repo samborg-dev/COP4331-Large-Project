@@ -1,0 +1,57 @@
+@startuml use-case
+' Use case diagram. Owner: Sam. Render at https://www.plantuml.com/plantuml or with the VS Code PlantUML extension.
+title Country Distance Guessing Game: Use Case Diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #f8fafc
+  BorderColor #1e293b
+}
+
+actor "Visitor\n(not logged in)" as Visitor
+actor "Player\n(logged in)" as Player
+actor "Email Service" as Mail <<system>>
+
+rectangle "Country Distance Guessing Game (web + mobile)" {
+  usecase "Register account" as Register
+  usecase "Verify email" as Verify
+  usecase "Resend verification email" as Resend
+  usecase "Log in" as Login
+  usecase "Reset forgotten password" as Reset
+  usecase "Send verification email" as SendVerify
+  usecase "Send password-reset email" as SendReset
+
+  usecase "Play a round" as Play
+  usecase "Submit a guess" as Guess
+  usecase "Search countries\n(partial match)" as Search
+  usecase "Get distance range" as Feedback
+  usecase "Earn points" as Points
+  usecase "View leaderboard" as Leaderboard
+  usecase "View profile and points" as Profile
+  usecase "Log out" as Logout
+}
+
+Visitor --> Register
+Visitor --> Verify
+Visitor --> Login
+Visitor --> Reset
+
+Register ..> SendVerify : <<include>>
+Resend .> Login : <<extend>>\n(account not verified)
+Resend ..> SendVerify : <<include>>
+Reset ..> SendReset : <<include>>
+SendVerify --> Mail
+SendReset --> Mail
+
+Player --> Play
+Player --> Leaderboard
+Player --> Profile
+Player --> Logout
+
+Play ..> Guess : <<include>>
+Guess ..> Search : <<include>>
+Guess ..> Feedback : <<include>>
+Points .> Guess : <<extend>>\n(correct guess)
+@enduml
