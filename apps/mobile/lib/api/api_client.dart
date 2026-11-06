@@ -23,6 +23,7 @@ class ApiClient {
   static const _envUrl = String.fromEnvironment('API_URL');
   static const _storage = FlutterSecureStorage();
   static const _tokenKey = 'token_data';
+  static const _userKey = 'user_data';
 
   static String get baseUrl {
     if (_envUrl.isNotEmpty) return _envUrl;
@@ -82,14 +83,22 @@ class ApiClient {
 
   Future<String?> get token => _storage.read(key: _tokenKey);
 
-  /// Decoded JWT payload: userId, firstName, lastName.
+  /// The JWT payload merged with the `user` object saved at login, so
+  /// firstName/lastName are there even when the token only carries userId.
   Future<Map<String, dynamic>?> currentUser() async {
     final t = await token;
     if (t == null || JwtDecoder.isExpired(t)) return null;
-    return JwtDecoder.decode(t);
+    final saved = await _storage.read(key: _userKey);
+    return {
+      ...JwtDecoder.decode(t),
+      if (saved != null) ...jsonDecode(saved) as Map<String, dynamic>,
+    };
   }
 
-  Future<void> logout() => _storage.delete(key: _tokenKey);
+  Future<void> logout() async {
+    await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: _userKey);
+  }
 
   /// Stores the JWT on success. Throws [ApiException]; a 403 means the
   /// account exists but the email hasn't been verified yet.
@@ -104,6 +113,12 @@ class ApiClient {
     final accessToken = json['accessToken'];
     if (accessToken is! String) throw ApiException(status, 'Login failed');
     await _storeToken({'accessToken': accessToken});
+    final user = json['user'];
+    if (user is Map<String, dynamic>) {
+      await _storage.write(key: _userKey, value: jsonEncode(user));
+    } else {
+      await _storage.delete(key: _userKey);
+    }
   }
 
   /// Creates an unverified account; the server emails a verification link.
