@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
-    "mail:test": "tsx scripts/send-test-email.ts"
+    "mail:test": "tsx scripts/send-test-email.ts",
+    "user:verify": "tsx scripts/verify-user.ts"
   },
   "dependencies": {
     "@cop4331/shared": "workspace:*",
