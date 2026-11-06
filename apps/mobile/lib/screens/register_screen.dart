@@ -163,8 +163,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         LoadingButton(label: 'Sign Up', loading: _loading, onPressed: _doRegister),
         FormMessage(_message),
         const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             const Text('Already have an account?'),
             TextButton(
