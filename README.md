@@ -29,7 +29,23 @@ The demo expects a `Users` collection (`UserId`, `FirstName`, `LastName`, `Login
 | `POST /api/addcard` | `userId`, `card`, `jwtToken` | returns refreshed `jwtToken` |
 | `POST /api/searchcards` | `userId`, `search`, `jwtToken` | server-side partial, case-insensitive match |
 
-Contracts live in `packages/shared/src/index.ts`. `GET /health` is a liveness check.
+Contracts live in `packages/shared/src/index.ts`.
+
+## Auth API (`/api/auth/*`)
+
+Real HTTP status codes; errors are `{ "error": "..." }`.
+
+| Endpoint | Body | Success | Errors |
+| --- | --- | --- | --- |
+| `POST /api/auth/register` | `firstName`, `lastName`, `email`, `password` (8+) | 201, sends verification email | 400, 409 email taken |
+| `POST /api/auth/verify-email` | `token` | 200 | 400 invalid/expired/used |
+| `POST /api/auth/resend-verification` | `email` | always 200 | 400 |
+| `POST /api/auth/login` | `email`, `password` | 200 `{ accessToken, user }` | 401 bad email or password, 403 not verified |
+| `POST /api/auth/forgot-password` | `email` | always 200, sends reset email | 400 |
+| `POST /api/auth/reset-password` | `token`, `password` | 200 | 400 invalid/expired/used |
+
+Locally, without `RESEND_API_KEY`, emails (with their links) are printed in the API console. Until the web `/verify-email` page exists, verify an account with `pnpm --filter @cop4331/api user:verify <email>`.
+ `GET /health` is a liveness check.
 
 ## Mobile (Flutter)
 
