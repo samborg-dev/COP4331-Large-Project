@@ -1,21 +1,34 @@
-import cors from 'cors';
 import express from 'express';
-import { setApp } from './api.js';
-import { connectDb } from './db.js';
-import { env } from './env.js';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { connectDB } from './db';
+import authRouter from './routes/auth';
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.get('/health', (_req, res) => {
-  res.json({ ok: true });
+  res.status(200).json({ status: 'ok' });
 });
 
-setApp(app);
+app.use('/api/auth', authRouter);
 
-connectDb().catch((err) => console.error('MongoDB connection failed:', err.message));
+const PORT = process.env.PORT || 5000;
 
-app.listen(env.PORT, () => {
-  console.log(`API listening on port ${env.PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`API listening on port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error('MongoDB connection failed:', err);
+      process.exit(1);
+    });
+}
+
+export default app;
