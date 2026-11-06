@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import { setApp } from './api.js';
+import { ensureAuthIndexes, setAuthRoutes } from './auth.js';
 import { connectDb } from './db.js';
 import { env } from './env.js';
 
@@ -13,8 +14,11 @@ app.get('/health', (_req, res) => {
 });
 
 setApp(app);
+setAuthRoutes(app);
 
-connectDb().catch((err) => console.error('MongoDB connection failed:', err.message));
+connectDb()
+  .then(ensureAuthIndexes)
+  .catch((err) => console.error('MongoDB connection failed:', err.message));
 
 app.listen(env.PORT, () => {
   console.log(`API listening on port ${env.PORT}`);
