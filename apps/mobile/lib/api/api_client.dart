@@ -91,14 +91,48 @@ class ApiClient {
 
   Future<void> logout() => _storage.delete(key: _tokenKey);
 
-  /// Returns null on success, otherwise an error message.
-  Future<String?> login(String login, String password) async {
-    final res = await _post('api/login', {'login': login, 'password': password});
-    if (res['error'] != null || res['accessToken'] == null) {
-      return (res['error'] as String?) ?? 'Login failed';
+  /// Stores the JWT on success. Throws [ApiException]; a 403 means the
+  /// account exists but the email hasn't been verified yet.
+  Future<void> login(String email, String password) async {
+    var (status, json) = await _send('api/auth/login', {'email': email, 'password': password});
+    // TODO(arwa): remove once /api/auth/login is merged. Until then, fall back
+    // to the course demo route, which takes a username instead of an email.
+    if (status == 404) {
+      (status, json) = await _send('api/login', {'login': email, 'password': password});
     }
-    await _storeToken({'accessToken': res['accessToken']});
-    return null;
+    _throwIfError(status, json);
+    final accessToken = json['accessToken'];
+    if (accessToken is! String) throw ApiException(status, 'Login failed');
+    await _storeToken({'accessToken': accessToken});
+  }
+
+  /// Creates an unverified account; the server emails a verification link.
+  /// Throws [ApiException] (409 if the email is already registered).
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+  }) async {
+    final (status, json) = await _send('api/auth/register', {
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'password': password,
+    });
+    _throwIfError(status, json);
+  }
+
+  /// Always succeeds server-side for a valid email (no account enumeration).
+  Future<void> resendVerification(String email) async {
+    final (status, json) = await _send('api/auth/resend-verification', {'email': email});
+    _throwIfError(status, json);
+  }
+
+  /// Emails a reset link that opens the web app. Always 200 for a valid email.
+  Future<void> forgotPassword(String email) async {
+    final (status, json) = await _send('api/auth/forgot-password', {'email': email});
+    _throwIfError(status, json);
   }
 
   /// Returns null on success, otherwise an error message.

@@ -25,13 +25,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _doLogin() async {
     try {
-      final error = await widget.api.login(_login.text, _password.text);
+      await widget.api.login(_login.text, _password.text);
       if (!mounted) return;
-      if (error != null) {
-        setState(() => _message = 'User/Password combination incorrect');
-        return;
-      }
       Navigator.pushReplacementNamed(context, '/cards');
+    } on ApiException {
+      if (mounted) setState(() => _message = 'User/Password combination incorrect');
     } catch (e) {
       if (mounted) setState(() => _message = e.toString());
     }
