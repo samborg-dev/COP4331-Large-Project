@@ -5,6 +5,17 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 
+/// An error response from the API: `{ "error": "..." }` plus the HTTP status.
+class ApiException implements Exception {
+  ApiException(this.statusCode, this.message);
+
+  final int statusCode;
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 /// Mirrors the contracts in packages/shared (apps/api REST endpoints).
 ///
 /// Override the server with: flutter run --dart-define=API_URL=https://your-domain.com:5000
@@ -29,6 +40,38 @@ class ApiClient {
       body: jsonEncode(body),
     );
     return jsonDecode(res.body) as Map<String, dynamic>;
+  }
+
+  /// Like [_post], but keeps the HTTP status, tolerates non-JSON bodies
+  /// (e.g. Express's HTML 404 page), and logs out on a 401.
+  Future<(int, Map<String, dynamic>)> _send(String route, Map<String, dynamic> body) async {
+    final res = await http
+        .post(
+          Uri.parse('$baseUrl/$route'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(body),
+        )
+        .timeout(const Duration(seconds: 15));
+    if (res.statusCode == 401) await logout();
+    Map<String, dynamic> json = {};
+    try {
+      final decoded = jsonDecode(res.body);
+      if (decoded is Map<String, dynamic>) json = decoded;
+    } on FormatException {
+      // not JSON; fall through with an empty body
+    }
+    return (res.statusCode, json);
+  }
+
+  /// Throws [ApiException] for a non-2xx status or a non-empty `error` field.
+  void _throwIfError(int status, Map<String, dynamic> json) {
+    final error = json['error'];
+    if (status >= 400 || (error is String && error.isNotEmpty)) {
+      throw ApiException(
+        status,
+        error is String && error.isNotEmpty ? error : 'Something went wrong (HTTP $status)',
+      );
+    }
   }
 
   Future<void> _storeToken(Object? jwtToken) async {
