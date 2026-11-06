@@ -4,6 +4,7 @@ import 'api/api_client.dart';
 import 'screens/cards_screen.dart';
 import 'screens/check_inbox_screen.dart';
 import 'screens/forgot_password_screen.dart';
+import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 
@@ -27,6 +28,7 @@ class App extends StatelessWidget {
         '/register': (_) => RegisterScreen(api: api),
         '/check-inbox': (_) => CheckInboxScreen(api: api),
         '/forgot-password': (_) => ForgotPasswordScreen(api: api),
+        '/home': (_) => HomeScreen(api: api),
         '/cards': (_) => CardsScreen(api: api),
       },
     );

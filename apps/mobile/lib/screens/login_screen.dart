@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await widget.api.login(email, _password.text);
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/cards');
+      Navigator.pushReplacementNamed(context, '/home');
     } on ApiException catch (e) {
       if (!mounted) return;
       if (e.statusCode == 403) {
