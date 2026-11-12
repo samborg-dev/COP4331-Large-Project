@@ -11,6 +11,8 @@ import {
 } from '@cop4331/shared';
 import { createToken, isExpired, refresh } from './createJWT.js';
 import { getDb } from './db.js';
+import gamesRouter from './routes/games';
+
 
 const INVALID_JWT = 'The JWT is no longer valid';
 const BAD_REQUEST = 'Invalid request body';
@@ -18,6 +20,7 @@ const BAD_REQUEST = 'Invalid request body';
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export function setApp(app: Express): void {
+  app.use('/api/games', gamesRouter);
   app.post('/api/login', async (req, res) => {
     const parsed = loginRequestSchema.safeParse(req.body);
     if (!parsed.success) {
