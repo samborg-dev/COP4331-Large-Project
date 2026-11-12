@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import countries from './countriesModel.js';
 
-const ATLAS_URI = "mongodb+srv://Large_Project_User:Cop4331C@cluster0.jlixyxr.mongodb.net/Large_Project_DB?retryWrites=true&w=majority";
+const ATLAS_URI = "FakeURI";
 
 function escapeRegex(string) {
     return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
