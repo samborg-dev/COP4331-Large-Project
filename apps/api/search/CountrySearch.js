@@ -1,32 +1,28 @@
+import dotenv from 'dotenv';
+import express from 'express';
 import mongoose from 'mongoose';
 import countries from './countriesModel.js';
-
-const ATLAS_URI = "mongodb+srv://Large_Project_User:Cop4331C@cluster0.jlixyxr.mongodb.net/Large_Project_DB?retryWrites=true&w=majority";
-
-function escapeRegex(string) {
-    return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
-}
-
-
+dotenv.config({path:'../../../.env'});
+const ATLAS_URI = process.env.MONGO_URI;
 
 export async function CountrySearch(countryName) {
   try {
-    
+   console.log(ATLAS_URI);
+
     await mongoose.connect(ATLAS_URI);
-    console.log("Connected to MongoDB Atlas!");
-   const input = escapeRegex(countryName);
+   
     const pipeline = [
   {
     $search: {
       index: "name",
       autocomplete: {
-        query: input,
+        query: countryName,
         path: "COUNTRY",
       },
     },
   },
 ]
-   
+
   const fullResults = await countries.aggregate(pipeline);
   const results = fullResults.slice(0,10);
   return results;
@@ -41,3 +37,4 @@ export async function CountrySearch(countryName) {
     mongoose.disconnect();
   }
 }
+
