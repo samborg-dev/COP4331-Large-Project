@@ -1,22 +1,26 @@
-export {};
-import mongoose from 'mongoose';
+import { ObjectId } from 'mongodb';
 
-const countriesSchema = new mongoose.Schema({
-  type: { type: String, required: true },
-  features: [{
-    type: { type: String, required: true },
-    geometry: {
-      type: { type: String, required: true },
-      coordinates: { type: [Number], required: true }
-    },
-    properties: {
-      AFF_ISO: { type: String, required: true },
-      COUNTRY: { type: String, required: true },
-      COUNTRYAFF: { type: String, required: true },
-      ISO: { type: String, required: true }
-    }
-  }]
-});
+export interface CountryFeature {
+  type: string;
+  geometry: {
+    type: string;
+    coordinates: [number, number]; // [lng, lat]
+  };
+  properties: {
+    AFF_ISO: string;
+    COUNTRY: string;
+    COUNTRYAFF: string;
+    ISO: string;
+  };
+}
 
-const Country = mongoose.model('Country', countriesSchema);
-export default Country;
+export interface CountryDoc {
+  _id?: ObjectId;
+  type?: string;
+  features?: CountryFeature[];
+  // Supports flat country documents if imported via idempotentImport.js
+  name?: string;
+  iso?: string;
+  lat?: number;
+  lng?: number;
+}
