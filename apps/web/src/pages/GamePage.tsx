@@ -1,10 +1,81 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { Link, useLocation } from "react-router-dom";
 import type { SubmitGuessInput } from "@cop4331/shared";
-import { api } from "../api";
+import { api, readPlayer } from "../api";
 import { CountrySearch, type CountryOption } from "../components/CountrySearch";
 import { GuessHistory, RoundResult } from "../components/RoundUI";
 import { guessResponseSchema, startRoundSchema, type Round } from "../round";
+
+function useGameState(initialPoints?: number) {
+  const [round, setRound] = useState<Round | null>(null);
+  const [points, setPoints] = useState(initialPoints);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const requestPending = useRef(false);
+
+  function beginRequest() {
+    if (requestPending.current) return false;
+    requestPending.current = true;
+    setBusy(true);
+    setError("");
+    return true;
+  }
+
+  function finishRequest() {
+    requestPending.current = false;
+    setBusy(false);
+  }
+
+  return {
+    round,
+    setRound,
+    points,
+    setPoints,
+    busy,
+    error,
+    setError,
+    beginRequest,
+    finishRequest,
+  };
+}
+
+const GameSessionContext = createContext<ReturnType<typeof useGameState> | null>(
+  null,
+);
+
+function GameSession({
+  children,
+  initialPoints,
+}: {
+  children: ReactNode;
+  initialPoints?: number;
+}) {
+  const state = useGameState(initialPoints);
+  return (
+    <GameSessionContext.Provider value={state}>
+      {children}
+    </GameSessionContext.Provider>
+  );
+}
+
+export function GameSessionProvider({ children }: { children: ReactNode }) {
+  // Navigation rechecks the session; changing accounts resets the saved round.
+  useLocation();
+  const player = readPlayer();
+  const sessionKey = player ? localStorage.getItem("token_data") : null;
+  return (
+    <GameSession key={sessionKey} initialPoints={player?.totalPoints}>
+      {children}
+    </GameSession>
+  );
+}
 
 export function GamePage({
   player,
@@ -13,16 +84,18 @@ export function GamePage({
   player?: { name: string; totalPoints?: number };
   onSignOut?: () => void;
 }) {
+  const session = useContext(GameSessionContext);
+  if (!session) throw new Error("GamePage requires GameSessionProvider");
+  const { setRound, setPoints, busy, setError, beginRequest, finishRequest } =
+    session;
+  const round = player ? session.round : null;
+  const points = player ? session.points : undefined;
+  const error = player ? session.error : "";
   const helpDialog = useRef<HTMLDialogElement>(null);
-  const requestPending = useRef(false);
   const restoreFocus = useRef(false);
   const searchInput = useRef<HTMLInputElement>(null);
   const startButton = useRef<HTMLButtonElement>(null);
   const playAgainButton = useRef<HTMLButtonElement>(null);
-  const [round, setRound] = useState<Round | null>(null);
-  const [points, setPoints] = useState(player?.totalPoints);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (busy || !restoreFocus.current) return;
@@ -36,11 +109,8 @@ export function GamePage({
   }, [busy, round, error]);
 
   async function startRound() {
-    if (requestPending.current) return;
-    requestPending.current = true;
+    if (!beginRequest()) return;
     restoreFocus.current = true;
-    setBusy(true);
-    setError("");
     try {
       const { gameId, maxGuesses } = startRoundSchema.parse(
         await api<unknown>("games", {}, true),
@@ -59,21 +129,18 @@ export function GamePage({
           : "The server returned an unexpected round.",
       );
     } finally {
-      requestPending.current = false;
-      setBusy(false);
+      finishRequest();
     }
   }
 
   async function submitGuess(country: CountryOption) {
-    if (!round || round.status !== "active" || requestPending.current) return;
+    if (!round || round.status !== "active" || busy) return;
     if (round.guesses.some((guess) => guess.countryId === country.id)) {
       setError("You already guessed that country.");
       return;
     }
-    requestPending.current = true;
+    if (!beginRequest()) return;
     restoreFocus.current = true;
-    setBusy(true);
-    setError("");
     try {
       const guess = guessResponseSchema.parse(
         await api<unknown>(
@@ -116,8 +183,7 @@ export function GamePage({
           : "The server returned an unexpected guess result.",
       );
     } finally {
-      requestPending.current = false;
-      setBusy(false);
+      finishRequest();
     }
   }
 
