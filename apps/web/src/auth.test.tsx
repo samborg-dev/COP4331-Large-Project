@@ -21,6 +21,7 @@ function show(path = "/") {
 }
 beforeEach(() => {
   localStorage.clear();
+  sessionStorage.clear();
 });
 afterEach(() => {
   cleanup();

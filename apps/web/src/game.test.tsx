@@ -10,6 +10,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { GuessHistory, RoundResult } from "./components/RoundUI";
 import { guessesLeft, type Round } from "./round";
+import { savedRoundKey } from "./api";
 import { GamePage, GameSessionProvider } from "./pages/GamePage";
 import App from "./App";
 import { LeaderboardPage, Rankings } from "./pages/LeaderboardPage";
@@ -19,6 +20,7 @@ vi.mock("./env", () => ({ env: { VITE_API_URL: "http://localhost:5000" } }));
 afterEach(() => {
   cleanup();
   localStorage.clear();
+  sessionStorage.clear();
   vi.unstubAllGlobals();
   window.history.replaceState(null, "", "/");
 });
@@ -106,6 +108,7 @@ describe("Round screens", () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Start round" }));
     const input = await screen.findByRole("combobox");
+    expect(localStorage.getItem(savedRoundKey("john"))).toBe("game-1");
     await waitFor(() => expect(document.activeElement).toBe(input));
     await user.type(input, "port");
     await user.click(await screen.findByRole("option", { name: "Portugal" }));
@@ -194,6 +197,7 @@ describe("Game navigation", () => {
     expect(screen.getByText("You found it!")).toBeTruthy();
     expect(screen.getByText("John · 100 pts")).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Sign out" }));
+    expect(localStorage.getItem(savedRoundKey("john"))).toBe("won-round");
     await user.type(screen.getByLabelText("Email address"), "other@example.com");
     await user.type(screen.getByLabelText("Password"), "password123");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
@@ -201,6 +205,120 @@ describe("Game navigation", () => {
     expect(screen.getByRole("button", { name: "Start round" })).toBeTruthy();
     expect(screen.queryByText("You found it!")).toBeNull();
     expect(screen.queryByText("Portugal")).toBeNull();
+  });
+});
+
+describe("Restoring a saved round", () => {
+  const snapshot = {
+    gameId: "saved-round",
+    status: "IN_PROGRESS",
+    maxGuesses: 6,
+    guessesUsed: 2,
+    guesses: [
+      { countryId: "ES", guessName: "Spain", range: "500–1,500 km" },
+      { countryId: "FR", guessName: "France", range: "< 500 km" },
+    ],
+  };
+
+  it("reloads the same player's round after signing out and signing back in", async () => {
+    keepLogin();
+    localStorage.setItem(savedRoundKey("john"), "saved-round");
+    window.history.replaceState(null, "", "/game");
+    const fetcher = vi.fn((url: string) => {
+      if (url.endsWith("games/saved-round")) return Promise.resolve(Response.json(snapshot));
+      if (url.endsWith("users/me")) return Promise.resolve(Response.json({ totalPoints: 25 }));
+      if (url.endsWith("auth/login")) return Promise.resolve(Response.json(signedInPlayer("John", 25)));
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(<App />);
+    await screen.findByText("4 guesses left");
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    expect(localStorage.getItem("token_data")).toBeNull();
+    expect(localStorage.getItem(savedRoundKey("john"))).toBe("saved-round");
+    expect(screen.queryByText("Spain")).toBeNull();
+    await user.type(screen.getByLabelText("Email address"), "john@example.com");
+    await user.type(screen.getByLabelText("Password"), "password123");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(await screen.findByText("4 guesses left")).toBeTruthy();
+    expect(screen.getByText("Spain")).toBeTruthy();
+    expect(screen.getByText("John · 25 pts")).toBeTruthy();
+    expect(fetcher.mock.calls.filter(([url]) => url.endsWith("games/saved-round"))).toHaveLength(2);
+  });
+
+  it.each(["IN_PROGRESS", "WON"])("reloads a %s round and uses the server's points without awarding them again", async (status) => {
+    keepLogin();
+    sessionStorage.setItem(savedRoundKey("john"), "saved-round");
+    window.history.replaceState(null, "", "/game");
+    const fetcher = vi.fn((url: string) => {
+      if (url.endsWith("games/saved-round")) return Promise.resolve(Response.json({
+        ...snapshot, status,
+        ...(status === "WON" ? { pointsEarned: 90, targetCountry: "France" } : {}),
+      }));
+      if (url.endsWith("users/me")) return Promise.resolve(Response.json({ totalPoints: 175 }));
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(<App />);
+    expect(await screen.findByText("4 guesses left")).toBeTruthy();
+    expect(screen.getByText("John · 175 pts")).toBeTruthy();
+    const history = screen.getByRole("region", { name: "Your guesses" });
+    expect(within(history).getByText("Spain")).toBeTruthy();
+    expect(within(history).getByText("France")).toBeTruthy();
+    expect(Boolean(screen.queryByText("You found it!"))).toBe(status === "WON");
+    expect(Boolean(screen.queryByRole("combobox"))).toBe(status === "IN_PROGRESS");
+    expect(screen.queryByRole("button", { name: "Start round" })).toBeNull();
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("preserves the saved round after a network failure and allows retrying", async () => {
+    keepLogin();
+    sessionStorage.setItem(savedRoundKey("john"), "saved-round");
+    window.history.replaceState(null, "", "/game");
+    let unavailable = true;
+    vi.stubGlobal("fetch", vi.fn((url: string) => {
+      if (url.endsWith("users/me")) return Promise.resolve(Response.json({ totalPoints: 20 }));
+      if (url.endsWith("games/saved-round")) {
+        return unavailable ? Promise.reject(new TypeError("Failed to fetch")) : Promise.resolve(Response.json(snapshot));
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    }));
+    render(<App />);
+    expect((await screen.findByRole("alert")).textContent).toContain("Could not reload");
+    expect(sessionStorage.getItem(savedRoundKey("john"))).toBe("saved-round");
+    expect(screen.queryByRole("button", { name: "Start round" })).toBeNull();
+    unavailable = false;
+    await userEvent.click(screen.getByRole("button", { name: "Try loading round again" }));
+    expect(await screen.findByText("4 guesses left")).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("allows a new round when the server says the saved round no longer exists", async () => {
+    keepLogin();
+    sessionStorage.setItem(savedRoundKey("john"), "deleted-round");
+    window.history.replaceState(null, "", "/game");
+    vi.stubGlobal("fetch", vi.fn((url: string) => Promise.resolve(
+      url.endsWith("users/me") ? Response.json({ totalPoints: 20 }) : Response.json({ error: "Game not found" }, { status: 404 }),
+    )));
+    render(<App />);
+    expect(await screen.findByRole("button", { name: "Start round" })).toBeTruthy();
+    expect(sessionStorage.getItem(savedRoundKey("john"))).toBeNull();
+    expect(screen.getByRole("alert").textContent).toContain("no longer available");
+  });
+
+  it("does not load a different account's saved round", () => {
+    const other = signedInPlayer("Other", 25);
+    localStorage.setItem("token_data", other.accessToken);
+    localStorage.setItem("user_data", JSON.stringify(other.user));
+    sessionStorage.setItem(savedRoundKey("john"), "johns-round");
+    window.history.replaceState(null, "", "/game");
+    const fetcher = vi.fn();
+    vi.stubGlobal("fetch", fetcher);
+    render(<App />);
+    expect(screen.getByText("Other · 25 pts")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Start round" })).toBeTruthy();
+    expect(fetcher).not.toHaveBeenCalled();
   });
 });
 

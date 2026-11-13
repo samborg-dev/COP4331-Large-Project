@@ -35,7 +35,10 @@ export class ApiError extends Error {
     this.status = status;
   }
 }
+export const savedRoundKey = (userId: string) => `countryguesser.round.${userId}`;
+
 export function clearSession() {
+  // Keep the per-account round ID so signing back in can reload it from the API.
   localStorage.removeItem("token_data");
   localStorage.removeItem("user_data");
 }

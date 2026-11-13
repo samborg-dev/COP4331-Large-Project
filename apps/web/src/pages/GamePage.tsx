@@ -8,20 +8,86 @@ import {
 } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { SubmitGuessInput } from "@cop4331/shared";
-import { api, readPlayer } from "../api";
+import { api, ApiError, readPlayer, savedRoundKey } from "../api";
 import { CountrySearch, type CountryOption } from "../components/CountrySearch";
 import { GuessHistory, RoundResult } from "../components/RoundUI";
-import { guessResponseSchema, startRoundSchema, type Round } from "../round";
+import { guessResponseSchema, savedRoundSchema, startRoundSchema, type Round } from "../round";
 
-function useGameState(initialPoints?: number) {
+function useGameState(initialPoints?: number, playerId?: string) {
+  const storageKey = playerId ? savedRoundKey(playerId) : null;
+  const [savedGameId] = useState(() => storageKey
+    ? localStorage.getItem(storageKey) ?? sessionStorage.getItem(storageKey)
+    : null);
   const [round, setRound] = useState<Round | null>(null);
   const [points, setPoints] = useState(initialPoints);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [restoring, setRestoring] = useState(Boolean(savedGameId));
+  const [restoreFailed, setRestoreFailed] = useState(false);
+  const [restoreAttempt, setRestoreAttempt] = useState(0);
   const requestPending = useRef(false);
 
+  useEffect(() => {
+    if (!savedGameId) return;
+    const controller = new AbortController();
+    async function restoreRound() {
+      try {
+        const [game, profile] = await Promise.allSettled([
+          api<unknown>(`games/${encodeURIComponent(savedGameId!)}`, undefined, true, controller.signal),
+          api<{ totalPoints?: unknown }>("users/me", undefined, true, controller.signal),
+        ]);
+        if (controller.signal.aborted) return;
+        if (game.status === "rejected") throw game.reason;
+        const restored = savedRoundSchema.parse(game.value);
+        if (restored.gameId !== savedGameId) throw new Error("The server returned a different round.");
+        if (storageKey) {
+          localStorage.setItem(storageKey, restored.gameId);
+          sessionStorage.removeItem(storageKey);
+        }
+        setRound(restored);
+        // Use the saved server total, rather than adding the same win again.
+        const total = profile.status === "fulfilled" ? profile.value?.totalPoints : undefined;
+        setPoints(typeof total === "number" && Number.isFinite(total) ? total : undefined);
+        setRestoreFailed(false);
+        setError("");
+      } catch (cause) {
+        if (controller.signal.aborted) return;
+        if (cause instanceof ApiError && [403, 404].includes(cause.status)) {
+          if (storageKey) {
+            localStorage.removeItem(storageKey);
+            sessionStorage.removeItem(storageKey);
+          }
+          setError("Your previous round is no longer available. You can start a new round.");
+          setRestoreFailed(false);
+        } else {
+          setError("Could not reload your saved round. Try again to keep your progress.");
+          setRestoreFailed(true);
+        }
+      } finally {
+        if (!controller.signal.aborted) setRestoring(false);
+      }
+    }
+    void restoreRound();
+    return () => controller.abort();
+  }, [savedGameId, storageKey, restoreAttempt]);
+
+  function saveRound(nextRound: Round) {
+    if (storageKey) {
+      localStorage.setItem(storageKey, nextRound.gameId);
+      sessionStorage.removeItem(storageKey);
+    }
+    setRound(nextRound);
+  }
+
+  function retryRestore() {
+    setRestoring(true);
+    setRestoreFailed(false);
+    setError("");
+    setRestoreAttempt((attempt) => attempt + 1);
+  }
+
   function beginRequest() {
-    if (requestPending.current) return false;
+    if (requestPending.current || restoring) return false;
     requestPending.current = true;
     setBusy(true);
     setError("");
@@ -35,10 +101,13 @@ function useGameState(initialPoints?: number) {
 
   return {
     round,
-    setRound,
+    setRound: saveRound,
     points,
     setPoints,
-    busy,
+    busy: busy || restoring,
+    restoring,
+    restoreFailed,
+    retryRestore,
     error,
     setError,
     beginRequest,
@@ -53,11 +122,13 @@ const GameSessionContext = createContext<ReturnType<typeof useGameState> | null>
 function GameSession({
   children,
   initialPoints,
+  playerId,
 }: {
   children: ReactNode;
   initialPoints?: number;
+  playerId?: string;
 }) {
-  const state = useGameState(initialPoints);
+  const state = useGameState(initialPoints, playerId);
   return (
     <GameSessionContext.Provider value={state}>
       {children}
@@ -71,7 +142,7 @@ export function GameSessionProvider({ children }: { children: ReactNode }) {
   const player = readPlayer();
   const sessionKey = player ? localStorage.getItem("token_data") : null;
   return (
-    <GameSession key={sessionKey} initialPoints={player?.totalPoints}>
+    <GameSession key={sessionKey} initialPoints={player?.totalPoints} playerId={player?.id}>
       {children}
     </GameSession>
   );
@@ -230,7 +301,11 @@ export function GamePage({
               score.
             </p>
           )}
-          {player && !round && (
+          {player && session.restoring && <p role="status">Loading your round…</p>}
+          {player && session.restoreFailed && (
+            <button type="button" onClick={session.retryRestore}>Try loading round again</button>
+          )}
+          {player && !round && !session.restoring && !session.restoreFailed && (
             <button
               ref={startButton}
               type="button"
