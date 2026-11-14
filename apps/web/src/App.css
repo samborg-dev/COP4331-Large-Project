@@ -171,6 +171,34 @@ button:disabled {
 }
 .password-field {
   position: relative;
+  margin-bottom: 18px;
+}
+.password-field > label {
+  margin-bottom: 0;
+}
+.password-input {
+  display: block;
+  position: relative;
+}
+.password-input input {
+  padding-right: 52px;
+}
+.password-toggle {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 34px;
+  min-height: 34px;
+  border-radius: 50%;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: #b4bdce;
+}
+.password-toggle:hover {
+  background: #a8bbff18;
+  color: #f2f4f8;
 }
 .guest-card {
   display: flex;
@@ -363,6 +391,35 @@ button:disabled {
   color: #c7d5ff;
 }
 
+/* Glassy hover bubbles without moving the header links. */
+.preview-header a,
+.guest-account .signout-link {
+  position: relative;
+  isolation: isolate;
+  text-decoration: none;
+}
+.preview-header a::before,
+.guest-account .signout-link::before {
+  content: "";
+  position: absolute;
+  inset: -7px -9px;
+  z-index: -1;
+  pointer-events: none;
+  border: 1px solid #c7d5ff30;
+  border-radius: 12px;
+  background: #a8bbff18;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px #0003, inset 0 1px 0 #ffffff12;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+.preview-header a:hover::before,
+.preview-header a:focus-visible::before,
+.guest-account .signout-link:hover::before,
+.guest-account .signout-link:focus-visible::before {
+  opacity: 1;
+}
+
 /* Guess history and round results */
 .sample-guesses {
   background: #202633;
@@ -506,10 +563,13 @@ button:disabled {
   text-align: left;
   margin: 0 0 18px;
 }
-.help-content > p:last-child {
+.help-content > p:not(.preview-kicker) {
   color: #c0cbe0;
   font-size: 15px;
   line-height: 1.7;
+  margin-bottom: 16px;
+}
+.help-content > p:last-child {
   margin-bottom: 0;
 }
 .help-close {
