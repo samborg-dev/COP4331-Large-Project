@@ -52,6 +52,32 @@ function keepLogin() {
 }
 
 describe("Round screens", () => {
+  it.each([false, true])("finishes a loss and fetches its answer (lookup fails: %s)", async (lookupFails) => {
+    keepLogin();
+    window.history.replaceState(null, "", "/game");
+    const fetcher = vi.fn((url: string) => {
+      if (url.endsWith("/api/games")) return Promise.resolve(Response.json({ gameId: "last-guess", maxGuesses: 1 }));
+      if (url.includes("countries/search")) return Promise.resolve(Response.json([{ id: "FR", name: "France" }]));
+      if (url.endsWith("/guesses")) return Promise.resolve(Response.json({ country: "France", range: "> 6,000 km", solved: false, guessesUsed: 1 }));
+      if (url.endsWith("games/last-guess")) {
+        if (lookupFails) return Promise.reject(new TypeError("Offline"));
+        return Promise.resolve(Response.json({ gameId: "last-guess", status: "LOST", maxGuesses: 1, guessesUsed: 1, guesses: [{ countryId: "FR", guessName: "France", range: "> 6,000 km" }], targetCountry: "Mauritius", pointsEarned: 0 }));
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetcher);
+    render(<App />);
+    const user = userEvent.setup();
+    await user.type(await screen.findByRole("combobox"), "fra");
+    await user.click(await screen.findByRole("option", { name: "France" }));
+    expect(await screen.findByText("Out of guesses")).toBeTruthy();
+    if (lookupFails) expect((await screen.findByRole("alert")).textContent).toContain("answer could not be loaded");
+    else expect(await screen.findByText("Mauritius")).toBeTruthy();
+    await waitFor(() => expect((screen.getByRole("button", { name: "Play again" }) as HTMLButtonElement).disabled).toBe(false));
+    expect(screen.getByText("0 guesses left")).toBeTruthy();
+    expect(fetcher.mock.calls.filter(([url]) => url.endsWith("/api/games"))).toHaveLength(1);
+  });
+
   it("automatically starts just one round, including under StrictMode", async () => {
     keepLogin();
     window.history.replaceState(null, "", "/game");

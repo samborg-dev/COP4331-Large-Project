@@ -248,6 +248,19 @@ export function GamePage({
         pointsEarned: guess.pointsEarned,
         answer: guess.solved ? guess.country : undefined,
       });
+      if (status === "lost") {
+        try {
+          const completed = savedRoundSchema.parse(
+            await api<unknown>(`games/${encodeURIComponent(round.gameId)}`, undefined, true),
+          );
+          if (completed.gameId !== round.gameId || completed.status !== "lost" || !completed.answer) {
+            throw new Error("The completed round did not include its answer.");
+          }
+          setRound(completed);
+        } catch {
+          setError("The round is over, but its answer could not be loaded. Refresh to try again.");
+        }
+      }
       if (guess.solved && guess.pointsEarned !== undefined) {
         const earned = guess.pointsEarned;
         setPoints((total) =>
