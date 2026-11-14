@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useImperativeHandle, useRef, useState } from "react";
 import type { KeyboardEvent, Ref } from "react";
 import { z } from "zod";
 import { api } from "../api";
@@ -31,6 +31,8 @@ export function CountrySearch({
   const [message, setMessage] = useState("");
   const [selected, setSelected] = useState<CountryOption | null>(null);
   const optionRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const inputElement = useRef<HTMLInputElement>(null);
+  useImperativeHandle(inputRef, () => inputElement.current!);
   useEffect(() => {
     const controller = new AbortController();
     let current = true;
@@ -88,8 +90,10 @@ export function CountrySearch({
     setResults([]);
     setActive(-1);
     setMessage("");
-    onSelect?.(country);
   }
+  useEffect(() => {
+    if (selected) inputElement.current?.focus();
+  }, [selected]);
   function keys(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Escape") {
       setOpen(false);
@@ -110,7 +114,9 @@ export function CountrySearch({
     }
     if (event.key === "Enter") {
       event.preventDefault();
-      if (open && active >= 0 && results[active]) choose(results[active]);
+      if (event.repeat) return;
+      if (selected) onSelect?.(selected);
+      else if (open && active >= 0 && results[active]) choose(results[active]);
     }
   }
   return (
@@ -126,7 +132,7 @@ export function CountrySearch({
       <label htmlFor={`${listId}-input`}>Your next guess</label>
       <div className="preview-search">
         <input
-          ref={inputRef}
+          ref={inputElement}
           id={`${listId}-input`}
           role="combobox"
           autoComplete="off"
@@ -158,9 +164,9 @@ export function CountrySearch({
         />
         <button
           type="button"
-          disabled={disabled || !open || active < 0 || !results[active]}
+          disabled={disabled || !selected}
           onClick={() => {
-            if (results[active]) choose(results[active]);
+            if (selected) onSelect?.(selected);
           }}
         >
           Enter
@@ -181,7 +187,29 @@ export function CountrySearch({
                 optionRefs.current[index] = element;
               }}
               role="option"
+              tabIndex={0}
               aria-selected={index === active}
+              onFocus={() => setActive(index)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  inputElement.current?.focus();
+                  setOpen(false);
+                  setActive(-1);
+                  return;
+                }
+                if (event.key === "Tab" || event.key === "ArrowDown" || event.key === "ArrowUp") {
+                  event.preventDefault();
+                  const backwards = event.key === "ArrowUp" || (event.key === "Tab" && event.shiftKey);
+                  const next = (index + (backwards ? -1 : 1) + results.length) % results.length;
+                  optionRefs.current[next]?.focus();
+                  return;
+                }
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  choose(country);
+                }
+              }}
               onMouseDown={(event) => event.preventDefault()}
               onMouseEnter={() => setActive(index)}
               onClick={() => choose(country)}

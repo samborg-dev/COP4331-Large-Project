@@ -70,6 +70,7 @@ describe("Round screens", () => {
     const user = userEvent.setup();
     await user.type(await screen.findByRole("combobox"), "fra");
     await user.click(await screen.findByRole("option", { name: "France" }));
+    await user.click(screen.getByRole("button", { name: "Enter" }));
     expect(await screen.findByText("Out of guesses")).toBeTruthy();
     if (lookupFails) expect((await screen.findByRole("alert")).textContent).toContain("answer could not be loaded");
     else expect(await screen.findByText("Mauritius")).toBeTruthy();
@@ -174,6 +175,7 @@ describe("Round screens", () => {
     await waitFor(() => expect(document.activeElement).toBe(input));
     await user.type(input, "port");
     await user.click(await screen.findByRole("option", { name: "Portugal" }));
+    await user.click(screen.getByRole("button", { name: "Enter" }));
     expect(await screen.findByText("You found it!")).toBeTruthy();
     await waitFor(() =>
       expect(document.activeElement).toBe(
@@ -221,6 +223,7 @@ describe("Game navigation", () => {
     await screen.findByRole("combobox");
     await user.type(await screen.findByRole("combobox"), "fra");
     await user.click(await screen.findByRole("option", { name: "France" }));
+    await user.click(screen.getByRole("button", { name: "Enter" }));
     await user.click(screen.getByRole("link", { name: "Leaderboard" }));
     await screen.findByText("No rankings to show yet.");
     await user.click(screen.getByRole("link", { name: "Back to game" }));
@@ -253,6 +256,7 @@ describe("Game navigation", () => {
     await screen.findByRole("combobox");
     await user.type(await screen.findByRole("combobox"), "port");
     await user.click(await screen.findByRole("option", { name: "Portugal" }));
+    await user.click(screen.getByRole("button", { name: "Enter" }));
     await screen.findByText("You found it!");
     await user.click(screen.getByRole("link", { name: "Leaderboard" }));
     await user.click(screen.getByRole("link", { name: "Back to game" }));
