@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -179,7 +180,7 @@ export function GamePage({
     )?.focus();
   }, [busy, round, error]);
 
-  async function startRound() {
+  const startRound = useCallback(async () => {
     if (!beginRequest()) return;
     restoreFocus.current = true;
     try {
@@ -202,7 +203,13 @@ export function GamePage({
     } finally {
       finishRequest();
     }
-  }
+  }, [beginRequest, finishRequest, setRound, setError]);
+
+  useEffect(() => {
+    if (player && !round && !busy && !error && !session.restoreFailed) {
+      void startRound();
+    }
+  }, [player, round, busy, error, session.restoreFailed, startRound]);
 
   async function submitGuess(country: CountryOption) {
     if (!round || round.status !== "active" || busy) return;
@@ -305,14 +312,15 @@ export function GamePage({
           {player && session.restoreFailed && (
             <button type="button" onClick={session.retryRestore}>Try loading round again</button>
           )}
-          {player && !round && !session.restoring && !session.restoreFailed && (
+          {player && !round && busy && !session.restoring && <p role="status">Starting round…</p>}
+          {player && !round && error && !busy && !session.restoreFailed && (
             <button
               ref={startButton}
               type="button"
               onClick={startRound}
               disabled={busy}
             >
-              {busy ? "Starting round…" : "Start round"}
+              Try starting round again
             </button>
           )}
           {round?.status === "active" && (

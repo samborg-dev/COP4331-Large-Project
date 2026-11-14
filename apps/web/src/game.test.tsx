@@ -13,6 +13,7 @@ import { guessesLeft, type Round } from "./round";
 import { savedRoundKey } from "./api";
 import { GamePage, GameSessionProvider } from "./pages/GamePage";
 import App from "./App";
+import { StrictMode } from "react";
 import { LeaderboardPage, Rankings } from "./pages/LeaderboardPage";
 
 vi.mock("./env", () => ({ env: { VITE_API_URL: "http://localhost:5000" } }));
@@ -51,6 +52,41 @@ function keepLogin() {
 }
 
 describe("Round screens", () => {
+  it("automatically starts just one round, including under StrictMode", async () => {
+    keepLogin();
+    window.history.replaceState(null, "", "/game");
+    const fetcher = vi.fn().mockImplementation(() => Promise.resolve(Response.json({ gameId: "auto-round", maxGuesses: 6 })));
+    vi.stubGlobal("fetch", fetcher);
+    render(<StrictMode><App /></StrictMode>);
+    await screen.findByRole("combobox");
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("button", { name: "Play again" })).toBeNull();
+  });
+
+  it("does not start games for guests", () => {
+    window.history.replaceState(null, "", "/guest");
+    const fetcher = vi.fn();
+    vi.stubGlobal("fetch", fetcher);
+    render(<App />);
+    expect(fetcher).not.toHaveBeenCalled();
+    expect(screen.queryByRole("button", { name: "Play again" })).toBeNull();
+  });
+
+  it("offers a manual retry after a failed automatic start", async () => {
+    keepLogin();
+    window.history.replaceState(null, "", "/game");
+    const fetcher = vi.fn()
+      .mockRejectedValueOnce(new TypeError("Offline"))
+      .mockResolvedValueOnce(Response.json({ gameId: "retry-round", maxGuesses: 6 }));
+    vi.stubGlobal("fetch", fetcher);
+    render(<App />);
+    const retry = await screen.findByRole("button", { name: "Try starting round again" });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    await userEvent.click(retry);
+    await screen.findByRole("combobox");
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
   it("sorts closest-first without changing submission order", () => {
     render(<GuessHistory round={round} />);
     expect(
@@ -106,7 +142,7 @@ describe("Round screens", () => {
       </MemoryRouter>,
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Start round" }));
+    await screen.findByRole("combobox");
     const input = await screen.findByRole("combobox");
     expect(localStorage.getItem(savedRoundKey("john"))).toBe("game-1");
     await waitFor(() => expect(document.activeElement).toBe(input));
@@ -156,7 +192,7 @@ describe("Game navigation", () => {
     vi.stubGlobal("fetch", fetcher);
     render(<App />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Start round" }));
+    await screen.findByRole("combobox");
     await user.type(await screen.findByRole("combobox"), "fra");
     await user.click(await screen.findByRole("option", { name: "France" }));
     await user.click(screen.getByRole("link", { name: "Leaderboard" }));
@@ -188,7 +224,7 @@ describe("Game navigation", () => {
     vi.stubGlobal("fetch", fetcher);
     render(<App />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Start round" }));
+    await screen.findByRole("combobox");
     await user.type(await screen.findByRole("combobox"), "port");
     await user.click(await screen.findByRole("option", { name: "Portugal" }));
     await screen.findByText("You found it!");
@@ -202,7 +238,7 @@ describe("Game navigation", () => {
     await user.type(screen.getByLabelText("Password"), "password123");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
     expect(await screen.findByText("Other · 50 pts")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Start round" })).toBeTruthy();
+    expect(await screen.findByRole("combobox")).toBeTruthy();
     expect(screen.queryByText("You found it!")).toBeNull();
     expect(screen.queryByText("Portugal")).toBeNull();
   });
@@ -302,23 +338,23 @@ describe("Restoring a saved round", () => {
       url.endsWith("users/me") ? Response.json({ totalPoints: 20 }) : Response.json({ error: "Game not found" }, { status: 404 }),
     )));
     render(<App />);
-    expect(await screen.findByRole("button", { name: "Start round" })).toBeTruthy();
+    expect(await screen.findByRole("button", { name: "Try starting round again" })).toBeTruthy();
     expect(sessionStorage.getItem(savedRoundKey("john"))).toBeNull();
     expect(screen.getByRole("alert").textContent).toContain("no longer available");
   });
 
-  it("does not load a different account's saved round", () => {
+  it("does not load a different account's saved round", async () => {
     const other = signedInPlayer("Other", 25);
     localStorage.setItem("token_data", other.accessToken);
     localStorage.setItem("user_data", JSON.stringify(other.user));
     sessionStorage.setItem(savedRoundKey("john"), "johns-round");
     window.history.replaceState(null, "", "/game");
-    const fetcher = vi.fn();
+    const fetcher = vi.fn().mockResolvedValue(Response.json({ gameId: "other-game", maxGuesses: 6 }));
     vi.stubGlobal("fetch", fetcher);
     render(<App />);
     expect(screen.getByText("Other · 25 pts")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Start round" })).toBeTruthy();
-    expect(fetcher).not.toHaveBeenCalled();
+    expect(await screen.findByRole("combobox")).toBeTruthy();
+    expect(fetcher.mock.calls.every(([url]) => url.endsWith("/api/games"))).toBe(true);
   });
 });
 
