@@ -363,6 +363,35 @@ button:disabled {
   color: #c7d5ff;
 }
 
+/* Glassy hover bubbles without moving the header links. */
+.preview-header a,
+.guest-account .signout-link {
+  position: relative;
+  isolation: isolate;
+  text-decoration: none;
+}
+.preview-header a::before,
+.guest-account .signout-link::before {
+  content: "";
+  position: absolute;
+  inset: -7px -9px;
+  z-index: -1;
+  pointer-events: none;
+  border: 1px solid #c7d5ff30;
+  border-radius: 12px;
+  background: #a8bbff18;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px #0003, inset 0 1px 0 #ffffff12;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+.preview-header a:hover::before,
+.preview-header a:focus-visible::before,
+.guest-account .signout-link:hover::before,
+.guest-account .signout-link:focus-visible::before {
+  opacity: 1;
+}
+
 /* Guess history and round results */
 .sample-guesses {
   background: #202633;
