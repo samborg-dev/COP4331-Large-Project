@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import type { SubmitGuessInput } from "@cop4331/shared";
-import { api } from "../api";
+import { api, ApiError } from "../api";
 import { CountrySearch, type CountryOption } from "../components/CountrySearch";
 import { GuessHistory, RoundResult } from "../components/RoundUI";
-import { guessResponseSchema, startRoundSchema, type Round } from "../round";
+import {
+  guessResponseSchema,
+  resumeRoundSchema,
+  startRoundSchema,
+  type Round,
+} from "../round";
+
+const CURRENT_GAME_KEY = "current_game_id";
 
 export function GamePage({
   player,
@@ -23,6 +30,52 @@ export function GamePage({
   const [points, setPoints] = useState(player?.totalPoints);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const gameId = localStorage.getItem(CURRENT_GAME_KEY);
+    if (!player || !gameId || requestPending.current) return;
+
+    requestPending.current = true;
+    setBusy(true);
+    void api<unknown>(
+      "games/" + encodeURIComponent(gameId),
+      undefined,
+      true,
+    )
+      .then((data) => {
+        const restored = resumeRoundSchema.parse(data);
+        setRound({
+          gameId: restored.gameId,
+          status: restored.status,
+          maxGuesses: restored.maxGuesses,
+          guessesUsed: restored.guessesUsed,
+          guesses: restored.guesses.map((guess) => {
+            return {
+              countryId: guess.countryId,
+              name: guess.country,
+              range: guess.range,
+              correct: guess.range === "Correct",
+            };
+          }),
+          pointsEarned: restored.pointsEarned,
+          answer: restored.answer,
+        });
+      })
+      .catch((cause) => {
+        if (cause instanceof ApiError && (cause.status === 403 || cause.status === 404)) {
+          localStorage.removeItem(CURRENT_GAME_KEY);
+        }
+        setError(
+          cause instanceof Error
+            ? cause.message
+            : "The server returned an unexpected round.",
+        );
+      })
+      .finally(() => {
+        requestPending.current = false;
+        setBusy(false);
+      });
+  }, [player]);
 
   useEffect(() => {
     if (busy || !restoreFocus.current) return;
@@ -52,6 +105,7 @@ export function GamePage({
         guessesUsed: 0,
         guesses: [],
       });
+      localStorage.setItem(CURRENT_GAME_KEY, gameId);
     } catch (cause) {
       setError(
         cause instanceof Error && cause.name !== "ZodError"

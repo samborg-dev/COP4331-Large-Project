@@ -160,6 +160,7 @@ router.get('/:id', async (req: AuthenticatedRequest, res) => {
       maxGuesses: MAX_GUESSES,
       guessesUsed: game.guesses.length,
       pointsEarned: game.pointsEarned ?? 0,
+      ...(game.status !== 'IN_PROGRESS' ? { answer: game.targetCountry } : {}),
     });
   } catch (error) {
     console.error('Get game error:', error);

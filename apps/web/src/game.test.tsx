@@ -34,6 +34,43 @@ const round: Round = {
 };
 
 describe("Round screens", () => {
+  it("restores the current round after loading the game page", async () => {
+    localStorage.setItem("token_data", "test-token");
+    localStorage.setItem("current_game_id", "game-1");
+    const fetcher = vi.fn().mockResolvedValue(
+      Response.json({
+        gameId: "game-1",
+        status: "active",
+        maxGuesses: 10,
+        guessesUsed: 1,
+        guesses: [
+          {
+            countryId: "ca",
+            country: "Canada",
+            range: "3,000–6,000 km",
+          },
+        ],
+        pointsEarned: 0,
+      }),
+    );
+    vi.stubGlobal("fetch", fetcher);
+
+    render(
+      <MemoryRouter>
+        <GamePage player={{ name: "John" }} />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Canada")).toBeTruthy();
+    expect(fetcher.mock.calls[0]).toEqual([
+      "http://localhost:5000/api/games/game-1",
+      expect.objectContaining({
+        method: "GET",
+        headers: { Authorization: "Bearer test-token" },
+      }),
+    ]);
+  });
+
   it("sorts closest-first without changing submission order", () => {
     render(<GuessHistory round={round} />);
     expect(
