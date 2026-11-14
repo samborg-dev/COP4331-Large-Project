@@ -37,8 +37,18 @@ export class ApiError extends Error {
 }
 export const savedRoundKey = (userId: string) => `countryguesser.round.${userId}`;
 
-export function clearSession() {
-  // Keep the per-account round ID so signing back in can reload it from the API.
+export function clearSession(forgetRound = false) {
+  if (forgetRound) {
+    try {
+      const user = JSON.parse(localStorage.getItem("user_data") || "null");
+      if (typeof user?.id === "string") {
+        localStorage.removeItem(savedRoundKey(user.id));
+        sessionStorage.removeItem(savedRoundKey(user.id));
+      }
+    } catch {
+      // Sign-out still works if the stored player record is malformed.
+    }
+  }
   localStorage.removeItem("token_data");
   localStorage.removeItem("user_data");
 }

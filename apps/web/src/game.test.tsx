@@ -259,7 +259,7 @@ describe("Game navigation", () => {
     expect(screen.getByText("You found it!")).toBeTruthy();
     expect(screen.getByText("John · 100 pts")).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Sign out" }));
-    expect(localStorage.getItem(savedRoundKey("john"))).toBe("won-round");
+    expect(localStorage.getItem(savedRoundKey("john"))).toBeNull();
     await user.type(screen.getByLabelText("Email address"), "other@example.com");
     await user.type(screen.getByLabelText("Password"), "password123");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
@@ -282,7 +282,7 @@ describe("Restoring a saved round", () => {
     ],
   };
 
-  it("reloads the same player's round after signing out and signing back in", async () => {
+  it("starts a fresh round after signing out and signing back in, keeping earned points", async () => {
     keepLogin();
     localStorage.setItem(savedRoundKey("john"), "saved-round");
     window.history.replaceState(null, "", "/game");
@@ -290,6 +290,7 @@ describe("Restoring a saved round", () => {
       if (url.endsWith("games/saved-round")) return Promise.resolve(Response.json(snapshot));
       if (url.endsWith("users/me")) return Promise.resolve(Response.json({ totalPoints: 25 }));
       if (url.endsWith("auth/login")) return Promise.resolve(Response.json(signedInPlayer("John", 25)));
+      if (url.endsWith("/api/games")) return Promise.resolve(Response.json({ gameId: "fresh-round", maxGuesses: 6 }));
       throw new Error(`Unexpected request: ${url}`);
     });
     vi.stubGlobal("fetch", fetcher);
@@ -298,15 +299,16 @@ describe("Restoring a saved round", () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Sign out" }));
     expect(localStorage.getItem("token_data")).toBeNull();
-    expect(localStorage.getItem(savedRoundKey("john"))).toBe("saved-round");
+    expect(localStorage.getItem(savedRoundKey("john"))).toBeNull();
     expect(screen.queryByText("Spain")).toBeNull();
     await user.type(screen.getByLabelText("Email address"), "john@example.com");
     await user.type(screen.getByLabelText("Password"), "password123");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
-    expect(await screen.findByText("4 guesses left")).toBeTruthy();
-    expect(screen.getByText("Spain")).toBeTruthy();
+    expect(await screen.findByText("6 guesses left")).toBeTruthy();
+    expect(screen.queryByText("Spain")).toBeNull();
     expect(screen.getByText("John · 25 pts")).toBeTruthy();
-    expect(fetcher.mock.calls.filter(([url]) => url.endsWith("games/saved-round"))).toHaveLength(2);
+    expect(fetcher.mock.calls.filter(([url]) => url.endsWith("games/saved-round"))).toHaveLength(1);
+    expect(localStorage.getItem(savedRoundKey("john"))).toBe("fresh-round");
   });
 
   it.each(["IN_PROGRESS", "WON"])("reloads a %s round and uses the server's points without awarding them again", async (status) => {

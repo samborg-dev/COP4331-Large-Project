@@ -15,6 +15,7 @@ import { GuessHistory, RoundResult } from "../components/RoundUI";
 import { guessResponseSchema, savedRoundSchema, startRoundSchema, type Round } from "../round";
 
 function useGameState(initialPoints?: number, playerId?: string) {
+  const [sessionToken] = useState(() => localStorage.getItem("token_data"));
   const storageKey = playerId ? savedRoundKey(playerId) : null;
   const [savedGameId] = useState(() => storageKey
     ? localStorage.getItem(storageKey) ?? sessionStorage.getItem(storageKey)
@@ -73,7 +74,7 @@ function useGameState(initialPoints?: number, playerId?: string) {
   }, [savedGameId, storageKey, restoreAttempt]);
 
   function saveRound(nextRound: Round) {
-    if (storageKey) {
+    if (storageKey && localStorage.getItem("token_data") === sessionToken) {
       localStorage.setItem(storageKey, nextRound.gameId);
       sessionStorage.removeItem(storageKey);
     }

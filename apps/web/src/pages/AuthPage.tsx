@@ -54,7 +54,7 @@ export function ProtectedPage() {
     <GamePage
       player={player}
       onSignOut={() => {
-        clearSession();
+        clearSession(true);
         navigate("/", { replace: true });
       }}
     />
