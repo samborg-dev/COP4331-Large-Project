@@ -1,10 +1,154 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { Link, useLocation } from "react-router-dom";
 import type { SubmitGuessInput } from "@cop4331/shared";
-import { api } from "../api";
+import { api, ApiError, readPlayer, savedRoundKey } from "../api";
 import { CountrySearch, type CountryOption } from "../components/CountrySearch";
 import { GuessHistory, RoundResult } from "../components/RoundUI";
-import { guessResponseSchema, startRoundSchema, type Round } from "../round";
+import { guessResponseSchema, savedRoundSchema, startRoundSchema, type Round } from "../round";
+
+function useGameState(initialPoints?: number, playerId?: string) {
+  const [sessionToken] = useState(() => localStorage.getItem("token_data"));
+  const storageKey = playerId ? savedRoundKey(playerId) : null;
+  const [savedGameId] = useState(() => storageKey
+    ? localStorage.getItem(storageKey) ?? sessionStorage.getItem(storageKey)
+    : null);
+  const [round, setRound] = useState<Round | null>(null);
+  const [points, setPoints] = useState(initialPoints);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [restoring, setRestoring] = useState(Boolean(savedGameId));
+  const [restoreFailed, setRestoreFailed] = useState(false);
+  const [restoreAttempt, setRestoreAttempt] = useState(0);
+  const requestPending = useRef(false);
+
+  useEffect(() => {
+    if (!savedGameId) return;
+    const controller = new AbortController();
+    async function restoreRound() {
+      try {
+        const [game, profile] = await Promise.allSettled([
+          api<unknown>(`games/${encodeURIComponent(savedGameId!)}`, undefined, true, controller.signal),
+          api<{ totalPoints?: unknown }>("users/me", undefined, true, controller.signal),
+        ]);
+        if (controller.signal.aborted) return;
+        if (game.status === "rejected") throw game.reason;
+        const restored = savedRoundSchema.parse(game.value);
+        if (restored.gameId !== savedGameId) throw new Error("The server returned a different round.");
+        if (storageKey) {
+          localStorage.setItem(storageKey, restored.gameId);
+          sessionStorage.removeItem(storageKey);
+        }
+        setRound(restored);
+        // Use the saved server total, rather than adding the same win again.
+        const total = profile.status === "fulfilled" ? profile.value?.totalPoints : undefined;
+        setPoints(typeof total === "number" && Number.isFinite(total) ? total : undefined);
+        setRestoreFailed(false);
+        setError("");
+      } catch (cause) {
+        if (controller.signal.aborted) return;
+        if (cause instanceof ApiError && [403, 404].includes(cause.status)) {
+          if (storageKey) {
+            localStorage.removeItem(storageKey);
+            sessionStorage.removeItem(storageKey);
+          }
+          setError("Your previous round is no longer available. You can start a new round.");
+          setRestoreFailed(false);
+        } else {
+          setError("Could not reload your saved round. Try again to keep your progress.");
+          setRestoreFailed(true);
+        }
+      } finally {
+        if (!controller.signal.aborted) setRestoring(false);
+      }
+    }
+    void restoreRound();
+    return () => controller.abort();
+  }, [savedGameId, storageKey, restoreAttempt]);
+
+  function saveRound(nextRound: Round) {
+    if (storageKey && localStorage.getItem("token_data") === sessionToken) {
+      localStorage.setItem(storageKey, nextRound.gameId);
+      sessionStorage.removeItem(storageKey);
+    }
+    setRound(nextRound);
+  }
+
+  function retryRestore() {
+    setRestoring(true);
+    setRestoreFailed(false);
+    setError("");
+    setRestoreAttempt((attempt) => attempt + 1);
+  }
+
+  function beginRequest() {
+    if (requestPending.current || restoring) return false;
+    requestPending.current = true;
+    setBusy(true);
+    setError("");
+    return true;
+  }
+
+  function finishRequest() {
+    requestPending.current = false;
+    setBusy(false);
+  }
+
+  return {
+    round,
+    setRound: saveRound,
+    points,
+    setPoints,
+    busy: busy || restoring,
+    restoring,
+    restoreFailed,
+    retryRestore,
+    error,
+    setError,
+    beginRequest,
+    finishRequest,
+  };
+}
+
+const GameSessionContext = createContext<ReturnType<typeof useGameState> | null>(
+  null,
+);
+
+function GameSession({
+  children,
+  initialPoints,
+  playerId,
+}: {
+  children: ReactNode;
+  initialPoints?: number;
+  playerId?: string;
+}) {
+  const state = useGameState(initialPoints, playerId);
+  return (
+    <GameSessionContext.Provider value={state}>
+      {children}
+    </GameSessionContext.Provider>
+  );
+}
+
+export function GameSessionProvider({ children }: { children: ReactNode }) {
+  // Navigation rechecks the session; changing accounts resets the saved round.
+  useLocation();
+  const player = readPlayer();
+  const sessionKey = player ? localStorage.getItem("token_data") : null;
+  return (
+    <GameSession key={sessionKey} initialPoints={player?.totalPoints} playerId={player?.id}>
+      {children}
+    </GameSession>
+  );
+}
 
 export function GamePage({
   player,
@@ -13,16 +157,18 @@ export function GamePage({
   player?: { name: string; totalPoints?: number };
   onSignOut?: () => void;
 }) {
+  const session = useContext(GameSessionContext);
+  if (!session) throw new Error("GamePage requires GameSessionProvider");
+  const { setRound, setPoints, busy, setError, beginRequest, finishRequest } =
+    session;
+  const round = player ? session.round : null;
+  const points = player ? session.points : undefined;
+  const error = player ? session.error : "";
   const helpDialog = useRef<HTMLDialogElement>(null);
-  const requestPending = useRef(false);
   const restoreFocus = useRef(false);
   const searchInput = useRef<HTMLInputElement>(null);
   const startButton = useRef<HTMLButtonElement>(null);
   const playAgainButton = useRef<HTMLButtonElement>(null);
-  const [round, setRound] = useState<Round | null>(null);
-  const [points, setPoints] = useState(player?.totalPoints);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (busy || !restoreFocus.current) return;
@@ -35,12 +181,9 @@ export function GamePage({
     )?.focus();
   }, [busy, round, error]);
 
-  async function startRound() {
-    if (requestPending.current) return;
-    requestPending.current = true;
+  const startRound = useCallback(async () => {
+    if (!beginRequest()) return;
     restoreFocus.current = true;
-    setBusy(true);
-    setError("");
     try {
       const { gameId, maxGuesses } = startRoundSchema.parse(
         await api<unknown>("games", {}, true),
@@ -59,21 +202,24 @@ export function GamePage({
           : "The server returned an unexpected round.",
       );
     } finally {
-      requestPending.current = false;
-      setBusy(false);
+      finishRequest();
     }
-  }
+  }, [beginRequest, finishRequest, setRound, setError]);
+
+  useEffect(() => {
+    if (player && !round && !busy && !error && !session.restoreFailed) {
+      void startRound();
+    }
+  }, [player, round, busy, error, session.restoreFailed, startRound]);
 
   async function submitGuess(country: CountryOption) {
-    if (!round || round.status !== "active" || requestPending.current) return;
+    if (!round || round.status !== "active" || busy) return;
     if (round.guesses.some((guess) => guess.countryId === country.id)) {
       setError("You already guessed that country.");
       return;
     }
-    requestPending.current = true;
+    if (!beginRequest()) return;
     restoreFocus.current = true;
-    setBusy(true);
-    setError("");
     try {
       const guess = guessResponseSchema.parse(
         await api<unknown>(
@@ -103,6 +249,19 @@ export function GamePage({
         pointsEarned: guess.pointsEarned,
         answer: guess.solved ? guess.country : undefined,
       });
+      if (status === "lost") {
+        try {
+          const completed = savedRoundSchema.parse(
+            await api<unknown>(`games/${encodeURIComponent(round.gameId)}`, undefined, true),
+          );
+          if (completed.gameId !== round.gameId || completed.status !== "lost" || !completed.answer) {
+            throw new Error("The completed round did not include its answer.");
+          }
+          setRound(completed);
+        } catch {
+          setError("The round is over, but its answer could not be loaded. Refresh to try again.");
+        }
+      }
       if (guess.solved && guess.pointsEarned !== undefined) {
         const earned = guess.pointsEarned;
         setPoints((total) =>
@@ -116,8 +275,7 @@ export function GamePage({
           : "The server returned an unexpected guess result.",
       );
     } finally {
-      requestPending.current = false;
-      setBusy(false);
+      finishRequest();
     }
   }
 
@@ -164,14 +322,19 @@ export function GamePage({
               score.
             </p>
           )}
-          {player && !round && (
+          {player && session.restoring && <p role="status">Loading your round…</p>}
+          {player && session.restoreFailed && (
+            <button type="button" onClick={session.retryRestore}>Try loading round again</button>
+          )}
+          {player && !round && busy && !session.restoring && <p role="status">Starting round…</p>}
+          {player && !round && error && !busy && !session.restoreFailed && (
             <button
               ref={startButton}
               type="button"
               onClick={startRound}
               disabled={busy}
             >
-              {busy ? "Starting round…" : "Start round"}
+              Try starting round again
             </button>
           )}
           {round?.status === "active" && (
@@ -220,7 +383,16 @@ export function GamePage({
           </button>
           <p className="preview-kicker">COUNTRYGUESSER</p>
           <h2 id="help-title">How to play</h2>
-          <p>Each guess brings you closer. Follow the distance clues.</p>
+          <p>Find the mystery country before you run out of guesses.</p>
+          <p>
+            Search for a country and choose a suggestion. Press Enter again or
+            click the Enter button to submit your guess.
+            Smaller distance ranges mean you’re closer.
+          </p>
+          <p>
+            Find it in fewer guesses to earn more points. Your points add to
+            your leaderboard total.
+          </p>
         </div>
       </dialog>
     </main>
