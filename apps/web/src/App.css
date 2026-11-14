@@ -171,6 +171,34 @@ button:disabled {
 }
 .password-field {
   position: relative;
+  margin-bottom: 18px;
+}
+.password-field > label {
+  margin-bottom: 0;
+}
+.password-input {
+  display: block;
+  position: relative;
+}
+.password-input input {
+  padding-right: 52px;
+}
+.password-toggle {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 34px;
+  min-height: 34px;
+  border-radius: 50%;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: #b4bdce;
+}
+.password-toggle:hover {
+  background: #a8bbff18;
+  color: #f2f4f8;
 }
 .guest-card {
   display: flex;

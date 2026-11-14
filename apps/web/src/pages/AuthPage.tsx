@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { FormEvent, InputHTMLAttributes } from "react";
 import {
   Link,
   Navigate,
@@ -65,6 +65,28 @@ export function AuthPage() {
   const pathname = location.pathname.toLowerCase().replace(/\/+$/, "") || "/";
   const path = pathname === "/login" ? "/" : pathname;
   return <AuthForm key={location.key} path={path} />;
+}
+function PasswordInput(props: InputHTMLAttributes<HTMLInputElement>) {
+  const [visible, setVisible] = useState(false);
+  const action = visible ? "Hide" : "Show";
+  return (
+    <span className="password-input">
+      <input {...props} type={visible ? "text" : "password"} />
+      <button
+        type="button"
+        className="password-toggle"
+        aria-label={`${action} ${props.name === "confirm" ? "confirm password" : "password"}`}
+        title={`${action} password`}
+        onClick={() => setVisible((current) => !current)}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="3" />
+          {visible && <path d="m3 3 18 18" />}
+        </svg>
+      </button>
+    </span>
+  );
 }
 function AuthForm({ path }: { path: string }) {
   const [params] = useSearchParams();
@@ -232,11 +254,11 @@ function AuthForm({ path }: { path: string }) {
                   </label>
                 )}
                 {(login || register || reset) && (
-                  <label className="password-field">
-                    Password
-                    <input
+                  <div className="password-field">
+                    <label htmlFor="password">Password</label>
+                    <PasswordInput
+                      id="password"
                       name="password"
-                      type="password"
                       required
                       minLength={login ? 1 : 8}
                       autoComplete={login ? "current-password" : "new-password"}
@@ -257,19 +279,19 @@ function AuthForm({ path }: { path: string }) {
                         Use at least 8 characters.
                       </small>
                     )}
-                  </label>
+                  </div>
                 )}
                 {(register || reset) && (
-                  <label>
-                    Confirm password
-                    <input
+                  <div className="password-field">
+                    <label htmlFor="confirm">Confirm password</label>
+                    <PasswordInput
+                      id="confirm"
                       name="confirm"
-                      type="password"
                       required
                       minLength={8}
                       autoComplete="new-password"
                     />
-                  </label>
+                  </div>
                 )}
                 {login && (
                   <Link className="forgot-link" to="/forgot-password">
