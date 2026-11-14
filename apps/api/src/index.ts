@@ -23,7 +23,7 @@ app.use('/api/auth', authRouter);
 // Protected game routes
 app.use('/api/games', requireAuth, gamesRouter);
 
-// GET /api/users/me (Protected)
+// GET /api/users/me (Bearer Auth)
 app.get('/api/users/me', requireAuth, async (req: AuthenticatedRequest, res) => {
   try {
     if (!req.userId || !ObjectId.isValid(req.userId)) {
@@ -36,19 +36,14 @@ app.get('/api/users/me', requireAuth, async (req: AuthenticatedRequest, res) => 
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const name =
-      user.username ??
-      ([user.firstName, user.lastName].filter(Boolean).join(' ') || user.email);
-
     return res.status(200).json({
       id: user._id.toString(),
-      name,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      totalPoints: user.totalPoints ?? 0,
-      gamesPlayed: user.gamesPlayed ?? 0,
-      gamesWon: user.gamesWon ?? 0,
+      firstName: (user.firstName as string) ?? (user.username as string) ?? '',
+      lastName: (user.lastName as string) ?? '',
+      email: (user.email as string) ?? '',
+      totalPoints: (user.totalPoints as number) ?? 0,
+      gamesPlayed: (user.gamesPlayed as number) ?? 0,
+      gamesWon: (user.gamesWon as number) ?? 0,
     });
   } catch (error) {
     console.error('Get current user error:', error);
@@ -56,7 +51,8 @@ app.get('/api/users/me', requireAuth, async (req: AuthenticatedRequest, res) => 
   }
 });
 
-// GET /api/countries/search?q=fra&limit=10 (Protected)
+// GET /api/countries/search?q=fra&limit=10 (Bearer Auth)
+// Returns top-level array: [{ id, name, iso2, iso3, continent }] matching start of country name
 app.get('/api/countries/search', requireAuth, async (req, res) => {
   try {
     const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
@@ -67,9 +63,11 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
     }
 
     const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Match strictly from the beginning of the country name
+    const prefixRegex = new RegExp(`^${escaped}`, 'i');
     const db = getDb();
 
-    // Try Atlas Search index "name" on path "COUNTRY" first, fallback to regex
+    // 1. Try MongoDB Atlas Search index "name" + strict prefix filter first
     try {
       const atlasResults = await db
         .collection('countries')
@@ -83,58 +81,87 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
               },
             },
           },
+          {
+            $match: {
+              COUNTRY: { $regex: prefixRegex },
+            },
+          },
           { $limit: limit },
         ])
         .toArray();
 
       if (atlasResults.length > 0) {
-        return res.status(200).json({
-          countries: atlasResults.map((doc: any) => ({
-            id: String(doc.ISO ?? doc.iso ?? doc._id),
-            name: doc.COUNTRY ?? doc.name ?? 'Unknown',
-          })),
-        });
+        return res.status(200).json(
+          atlasResults.map((doc: any) => {
+            const iso2 = String(doc.ISO ?? doc.iso2 ?? doc.ISO_A2 ?? '');
+            const iso3 = String(doc.ISO_A3 ?? doc.iso3 ?? iso2);
+            return {
+              id: String(doc._id ?? iso2),
+              name: String(doc.COUNTRY ?? doc.name ?? 'Unknown'),
+              iso2,
+              iso3,
+              continent: String(doc.CONTINENT ?? doc.continent ?? ''),
+            };
+          })
+        );
       }
     } catch {
-      // Fallback to standard regex query below if Atlas Search index is unavailable
+      // Fallback to collection scan below if Atlas Search index is unavailable
     }
 
-    const regex = new RegExp(escaped, 'i');
+    // 2. Fallback prefix regex over countries collection
     const docs = await db.collection('countries').find({}).toArray();
-    const matches: Array<{ id: string; name: string }> = [];
+    const matches: Array<{
+      id: string;
+      name: string;
+      iso2: string;
+      iso3: string;
+      continent: string;
+    }> = [];
 
     for (const doc of docs as any[]) {
       if (Array.isArray(doc.features)) {
         for (const f of doc.features) {
-          const name = f?.properties?.COUNTRY ?? '';
-          if (regex.test(name)) {
+          const name = String(f?.properties?.COUNTRY ?? f?.properties?.name ?? '');
+          if (prefixRegex.test(name)) {
+            const iso2 = String(f?.properties?.ISO ?? f?.properties?.ISO_A2 ?? '');
+            const iso3 = String(f?.properties?.ISO_A3 ?? f?.properties?.iso3 ?? iso2);
             matches.push({
-              id: String(f?.properties?.ISO ?? f?.properties?.COUNTRY ?? doc._id),
+              id: String(f?.properties?.ISO ?? doc._id),
               name,
+              iso2,
+              iso3,
+              continent: String(f?.properties?.CONTINENT ?? f?.properties?.continent ?? ''),
             });
             if (matches.length >= limit) break;
           }
         }
       } else {
-        const name = doc.COUNTRY ?? doc.name ?? doc?.properties?.COUNTRY ?? '';
-        if (regex.test(name)) {
+        const name = String(doc.COUNTRY ?? doc.name ?? doc?.properties?.COUNTRY ?? '');
+        if (prefixRegex.test(name)) {
+          const iso2 = String(doc.ISO ?? doc.iso ?? doc.iso2 ?? '');
+          const iso3 = String(doc.ISO_A3 ?? doc.iso3 ?? iso2);
           matches.push({
-            id: String(doc.ISO ?? doc.iso ?? doc._id),
+            id: String(doc._id ?? iso2),
             name,
+            iso2,
+            iso3,
+            continent: String(doc.CONTINENT ?? doc.continent ?? ''),
           });
         }
       }
       if (matches.length >= limit) break;
     }
 
-    return res.status(200).json({ countries: matches });
+    return res.status(200).json(matches);
   } catch (error) {
     console.error('Country search error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// GET /api/leaderboard?page=1&limit=20 (Protected)
+// GET /api/leaderboard?page=1&limit=20 (Bearer Auth)
+// Returns { entries: [{ rank, userId, firstName, lastName, totalPoints, gamesWon }], page, limit, total }
 app.get('/api/leaderboard', requireAuth, async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
@@ -154,20 +181,20 @@ app.get('/api/leaderboard', requireAuth, async (req, res) => {
       usersCol.countDocuments({}),
     ]);
 
-    const leaderboard = users.map((u: any, idx: number) => ({
+    const entries = users.map((u: any, idx: number) => ({
       rank: skip + idx + 1,
       userId: u._id.toString(),
-      name: u.username ?? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.email),
-      totalPoints: u.totalPoints ?? 0,
-      gamesPlayed: u.gamesPlayed ?? 0,
-      gamesWon: u.gamesWon ?? 0,
+      firstName: String(u.firstName ?? u.username ?? 'Player'),
+      lastName: String(u.lastName ?? ''),
+      totalPoints: Number(u.totalPoints ?? 0),
+      gamesWon: Number(u.gamesWon ?? 0),
     }));
 
     return res.status(200).json({
+      entries,
       page,
       limit,
       total,
-      leaderboard,
     });
   } catch (error) {
     console.error('Leaderboard error:', error);

@@ -2,9 +2,10 @@ import { Router } from 'express';
 import { ObjectId } from 'mongodb';
 import { getDb } from '../db.js';
 import type { GameDoc } from '../models/game.js';
+import type { AuthenticatedRequest } from '../middleware/requireAuth.js';
 
 const router = Router();
-const MAX_GUESSES = 6;
+const MAX_GUESSES = 10;
 
 // Haversine formula to calculate distance in kilometers between two lat/lng points
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -33,7 +34,7 @@ async function getAllNormalizedCountries() {
       for (const f of doc.features) {
         const [lng, lat] = f?.geometry?.coordinates ?? [0, 0];
         normalized.push({
-          id: f?.properties?.ISO ?? f?.properties?.COUNTRY ?? String(doc._id),
+          id: String(f?.properties?.ISO ?? f?.properties?.ISO_A2 ?? f?.properties?.COUNTRY ?? doc._id),
           name: f?.properties?.COUNTRY ?? 'Unknown',
           lat: Number(lat) || 0,
           lng: Number(lng) || 0,
@@ -53,11 +54,17 @@ async function getAllNormalizedCountries() {
   return normalized;
 }
 
+function mapStatusToContract(status: GameDoc['status']): 'active' | 'won' | 'lost' {
+  if (status === 'WON') return 'won';
+  if (status === 'LOST') return 'lost';
+  return 'active';
+}
+
 // POST /api/games - Start a new game session (never returns target)
-router.post('/', async (req, res) => {
+router.post('/', async (req: AuthenticatedRequest, res) => {
   try {
     const db = getDb();
-    const rawUserId = (req as any).userId ?? (req as any).user?.userId ?? req.body?.userId;
+    const rawUserId = req.userId ?? (req as any).user?.userId ?? req.body?.userId;
     const userId =
       rawUserId && ObjectId.isValid(String(rawUserId))
         ? new ObjectId(String(rawUserId))
@@ -94,28 +101,36 @@ router.post('/', async (req, res) => {
 });
 
 // GET /api/games/:id - Resume a round (guesses so far, status, never target while IN_PROGRESS)
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid game ID' });
+    if (typeof id !== 'string' || !ObjectId.isValid(id)) {
+      return res.status(404).json({ error: 'Game not found' });
     }
 
     const db = getDb();
     const game = await db.collection<GameDoc>('games').findOne({ _id: new ObjectId(id) });
 
     if (!game) {
-      return res.status(404).json({ error: 'Game session not found' });
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    if (game.userId && req.userId && game.userId.toString() !== req.userId) {
+      return res.status(403).json({ error: "Cannot access another user's game" });
     }
 
     return res.status(200).json({
       gameId: game._id.toString(),
-      status: game.status,
+      status: mapStatusToContract(game.status),
+      guesses: game.guesses.map((g) => ({
+        countryId: g.countryId ?? g.guessName,
+        country: g.guessName,
+        range: g.range ?? '< 500 km',
+        at: (g.createdAt instanceof Date ? g.createdAt : new Date(g.createdAt)).toISOString(),
+      })),
       maxGuesses: MAX_GUESSES,
       guessesUsed: game.guesses.length,
-      guesses: game.guesses,
-      targetCountry: game.status !== 'IN_PROGRESS' ? game.targetCountry : undefined,
-      pointsEarned: game.pointsEarned,
+      pointsEarned: game.pointsEarned ?? 0,
     });
   } catch (error) {
     console.error('Get game error:', error);
@@ -124,25 +139,30 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/games/:id/guesses - Submit a guess for an active game
-router.post('/:id/guesses', async (req, res) => {
+router.post('/:id/guesses', async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid game ID' });
+    if (!id || !ObjectId.isValid(id)) {
+      return res.status(404).json({ error: 'Game not found' });
     }
 
     const db = getDb();
     const game = await db.collection<GameDoc>('games').findOne({ _id: new ObjectId(id) });
 
     if (!game) {
-      return res.status(404).json({ error: 'Game session not found' });
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    if (game.userId && req.userId && game.userId.toString() !== req.userId) {
+      return res.status(403).json({ error: "Cannot guess on another user's game" });
     }
 
     if (game.status !== 'IN_PROGRESS') {
-      return res.status(400).json({ error: 'Game session is already completed' });
+      return res.status(400).json({ error: 'Game is already finished' });
     }
 
     const { countryId, guessLat, guessLng, guessName } = req.body;
+    let resolvedId = countryId ? String(countryId) : undefined;
     let resolvedName = guessName || 'Unknown';
     let resolvedLat = guessLat;
     let resolvedLng = guessLng;
@@ -158,6 +178,7 @@ router.post('/:id/guesses', async (req, res) => {
       if (!matched) {
         return res.status(404).json({ error: 'Guessed country not found' });
       }
+      resolvedId = matched.id;
       resolvedName = matched.name;
       resolvedLat = matched.lat;
       resolvedLng = matched.lng;
@@ -170,7 +191,7 @@ router.post('/:id/guesses', async (req, res) => {
     const distance = calculateDistance(resolvedLat, resolvedLng, game.targetLat, game.targetLng);
     const isSameCountry =
       resolvedName.toLowerCase() === game.targetCountry.toLowerCase() ||
-      (countryId && game.targetIso && String(countryId).toLowerCase() === game.targetIso.toLowerCase());
+      (resolvedId && game.targetIso && resolvedId.toLowerCase() === game.targetIso.toLowerCase());
     const solved = Boolean(isSameCountry || distance <= 50);
 
     const guessesUsed = game.guesses.length + 1;
@@ -190,12 +211,12 @@ router.post('/:id/guesses', async (req, res) => {
     const pointsEarned = solved ? Math.max(10, 100 - (guessesUsed - 1) * 10) : undefined;
 
     game.guesses.push({
-      countryId: countryId ? String(countryId) : undefined,
+      countryId: resolvedId,
       guessName: resolvedName,
       lat: resolvedLat,
       lng: resolvedLng,
       distance,
-      range,
+      range: solved ? 'Correct' : range,
       createdAt: new Date(),
     });
     game.status = newStatus;
@@ -204,7 +225,7 @@ router.post('/:id/guesses', async (req, res) => {
     }
 
     await db.collection<GameDoc>('games').replaceOne({ _id: game._id }, game);
-    
+
     if ((solved || isLost) && game.userId) {
       await db.collection('users').updateOne(
         { _id: game.userId },
