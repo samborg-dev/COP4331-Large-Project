@@ -12,7 +12,8 @@ export async function userUpload(userEmail,user,userPasswordHash,emailVerificati
     
     const newUser = new User({
     email: userEmail,
-    username: user,
+    firstName: first ,
+    lastName: last ,
     passwordHash: userPasswordHash,
     emailVerified: emailVerification,
     totalPoints: total,
