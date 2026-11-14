@@ -383,7 +383,16 @@ export function GamePage({
           </button>
           <p className="preview-kicker">COUNTRYGUESSER</p>
           <h2 id="help-title">How to play</h2>
-          <p>Each guess brings you closer. Follow the distance clues.</p>
+          <p>Find the mystery country before you run out of guesses.</p>
+          <p>
+            Search for a country and choose a suggestion. Press Enter again or
+            click the Enter button to submit your guess.
+            Smaller distance ranges mean you’re closer.
+          </p>
+          <p>
+            Find it in fewer guesses to earn more points. Your points add to
+            your leaderboard total.
+          </p>
         </div>
       </dialog>
     </main>

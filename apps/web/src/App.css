@@ -506,10 +506,13 @@ button:disabled {
   text-align: left;
   margin: 0 0 18px;
 }
-.help-content > p:last-child {
+.help-content > p:not(.preview-kicker) {
   color: #c0cbe0;
   font-size: 15px;
   line-height: 1.7;
+  margin-bottom: 16px;
+}
+.help-content > p:last-child {
   margin-bottom: 0;
 }
 .help-close {
