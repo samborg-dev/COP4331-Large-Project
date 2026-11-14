@@ -9,9 +9,9 @@ import countries from './countriesModel.js';
 // Resolve .env relative to this specific file
 dotenv.config({ path: '../../../.env' });
 
-const ATLAS_URI = process.env.MONGO_URI;
+const ATLAS_URI = process.env.MONGODB_URI;
 const app = express();
-const port = 80;
+const port = process.env.PORT || 5000;
 
 //app.use(cors()); // Allows browser requests from other ports
 
