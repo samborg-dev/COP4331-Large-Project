@@ -53,7 +53,12 @@ export function GameGlobe({ guesses = [], focusCountry, gameId }: { guesses?: Gu
     if (map.getLayer("raised-guessed-countries")) {
       map.setFilter("raised-guessed-countries", ["in", ["get", "countryKey"], ["literal", [...coloredCountries.current]]]);
     }
-
+    const labelSource = map.getSource("guessed-country-labels") as import("maplibre-gl").GeoJSONSource | undefined;
+    labelSource?.setData({ type: "FeatureCollection", features: next.flatMap((guess) => {
+      const point = centers.current.get(countryKey(guess.name));
+      return point ? [{ type: "Feature" as const, properties: { name: guess.name },
+        geometry: { type: "Point" as const, coordinates: point } }] : [];
+    }) });
   }
   useEffect(() => {
     latestGuesses.current = guesses;
@@ -122,6 +127,17 @@ export function GameGlobe({ guesses = [], focusCountry, gameId }: { guesses?: Gu
               "line-opacity": ["case", ["boolean", ["feature-state", "guessed"], false], 1, 0],
               "line-width": ["interpolate", ["linear"], ["zoom"], 0, 1.2, 4, 1.6, 9, 2],
             } });
+            map.addSource("guessed-country-labels", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+            map.addLayer({ id: "guessed-country-names", type: "symbol", source: "guessed-country-labels", layout: {
+              "text-field": ["get", "name"],
+              "text-font": ["Noto Sans Regular"],
+              "text-size": ["interpolate", ["linear"], ["zoom"], 0, 11, 5, 13, 9, 15],
+              "text-max-width": 10,
+              "text-allow-overlap": true,
+              "text-ignore-placement": true,
+              "text-pitch-alignment": "viewport",
+              "text-rotation-alignment": "viewport",
+            }, paint: { "text-color": "#f5f7fb", "text-halo-color": "#10141f", "text-halo-width": 1.8 } });
             updateHighlights(map, latestGuesses.current);
             focusGuess();
           } catch {
