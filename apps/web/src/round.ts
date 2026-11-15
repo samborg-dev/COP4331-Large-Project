@@ -65,7 +65,7 @@ export const savedRoundSchema = z.object({
   guesses: z.array(z.object({
     countryId: z.string().min(1),
     guessName: z.string().min(1),
-    range: z.enum(distanceRanges).or(z.literal("Correct")),
+    range: z.enum(distanceRanges),
   })),
   pointsEarned: z.number().int().nonnegative().optional(),
   targetCountry: z.string().optional(),
