@@ -59,6 +59,12 @@ Screens (`apps/mobile/lib/screens/`):
 | `/home` | Game: search a country, guess, see the distance range; win or reveal the answer | `POST /api/games`, `GET /api/countries/search`, `POST /api/games/:id/guesses`, `GET /api/games/:id`, `GET /api/users/me` |
 | `/leaderboard` | Players ranked by points, 20 per page | `GET /api/leaderboard` |
 
+The game screen has a globe (drag to spin, pinch to zoom) that colors each
+guessed country by distance with the same colors as the web globe, and shows the
+answer in green when the round ends. Its country shapes come from the web app's
+Natural Earth data; after that data changes, rebuild them with
+`dart run tool/build_countries.dart` (from `apps/mobile`).
+
 Protected calls send `Authorization: Bearer <accessToken>`; the token is kept in
 secure storage, and a 401 logs out and returns to the login screen.
 
