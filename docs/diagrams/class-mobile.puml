@@ -1,0 +1,161 @@
+@startuml class-mobile
+' Class diagram for the Flutter app (apps/mobile/lib). Owner: Arwa.
+' Render at https://www.plantuml.com/plantuml or with the VS Code PlantUML extension.
+!pragma layout smetana
+title CountryGuesser Mobile (Flutter): Class Diagram
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #f8fafc
+  BorderColor #1e293b
+  ArrowColor #1e293b
+}
+skinparam packageStyle rectangle
+
+package "app" {
+  class App <<StatelessWidget>> {
+    + build(context): MaterialApp
+  }
+  class AppColors {
+    + {static} background: Color
+    + {static} card: Color
+    + {static} primary: Color
+  }
+}
+
+package "api" {
+  class ApiClient {
+    - _http: http.Client
+    - {static} _storage: FlutterSecureStorage
+    + {static} baseUrl: String
+    + token: Future<String?>
+    + login(email, password): Future<void>
+    + register(firstName, lastName, email, password): Future<void>
+    + resendVerification(email): Future<void>
+    + forgotPassword(email): Future<void>
+    + currentUser(): Future<Map?>
+    + refreshUser(): Future<Map>
+    + logout(): Future<void>
+    + searchCountries(query, limit): Future<List<Country>>
+    + startGame(): Future<Game>
+    + getGame(gameId): Future<Game>
+    + guess(gameId, countryId): Future<GuessResult>
+    + leaderboard(page, limit): Future<LeaderboardPage>
+    - _request(method, route, body, auth)
+  }
+  class ApiException {
+    + statusCode: int
+    + message: String
+  }
+  class Country {
+    + id: String
+    + name: String
+    + continent: String
+  }
+  class Game {
+    + gameId: String
+    + maxGuesses: int
+    + status: String
+    + pointsEarned: int
+    + answer: String?
+  }
+  class Guess {
+    + country: String
+    + range: String
+  }
+  class GuessResult {
+    + country: String
+    + range: String
+    + solved: bool
+    + guessesUsed: int
+    + pointsEarned: int?
+  }
+  class LeaderboardPage {
+    + page: int
+    + limit: int
+    + total: int
+    + pageCount: int
+  }
+  class LeaderboardEntry {
+    + rank: int
+    + firstName: String
+    + lastName: String
+    + totalPoints: int
+    + gamesWon: int
+  }
+}
+
+package "screens" {
+  class LoginScreen <<StatefulWidget>> {
+    - _doLogin()
+  }
+  class RegisterScreen <<StatefulWidget>> {
+    - _doRegister()
+  }
+  class CheckInboxScreen <<StatefulWidget>> {
+    - _resend(email)
+  }
+  class ForgotPasswordScreen <<StatefulWidget>> {
+    - _send()
+  }
+  class GameScreen <<StatefulWidget>> {
+    - _game: Game?
+    - _guesses: List<Guess>
+    - _suggestions: List<Country>
+    - _selected: Country?
+    - _newRound()
+    - _onSearchChanged(text)
+    - _submitGuess()
+    - _revealAnswer(gameId)
+  }
+  class LeaderboardScreen <<StatefulWidget>> {
+    - _data: LeaderboardPage?
+    - _load(page)
+  }
+}
+
+package "widgets / utils" {
+  class AuthScaffold <<StatelessWidget>>
+  class LoadingButton <<StatelessWidget>>
+  class Validators <<functions>> {
+    + validateEmail(value): String?
+    + validateNewPassword(value): String?
+    + requiredField(name)
+  }
+}
+
+App --> ApiClient : creates one, shared by every screen
+App ..> AppColors : theme
+App --> LoginScreen : "/"
+App --> RegisterScreen : "/register"
+App --> CheckInboxScreen : "/check-inbox"
+App --> ForgotPasswordScreen : "/forgot-password"
+App --> GameScreen : "/home"
+App --> LeaderboardScreen : "/leaderboard"
+
+LoginScreen --> ApiClient
+RegisterScreen --> ApiClient
+CheckInboxScreen --> ApiClient
+ForgotPasswordScreen --> ApiClient
+GameScreen --> ApiClient
+LeaderboardScreen --> ApiClient
+
+LoginScreen ..> AuthScaffold
+RegisterScreen ..> AuthScaffold
+CheckInboxScreen ..> AuthScaffold
+ForgotPasswordScreen ..> AuthScaffold
+AuthScaffold ..> LoadingButton
+LoginScreen ..> Validators
+RegisterScreen ..> Validators
+
+ApiClient ..> ApiException : throws
+ApiClient ..> Country : returns
+ApiClient ..> Game : returns
+ApiClient ..> GuessResult : returns
+ApiClient ..> LeaderboardPage : returns
+Game "1" *-- "0..*" Guess
+LeaderboardPage "1" *-- "0..*" LeaderboardEntry
+GameScreen o-- Game
+GameScreen o-- "0..*" Country : suggestions
+@enduml
