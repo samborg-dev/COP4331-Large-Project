@@ -5,6 +5,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 
+import 'models.dart';
+
 /// An error response from the API: `{ "error": "..." }` plus the HTTP status.
 class ApiException implements Exception {
   ApiException(this.statusCode, this.message);
@@ -25,6 +27,10 @@ class ApiClient {
   static const _tokenKey = 'token_data';
   static const _userKey = 'user_data';
 
+  ApiClient({http.Client? client}) : _http = client ?? http.Client();
+
+  final http.Client _http;
+
   static String get baseUrl {
     if (_envUrl.isNotEmpty) return _envUrl;
     // The Android emulator reaches the host machine at 10.0.2.2
@@ -34,25 +40,53 @@ class ApiClient {
     return 'http://localhost:5000';
   }
 
-  /// POSTs JSON and returns the HTTP status with the decoded body. Tolerates tolerates non-JSON bodies
-  /// (e.g. Express's HTML 404 page), and logs out on a 401.
-  Future<(int, Map<String, dynamic>)> _send(String route, Map<String, dynamic> body) async {
-    final res = await http
-        .post(
-          Uri.parse('$baseUrl/$route'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(body),
-        )
-        .timeout(const Duration(seconds: 15));
-    if (res.statusCode == 401) await logout();
-    Map<String, dynamic> json = {};
+  /// Sends a request and returns the HTTP status with the decoded body
+  /// (a map, a list, or null for a non-JSON body such as Express's HTML 404).
+  /// With [auth], sends the saved JWT and treats a 401 as an expired session:
+  /// it logs out and throws [ApiException] with status 401.
+  Future<(int, dynamic)> _request(
+    String method,
+    String route, {
+    Map<String, dynamic>? body,
+    bool auth = false,
+  }) async {
+    final headers = <String, String>{
+      if (body != null) 'Content-Type': 'application/json',
+    };
+    if (auth) {
+      final t = await token;
+      if (t != null) headers['Authorization'] = 'Bearer $t';
+    }
+    final request = http.Request(method, Uri.parse('$baseUrl/$route'))..headers.addAll(headers);
+    if (body != null) request.body = jsonEncode(body);
+    final res = await http.Response.fromStream(
+      await _http.send(request).timeout(const Duration(seconds: 15)),
+    );
+    if (auth && res.statusCode == 401) {
+      await logout();
+      throw ApiException(401, 'Your session expired. Please log in again.');
+    }
+    dynamic json;
     try {
-      final decoded = jsonDecode(res.body);
-      if (decoded is Map<String, dynamic>) json = decoded;
+      json = jsonDecode(res.body);
     } on FormatException {
-      // not JSON; fall through with an empty body
+      // not JSON; leave it null
     }
     return (res.statusCode, json);
+  }
+
+  /// POSTs to a public route and returns the status with the body as a map.
+  Future<(int, Map<String, dynamic>)> _send(String route, Map<String, dynamic> body) async {
+    final (status, json) = await _request('POST', route, body: body);
+    return (status, json is Map<String, dynamic> ? json : <String, dynamic>{});
+  }
+
+  /// Calls a protected route, throws [ApiException] on any error, and
+  /// returns the decoded body.
+  Future<dynamic> _authed(String method, String route, [Map<String, dynamic>? body]) async {
+    final (status, json) = await _request(method, route, body: body, auth: true);
+    _throwIfError(status, json is Map<String, dynamic> ? json : const {});
+    return json;
   }
 
   /// Throws [ApiException] for a non-2xx status or a non-empty `error` field.
@@ -134,5 +168,47 @@ class ApiClient {
   Future<void> forgotPassword(String email) async {
     final (status, json) = await _send('api/auth/forgot-password', {'email': email});
     _throwIfError(status, json);
+  }
+
+  /// Refreshes the saved profile (name, points) from `GET /api/users/me`.
+  Future<Map<String, dynamic>> refreshUser() async {
+    final user = await _authed('GET', 'api/users/me') as Map<String, dynamic>;
+    await _storage.write(key: _userKey, value: jsonEncode(user));
+    return user;
+  }
+
+  /// Server-side partial-match search over country names.
+  Future<List<Country>> searchCountries(String query, {int limit = 8}) async {
+    final q = Uri.encodeQueryComponent(query.trim());
+    final json = await _authed('GET', 'api/countries/search?q=$q&limit=$limit');
+    return [
+      for (final c in json as List? ?? const []) Country.fromJson(c as Map<String, dynamic>),
+    ];
+  }
+
+  /// Starts a round: the server secretly picks the mystery country.
+  Future<Game> startGame() async {
+    final json = await _authed('POST', 'api/games', const {});
+    return Game.fromJson(json as Map<String, dynamic>);
+  }
+
+  /// Loads a round, including its guesses (and the answer once it's over).
+  Future<Game> getGame(String gameId) async {
+    final json = await _authed('GET', 'api/games/${Uri.encodeComponent(gameId)}');
+    return Game.fromJson(json as Map<String, dynamic>);
+  }
+
+  Future<GuessResult> guess(String gameId, String countryId) async {
+    final json = await _authed(
+      'POST',
+      'api/games/${Uri.encodeComponent(gameId)}/guesses',
+      {'countryId': countryId},
+    );
+    return GuessResult.fromJson(json as Map<String, dynamic>);
+  }
+
+  Future<LeaderboardPage> leaderboard({int page = 1, int limit = 20}) async {
+    final json = await _authed('GET', 'api/leaderboard?page=$page&limit=$limit');
+    return LeaderboardPage.fromJson(json as Map<String, dynamic>);
   }
 }
