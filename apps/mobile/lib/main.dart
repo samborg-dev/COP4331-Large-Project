@@ -6,6 +6,7 @@ import 'screens/forgot_password_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
+import 'theme.dart';
 
 void main() {
   runApp(const App());
@@ -20,7 +21,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Country Guesser',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
+      theme: buildTheme(),
       initialRoute: '/',
       routes: {
         '/': (_) => LoginScreen(api: api),

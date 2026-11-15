@@ -4,11 +4,19 @@ import 'package:flutter_test/flutter_test.dart';
 
 // These tests only exercise client-side validation and navigation, so they
 // never hit the network.
+
+/// Scrolls [finder] into view first, since the auth forms are taller than
+/// the 800x600 test window.
+Future<void> tap(WidgetTester tester, Finder finder) async {
+  await tester.ensureVisible(finder);
+  await tester.tap(finder);
+}
+
 void main() {
   testWidgets('login shows validation errors when submitted empty', (tester) async {
     await tester.pumpWidget(const App());
 
-    await tester.tap(find.widgetWithText(FilledButton, 'Log In'));
+    await tap(tester, find.widgetWithText(FilledButton, 'Log In'));
     await tester.pump();
 
     expect(find.text('Enter your email'), findsOneWidget);
@@ -18,26 +26,26 @@ void main() {
   testWidgets('"Sign up" opens the register screen and "Log in" returns', (tester) async {
     await tester.pumpWidget(const App());
 
-    await tester.tap(find.widgetWithText(TextButton, 'Sign up'));
+    await tap(tester, find.widgetWithText(TextButton, 'Sign up'));
     await tester.pumpAndSettle();
     expect(find.text('Create account'), findsOneWidget);
 
     await tester.ensureVisible(find.widgetWithText(TextButton, 'Log in'));
-    await tester.tap(find.widgetWithText(TextButton, 'Log in'));
+    await tap(tester, find.widgetWithText(TextButton, 'Log in'));
     await tester.pumpAndSettle();
     expect(find.text('Welcome back'), findsOneWidget);
   });
 
   testWidgets('register validates every field before calling the API', (tester) async {
     await tester.pumpWidget(const App());
-    await tester.tap(find.widgetWithText(TextButton, 'Sign up'));
+    await tap(tester, find.widgetWithText(TextButton, 'Sign up'));
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byKey(const Key('register-email')), 'not-an-email');
     await tester.enterText(find.byKey(const Key('register-password')), 'short');
     await tester.enterText(find.byKey(const Key('register-confirm')), 'different');
     await tester.ensureVisible(find.widgetWithText(FilledButton, 'Sign Up'));
-    await tester.tap(find.widgetWithText(FilledButton, 'Sign Up'));
+    await tap(tester, find.widgetWithText(FilledButton, 'Sign Up'));
     await tester.pump();
 
     expect(find.text('Enter your first name'), findsOneWidget);
@@ -50,7 +58,7 @@ void main() {
   testWidgets('"Forgot password?" opens the reset request screen', (tester) async {
     await tester.pumpWidget(const App());
 
-    await tester.tap(find.widgetWithText(TextButton, 'Forgot password?'));
+    await tap(tester, find.widgetWithText(TextButton, 'Forgot password?'));
     await tester.pumpAndSettle();
 
     expect(find.text('Forgot password?'), findsOneWidget); // the title
@@ -68,7 +76,7 @@ void main() {
         );
 
     expect(passwordField().obscureText, isTrue);
-    await tester.tap(find.byTooltip('Show password'));
+    await tap(tester, find.byTooltip('Show password'));
     await tester.pump();
     expect(passwordField().obscureText, isFalse);
   });

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme.dart';
+
 /// Shared layout for the logged-out screens: app mark, title, subtitle, and a
 /// scrollable, width-capped column so forms work on small phones and tablets.
 class AuthScaffold extends StatelessWidget {
@@ -30,24 +32,45 @@ class AuthScaffold extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(icon, size: 64, color: theme.colorScheme.primary),
-                  const SizedBox(height: 16),
-                  Text(
-                    title,
+                  const Text(
+                    'CountryGuesser',
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineMedium,
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      subtitle!,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium
-                          ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    style: TextStyle(
+                      color: Color(0xFFB5C6FF),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
                     ),
-                  ],
-                  const SizedBox(height: 32),
-                  ...children,
+                  ),
+                  const SizedBox(height: 24),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(28),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Icon(icon, size: 48, color: theme.colorScheme.primary),
+                          const SizedBox(height: 16),
+                          Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.headlineMedium,
+                          ),
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              subtitle!,
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodyMedium
+                                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                            ),
+                          ],
+                          const SizedBox(height: 28),
+                          ...children,
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -79,7 +102,7 @@ class LoadingButton extends StatelessWidget {
       child: loading
           ? const SizedBox.square(
               dimension: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimary),
             )
           : Text(label),
     );
