@@ -1,7 +1,10 @@
+import dotenv from 'dotenv';
+import express from 'express';
 import mongoose from 'mongoose';
 import Token from './tokensModel.js';
+dotenv.config({path:'../../../.env'});
+const ATLAS_URI = process.env.MONGO_URI;
 
-const ATLAS_URI = "mongodb+srv://Large_Project_User:Cop4331C@cluster0.jlixyxr.mongodb.net/Large_Project_DB?retryWrites=true&w=majority";
 
 export async function TokenUpload(ID,TokenType,Hash,expiration) {
   try {
