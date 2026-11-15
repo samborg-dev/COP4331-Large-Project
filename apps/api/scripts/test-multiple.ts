@@ -5,6 +5,9 @@ import { createRawToken, hashToken } from '../src/tokens.js';
 
 dotenv.config();
 
+const destructiveE2EAllowed =
+  process.env.NODE_ENV === 'test' && process.env.ALLOW_DESTRUCTIVE_E2E === 'true';
+
 const BASE_URL = `http://localhost:${process.env.PORT || 5000}`;
 const TEST_EMAIL = 'delivered@resend.dev';
 const INITIAL_PASSWORD = 'Password123!';
@@ -240,7 +243,14 @@ async function runTests() {
   process.exit(0);
 }
 
-runTests().catch((err) => {
-  console.error('E2E Test Error:', err);
-  process.exit(1);
-});
+if (!destructiveE2EAllowed) {
+  console.error(
+    'Refusing to run destructive E2E tests. Set NODE_ENV=test and ALLOW_DESTRUCTIVE_E2E=true explicitly.',
+  );
+  process.exitCode = 1;
+} else {
+  runTests().catch((err) => {
+    console.error('E2E Test Error:', err);
+    process.exit(1);
+  });
+}

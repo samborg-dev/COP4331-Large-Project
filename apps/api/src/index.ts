@@ -52,7 +52,7 @@ app.get('/api/users/me', requireAuth, async (req: AuthenticatedRequest, res) => 
 });
 
 // GET /api/countries/search?q=fra&limit=10 (Bearer Auth)
-// Returns top-level array: [{ id, name, iso2, iso3, continent }] matching start of country name
+// Returns top-level array: [{ id, name, iso2, iso3, continent }] matching any part of country name
 app.get('/api/countries/search', requireAuth, async (req, res) => {
   try {
     const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
@@ -63,11 +63,11 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
     }
 
     const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    // Match strictly from the beginning of the country name
-    const prefixRegex = new RegExp(`^${escaped}`, 'i');
+    const wildcardQuery = q.replace(/[\\*?]/g, '\\$&');
+    const partialRegex = new RegExp(escaped, 'i');
     const db = getDb();
 
-    // 1. Try MongoDB Atlas Search index "name" + strict prefix filter first
+    // 1. Try MongoDB Atlas Search index "name" for partial matches first
     try {
       const atlasResults = await db
         .collection('countries')
@@ -75,15 +75,16 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
           {
             $search: {
               index: 'name',
-              autocomplete: {
-                query: escaped,
+              wildcard: {
+                query: `*${wildcardQuery}*`,
                 path: 'COUNTRY',
+                allowAnalyzedField: true,
               },
             },
           },
           {
             $match: {
-              COUNTRY: { $regex: prefixRegex },
+              COUNTRY: { $regex: partialRegex },
             },
           },
           { $limit: limit },
@@ -109,7 +110,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
       // Fallback to collection scan below if Atlas Search index is unavailable
     }
 
-    // 2. Fallback prefix regex over countries collection
+    // 2. Fallback partial regex over countries collection
     const docs = await db.collection('countries').find({}).toArray();
     const matches: Array<{
       id: string;
@@ -123,7 +124,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
       if (Array.isArray(doc.features)) {
         for (const f of doc.features) {
           const name = String(f?.properties?.COUNTRY ?? f?.properties?.name ?? '');
-          if (prefixRegex.test(name)) {
+          if (partialRegex.test(name)) {
             const iso2 = String(f?.properties?.ISO ?? f?.properties?.ISO_A2 ?? '');
             const iso3 = String(f?.properties?.ISO_A3 ?? f?.properties?.iso3 ?? iso2);
             matches.push({
@@ -138,7 +139,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
         }
       } else {
         const name = String(doc.COUNTRY ?? doc.name ?? doc?.properties?.COUNTRY ?? '');
-        if (prefixRegex.test(name)) {
+        if (partialRegex.test(name)) {
           const iso2 = String(doc.ISO ?? doc.iso ?? doc.iso2 ?? '');
           const iso3 = String(doc.ISO_A3 ?? doc.iso3 ?? iso2);
           matches.push({

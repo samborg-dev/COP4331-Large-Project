@@ -6,6 +6,7 @@ import type { AuthenticatedRequest } from '../middleware/requireAuth.js';
 
 const router = Router();
 const MAX_GUESSES = 10;
+const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] as const;
 
 type NormalizedCountry = {
   id: string;
@@ -29,7 +30,25 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return Math.round(R * c);
+  return R * c;
+}
+
+function roundDistance(distance: number): number {
+  return Math.round(distance / 10) * 10;
+}
+
+function calculateDirection(lat1: number, lon1: number, lat2: number, lon2: number): string {
+  const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+  const dLon = toRadians(lon2 - lon1);
+  const latitude1 = toRadians(lat1);
+  const latitude2 = toRadians(lat2);
+  const y = Math.sin(dLon) * Math.cos(latitude2);
+  const x =
+    Math.cos(latitude1) * Math.sin(latitude2) -
+    Math.sin(latitude1) * Math.cos(latitude2) * Math.cos(dLon);
+  const bearing = (Math.atan2(y, x) * 180) / Math.PI;
+  const normalizedBearing = (bearing + 360) % 360;
+  return DIRECTIONS[Math.round(normalizedBearing / 45) % DIRECTIONS.length]!;
 }
 
 // Helper to normalize countries whether stored as GeoJSON features or flat CSV documents
@@ -155,11 +174,20 @@ router.get('/:id', async (req: AuthenticatedRequest, res) => {
         countryId: g.countryId ?? g.guessName,
         country: g.guessName,
         range: g.range ?? '< 500 km',
+        distance: roundDistance(
+          g.distance ?? calculateDistance(g.lat, g.lng, game.targetLat, game.targetLng),
+        ),
+        direction:
+          g.direction ??
+          (g.range === 'Correct'
+            ? 'Correct'
+            : calculateDirection(g.lat, g.lng, game.targetLat, game.targetLng)),
         at: (g.createdAt instanceof Date ? g.createdAt : new Date(g.createdAt)).toISOString(),
       })),
       maxGuesses: MAX_GUESSES,
       guessesUsed: game.guesses.length,
       pointsEarned: game.pointsEarned ?? 0,
+      surrendered: game.surrendered ?? false,
       ...(game.status !== 'IN_PROGRESS' ? { answer: game.targetCountry } : {}),
     });
   } catch (error) {
@@ -168,7 +196,49 @@ router.get('/:id', async (req: AuthenticatedRequest, res) => {
   }
 });
 
-// 3. POST /api/games/:id/guesses - Submit a guess for an active game
+// 3. POST /api/games/:id/give-up - End an active game without awarding points
+router.post('/:id/give-up', async (req: AuthenticatedRequest, res) => {
+  try {
+    const { id } = req.params;
+    if (typeof id !== 'string' || !ObjectId.isValid(id)) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    const db = getDb();
+    const game = await db.collection<GameDoc>('games').findOne({ _id: new ObjectId(id) });
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+    if (game.userId && game.userId.toString() !== req.userId) {
+      return res.status(403).json({ error: "Cannot give up another user's game" });
+    }
+    if (game.status !== 'IN_PROGRESS') {
+      return res.status(400).json({ error: 'Game is already finished' });
+    }
+
+    const ended = await db.collection<GameDoc>('games').updateOne(
+      { _id: game._id, status: 'IN_PROGRESS' },
+      { $set: { status: 'LOST', pointsEarned: 0, surrendered: true } },
+    );
+    if (ended.modifiedCount !== 1) {
+      return res.status(400).json({ error: 'Game is already finished' });
+    }
+
+    if (game.userId) {
+      await db.collection('users').updateOne(
+        { _id: game.userId },
+        { $inc: { gamesPlayed: 1 } },
+      );
+    }
+
+    return res.status(200).json({ gameId: game._id.toString() });
+  } catch (error) {
+    console.error('Give up game error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 4. POST /api/games/:id/guesses - Submit a guess for an active game
 router.post('/:id/guesses', async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
@@ -251,11 +321,17 @@ router.post('/:id/guesses', async (req: AuthenticatedRequest, res) => {
       return res.status(400).json({ error: 'Valid countryId or guess coordinates are required' });
     }
 
-    const distance = calculateDistance(resolvedLat, resolvedLng, game.targetLat, game.targetLng);
+    const exactDistance = calculateDistance(
+      resolvedLat,
+      resolvedLng,
+      game.targetLat,
+      game.targetLng,
+    );
+    const distance = roundDistance(exactDistance);
     const isSameCountry =
       resolvedName.toLowerCase() === game.targetCountry.toLowerCase() ||
       (resolvedId && game.targetIso && resolvedId.toLowerCase() === game.targetIso.toLowerCase());
-    const solved = Boolean(isSameCountry || distance <= 50);
+    const solved = Boolean(isSameCountry || exactDistance <= 50);
 
     const guessesUsed = game.guesses.length + 1;
     const isLost = !solved && guessesUsed >= MAX_GUESSES;
@@ -272,6 +348,9 @@ router.post('/:id/guesses', async (req: AuthenticatedRequest, res) => {
               ? '3,000–6,000 km'
               : '> 6,000 km';
     const pointsEarned = solved ? Math.max(10, 100 - (guessesUsed - 1) * 10) : undefined;
+    const direction = solved
+      ? 'Correct'
+      : calculateDirection(resolvedLat, resolvedLng, game.targetLat, game.targetLng);
 
     game.guesses.push({
       countryId: resolvedId,
@@ -280,6 +359,7 @@ router.post('/:id/guesses', async (req: AuthenticatedRequest, res) => {
       lng: resolvedLng,
       distance,
       range: solved ? 'Correct' : range,
+      direction,
       createdAt: new Date(),
     });
     game.status = newStatus;
@@ -305,6 +385,8 @@ router.post('/:id/guesses', async (req: AuthenticatedRequest, res) => {
     return res.status(200).json({
       country: resolvedName,
       range: solved ? 'Correct' : range,
+      distance,
+      direction,
       solved,
       guessesUsed,
       ...(pointsEarned !== undefined ? { pointsEarned } : {}),
