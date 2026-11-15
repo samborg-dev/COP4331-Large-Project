@@ -2,9 +2,20 @@ import { Router } from 'express';
 import { ObjectId } from 'mongodb';
 import { getDb } from '../db.js';
 import type { GameDoc } from '../models/game.js';
+import type { AuthenticatedRequest } from '../middleware/requireAuth.js';
 
 const router = Router();
-const MAX_GUESSES = 6;
+const MAX_GUESSES = 10;
+
+type NormalizedCountry = {
+  id: string;
+  mongoId: string;
+  iso2: string;
+  iso3: string;
+  name: string;
+  lat: number;
+  lng: number;
+};
 
 // Haversine formula to calculate distance in kilometers between two lat/lng points
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -21,29 +32,48 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return Math.round(R * c);
 }
 
-// Helper to normalize countries whether stored as GeoJSON features or flat documents
-async function getAllNormalizedCountries() {
+// Helper to normalize countries whether stored as GeoJSON features or flat CSV documents
+async function getAllNormalizedCountries(): Promise<NormalizedCountry[]> {
   const db = getDb();
   const docs = await db.collection('countries').find({}).toArray();
 
-  const normalized: Array<{ id: string; name: string; lat: number; lng: number }> = [];
+  const normalized: NormalizedCountry[] = [];
 
   for (const doc of docs as any[]) {
+    const mongoId = String(doc._id ?? '');
     if (Array.isArray(doc.features)) {
       for (const f of doc.features) {
         const [lng, lat] = f?.geometry?.coordinates ?? [0, 0];
+        const iso2 = String(f?.properties?.ISO ?? f?.properties?.ISO_A2 ?? '');
+        const iso3 = String(f?.properties?.ISO_A3 ?? f?.properties?.iso3 ?? iso2);
+        const name = String(f?.properties?.COUNTRY ?? f?.properties?.name ?? 'Unknown');
         normalized.push({
-          id: f?.properties?.ISO ?? f?.properties?.COUNTRY ?? String(doc._id),
-          name: f?.properties?.COUNTRY ?? 'Unknown',
+          id: mongoId || iso2 || name,
+          mongoId,
+          iso2,
+          iso3,
+          name,
           lat: Number(lat) || 0,
           lng: Number(lng) || 0,
         });
       }
     } else {
-      const [lng, lat] = doc?.geometry?.coordinates ?? [doc.lng ?? 0, doc.lat ?? 0];
+      const coords = doc?.geometry?.coordinates;
+      const lng = Array.isArray(coords)
+        ? coords[0]
+        : (doc.lng ?? doc.longitude ?? doc.LON ?? doc.lon ?? doc.LONGITUDE ?? 0);
+      const lat = Array.isArray(coords)
+        ? coords[1]
+        : (doc.lat ?? doc.latitude ?? doc.LAT ?? doc.LATITUDE ?? 0);
+      const iso2 = String(doc.ISO ?? doc.iso ?? doc.iso2 ?? doc.ISO_A2 ?? '');
+      const iso3 = String(doc.ISO_A3 ?? doc.iso3 ?? iso2);
+      const name = String(doc.COUNTRY ?? doc.name ?? doc?.properties?.COUNTRY ?? 'Unknown');
       normalized.push({
-        id: String(doc.iso ?? doc.ISO ?? doc._id),
-        name: doc.name ?? doc.COUNTRY ?? doc?.properties?.COUNTRY ?? 'Unknown',
+        id: mongoId || iso2 || name,
+        mongoId,
+        iso2,
+        iso3,
+        name,
         lat: Number(lat) || 0,
         lng: Number(lng) || 0,
       });
@@ -53,11 +83,17 @@ async function getAllNormalizedCountries() {
   return normalized;
 }
 
-// POST /api/games - Start a new game session (never returns target)
-router.post('/', async (req, res) => {
+function mapStatusToContract(status: GameDoc['status']): 'active' | 'won' | 'lost' {
+  if (status === 'WON') return 'won';
+  if (status === 'LOST') return 'lost';
+  return 'active';
+}
+
+// 1. POST /api/games - Start a new game session
+router.post('/', async (req: AuthenticatedRequest, res) => {
   try {
     const db = getDb();
-    const rawUserId = (req as any).userId ?? (req as any).user?.userId ?? req.body?.userId;
+    const rawUserId = req.userId ?? (req as any).user?.userId ?? req.body?.userId;
     const userId =
       rawUserId && ObjectId.isValid(String(rawUserId))
         ? new ObjectId(String(rawUserId))
@@ -73,7 +109,7 @@ router.post('/', async (req, res) => {
     const newGame: GameDoc = {
       userId,
       targetCountry: randomCountry.name,
-      targetIso: randomCountry.id,
+      targetIso: randomCountry.iso2 || randomCountry.id,
       targetLat: randomCountry.lat,
       targetLng: randomCountry.lng,
       guesses: [],
@@ -93,29 +129,38 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/games/:id - Resume a round (guesses so far, status, never target while IN_PROGRESS)
-router.get('/:id', async (req, res) => {
+// 2. GET /api/games/:id - Resume a round
+router.get('/:id', async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid game ID' });
+    if (typeof id !== 'string' || !ObjectId.isValid(id)) {
+      return res.status(404).json({ error: 'Game not found' });
     }
 
     const db = getDb();
     const game = await db.collection<GameDoc>('games').findOne({ _id: new ObjectId(id) });
 
     if (!game) {
-      return res.status(404).json({ error: 'Game session not found' });
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    if (game.userId && req.userId && game.userId.toString() !== req.userId) {
+      return res.status(403).json({ error: "Cannot access another user's game" });
     }
 
     return res.status(200).json({
       gameId: game._id.toString(),
-      status: game.status,
+      status: mapStatusToContract(game.status),
+      guesses: game.guesses.map((g) => ({
+        countryId: g.countryId ?? g.guessName,
+        country: g.guessName,
+        range: g.range ?? '< 500 km',
+        at: (g.createdAt instanceof Date ? g.createdAt : new Date(g.createdAt)).toISOString(),
+      })),
       maxGuesses: MAX_GUESSES,
       guessesUsed: game.guesses.length,
-      guesses: game.guesses,
-      targetCountry: game.status !== 'IN_PROGRESS' ? game.targetCountry : undefined,
-      pointsEarned: game.pointsEarned,
+      pointsEarned: game.pointsEarned ?? 0,
+      ...(game.status !== 'IN_PROGRESS' ? { answer: game.targetCountry } : {}),
     });
   } catch (error) {
     console.error('Get game error:', error);
@@ -123,41 +168,80 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/games/:id/guesses - Submit a guess for an active game
-router.post('/:id/guesses', async (req, res) => {
+// 3. POST /api/games/:id/guesses - Submit a guess for an active game
+router.post('/:id/guesses', async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid game ID' });
+    console.log('[DEBUG GUESS] gameId:', id, 'body:', req.body);
+
+    if (typeof id !== 'string' || !ObjectId.isValid(id)) {
+      return res.status(404).json({ error: 'Game not found' });
     }
 
     const db = getDb();
     const game = await db.collection<GameDoc>('games').findOne({ _id: new ObjectId(id) });
 
     if (!game) {
-      return res.status(404).json({ error: 'Game session not found' });
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    if (game.userId && req.userId && game.userId.toString() !== req.userId) {
+      return res.status(403).json({ error: "Cannot guess on another user's game" });
     }
 
     if (game.status !== 'IN_PROGRESS') {
-      return res.status(400).json({ error: 'Game session is already completed' });
+      return res.status(400).json({ error: 'Game is already finished' });
     }
 
-    const { countryId, guessLat, guessLng, guessName } = req.body;
-    let resolvedName = guessName || 'Unknown';
+    const { countryId, country, id: bodyId, name: bodyName, guessLat, guessLng, guessName } = req.body ?? {};
+    const rawLookup = String(countryId ?? country ?? bodyId ?? bodyName ?? guessName ?? '').trim();
+
+    let resolvedId = rawLookup || undefined;
+    let resolvedName = guessName || country || bodyName || 'Unknown';
     let resolvedLat = guessLat;
     let resolvedLng = guessLng;
 
-    // If the client sends { countryId } per API contract, look up its coordinates
-    if (countryId && (resolvedLat === undefined || resolvedLng === undefined)) {
+    if (rawLookup && (resolvedLat === undefined || resolvedLng === undefined)) {
       const countries = await getAllNormalizedCountries();
-      const matched = countries.find(
+      const targetLower = rawLookup.toLowerCase();
+      let matched = countries.find(
         (c) =>
-          c.id.toLowerCase() === String(countryId).toLowerCase() ||
-          c.name.toLowerCase() === String(countryId).toLowerCase()
+          c.id.toLowerCase() === targetLower ||
+          c.mongoId.toLowerCase() === targetLower ||
+          c.iso2.toLowerCase() === targetLower ||
+          c.iso3.toLowerCase() === targetLower ||
+          c.name.toLowerCase() === targetLower
       );
+
+      if (!matched && ObjectId.isValid(rawLookup)) {
+        const rawDoc: any = await db.collection('countries').findOne({ _id: new ObjectId(rawLookup) });
+        if (rawDoc) {
+          const coords = rawDoc?.geometry?.coordinates;
+          const lng = Array.isArray(coords)
+            ? coords[0]
+            : (rawDoc.lng ?? rawDoc.longitude ?? rawDoc.LON ?? rawDoc.lon ?? rawDoc.LONGITUDE ?? 0);
+          const lat = Array.isArray(coords)
+            ? coords[1]
+            : (rawDoc.lat ?? rawDoc.latitude ?? rawDoc.LAT ?? rawDoc.LATITUDE ?? 0);
+          const iso2 = String(rawDoc.ISO ?? rawDoc.iso ?? rawDoc.iso2 ?? rawDoc.ISO_A2 ?? '');
+          const name = String(rawDoc.COUNTRY ?? rawDoc.name ?? rawDoc?.properties?.COUNTRY ?? 'Unknown');
+          matched = {
+            id: String(rawDoc._id),
+            mongoId: String(rawDoc._id),
+            iso2,
+            iso3: String(rawDoc.ISO_A3 ?? rawDoc.iso3 ?? iso2),
+            name,
+            lat: Number(lat) || 0,
+            lng: Number(lng) || 0,
+          };
+        }
+      }
+
       if (!matched) {
+        console.log('[DEBUG GUESS] Country not found for:', rawLookup);
         return res.status(404).json({ error: 'Guessed country not found' });
       }
+      resolvedId = matched.id;
       resolvedName = matched.name;
       resolvedLat = matched.lat;
       resolvedLng = matched.lng;
@@ -170,7 +254,7 @@ router.post('/:id/guesses', async (req, res) => {
     const distance = calculateDistance(resolvedLat, resolvedLng, game.targetLat, game.targetLng);
     const isSameCountry =
       resolvedName.toLowerCase() === game.targetCountry.toLowerCase() ||
-      (countryId && game.targetIso && String(countryId).toLowerCase() === game.targetIso.toLowerCase());
+      (resolvedId && game.targetIso && resolvedId.toLowerCase() === game.targetIso.toLowerCase());
     const solved = Boolean(isSameCountry || distance <= 50);
 
     const guessesUsed = game.guesses.length + 1;
@@ -190,12 +274,12 @@ router.post('/:id/guesses', async (req, res) => {
     const pointsEarned = solved ? Math.max(10, 100 - (guessesUsed - 1) * 10) : undefined;
 
     game.guesses.push({
-      countryId: countryId ? String(countryId) : undefined,
+      countryId: resolvedId,
       guessName: resolvedName,
       lat: resolvedLat,
       lng: resolvedLng,
       distance,
-      range,
+      range: solved ? 'Correct' : range,
       createdAt: new Date(),
     });
     game.status = newStatus;
@@ -204,7 +288,7 @@ router.post('/:id/guesses', async (req, res) => {
     }
 
     await db.collection<GameDoc>('games').replaceOne({ _id: game._id }, game);
-    
+
     if ((solved || isLost) && game.userId) {
       await db.collection('users').updateOne(
         { _id: game.userId },

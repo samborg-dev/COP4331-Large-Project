@@ -24,6 +24,22 @@ export const guessResponseSchema = z
   })
   .refine((guess) => guess.solved || guess.range !== "Correct");
 
+export const resumeRoundSchema = z.object({
+  gameId: z.string().min(1),
+  status: z.enum(["active", "won", "lost"]),
+  maxGuesses: z.number().int().positive(),
+  guessesUsed: z.number().int().nonnegative(),
+  guesses: z.array(
+    z.object({
+      countryId: z.string().min(1),
+      country: z.string().min(1),
+      range: z.enum(distanceRanges).or(z.literal("Correct")),
+    }),
+  ),
+  pointsEarned: z.number().int().nonnegative().optional(),
+  answer: z.string().min(1).optional(),
+});
+
 export type Guess = {
   countryId: string;
   name: string;

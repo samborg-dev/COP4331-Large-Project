@@ -51,6 +51,7 @@ export function clearSession(forgetRound = false) {
   }
   localStorage.removeItem("token_data");
   localStorage.removeItem("user_data");
+  localStorage.removeItem("current_game_id");
 }
 export async function api<T>(
   path: string,
