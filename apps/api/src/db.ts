@@ -1,12 +1,26 @@
-import { MongoClient } from 'mongodb';
-import { env } from './env.js';
+import { MongoClient, Db } from 'mongodb';
+import dotenv from 'dotenv';
 
-export const client = new MongoClient(env.MONGODB_URI);
+dotenv.config();
 
-export async function connectDb(): Promise<void> {
+let client: MongoClient | null = null;
+let dbInstance: Db | null = null;
+
+export async function connectDB(): Promise<Db> {
+  if (dbInstance) return dbInstance;
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error('MONGODB_URI is not set in environment');
+  }
+  client = new MongoClient(uri);
   await client.connect();
-  console.log('MongoDB connected');
+  dbInstance = client.db();
+  return dbInstance;
 }
 
-// uses the database named in the connection string
-export const db = () => client.db();
+export function getDb(): Db {
+  if (!dbInstance) {
+    throw new Error('Database not connected. Call connectDB() first.');
+  }
+  return dbInstance;
+}

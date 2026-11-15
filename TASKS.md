@@ -125,7 +125,7 @@ down.
 |---|---|---|
 | `users` | firstName, lastName, email, passwordHash, emailVerified, totalPoints, gamesPlayed, gamesWon, createdAt | `email` unique; `totalPoints` desc |
 | `tokens` | userId, type (`verify` \| `reset`), tokenHash, expiresAt | TTL on `expiresAt`; `tokenHash` |
-| `countries` | name, aliases[], iso2, iso3, continent, lat, lng | `name`, `aliases` |
+| `countries` | name, iso2, Countryaff, iso3, lat, lng | `name`  |
 | `games` | userId, targetCountryId, status (`active` \| `won` \| `lost`), guesses[] (countryId, range, at), maxGuesses, pointsEarned, startedAt, finishedAt | `userId` + `status` |
 
 Store only a **hash** of verify and reset tokens, as you would a password. The raw
