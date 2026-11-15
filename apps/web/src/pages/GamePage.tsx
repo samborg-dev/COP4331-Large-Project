@@ -423,6 +423,7 @@ export function GamePage({
           <p>
             Search for a country and choose a suggestion. Press Enter again or
             click the Enter button to submit your guess.
+            You can also type an exact country name and press Enter.
             Smaller distance ranges mean you’re closer.
           </p>
           <p>
