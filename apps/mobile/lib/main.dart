@@ -23,6 +23,9 @@ class App extends StatelessWidget {
       title: 'Country Guesser',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
+      // Android 12+ stretches content when you scroll past the end, which
+      // squished the text; just stop at the edge instead
+      scrollBehavior: const MaterialScrollBehavior().copyWith(overscroll: false),
       initialRoute: '/',
       routes: {
         '/': (_) => LoginScreen(api: api),
