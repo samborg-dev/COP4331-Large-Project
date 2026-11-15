@@ -24,7 +24,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, .pagination span:foc
   outline: 3px solid #aac1ff;
   outline-offset: 4px;
 }
-h2 {
+h1, h2 {
   font-size: 27px;
   font-weight: 750;
   line-height: 1.2;
@@ -675,7 +675,7 @@ body:has(.help-dialog[open]) {
     padding: 30px 24px;
     border-radius: 20px;
   }
-  h2 {
+  h1, h2 {
     font-size: 25px;
   }
 }
@@ -738,4 +738,8 @@ body:has(.help-dialog[open]) {
   .round-result {
     padding: 24px;
   }
+}
+
+.preview-page .preview-caption a {
+  text-decoration: underline;
 }

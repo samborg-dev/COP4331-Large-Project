@@ -312,7 +312,7 @@ export function GamePage({
 
       <section className="preview-game" aria-label="Country guessing game">
         <div className="game-search-area">
-          <p className="preview-kicker">FIND THE MYSTERY COUNTRY</p>
+          <h1 className="preview-kicker">FIND THE MYSTERY COUNTRY</h1>
           <p className="game-instructions">
             Each guess brings you closer. Follow the distance clues.
           </p>
