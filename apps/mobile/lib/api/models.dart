@@ -19,7 +19,8 @@ class Guess {
   const Guess({required this.country, required this.range});
 
   factory Guess.fromJson(Map<String, dynamic> json) => Guess(
-        country: '${json['country'] ?? ''}',
+        // The contract says `country`; the server has also sent `guessName`
+        country: '${json['country'] ?? json['guessName'] ?? ''}',
         range: '${json['range'] ?? ''}',
       );
 
@@ -42,14 +43,23 @@ class Game {
   factory Game.fromJson(Map<String, dynamic> json) => Game(
         gameId: '${json['gameId']}',
         maxGuesses: (json['maxGuesses'] as num?)?.toInt() ?? 10,
-        status: '${json['status'] ?? 'active'}',
+        status: _status(json['status']),
         guesses: [
           for (final g in json['guesses'] as List? ?? const [])
             Guess.fromJson(g as Map<String, dynamic>),
         ],
         pointsEarned: (json['pointsEarned'] as num?)?.toInt() ?? 0,
-        answer: json['answer'] as String?,
+        // The contract says `answer`; the server has also sent `targetCountry`
+        answer: (json['answer'] ?? json['targetCountry']) as String?,
       );
+
+  /// Accepts the contract's `active`/`won`/`lost` and the database's
+  /// `IN_PROGRESS`/`WON`/`LOST`.
+  static String _status(Object? raw) => switch ('${raw ?? ''}'.toLowerCase()) {
+        'won' => 'won',
+        'lost' => 'lost',
+        _ => 'active',
+      };
 
   final String gameId;
   final int maxGuesses;

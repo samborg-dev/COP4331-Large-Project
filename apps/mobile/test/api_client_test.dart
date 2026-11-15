@@ -114,6 +114,24 @@ void main() {
     expect(game.guesses.single.range, '500–1,500 km');
   });
 
+  test('a finished round also parses the database-shaped response', () async {
+    final api = await loggedIn((_) => _json({
+          'gameId': 'g1',
+          'status': 'LOST',
+          'guesses': [
+            {'countryId': 'DE', 'guessName': 'Germany', 'range': '500–1,500 km'},
+          ],
+          'maxGuesses': 10,
+          'guessesUsed': 10,
+          'pointsEarned': 0,
+          'targetCountry': 'Poland',
+        }));
+    final game = await api.getGame('g1');
+    expect(game.status, 'lost');
+    expect(game.answer, 'Poland');
+    expect(game.guesses.single.country, 'Germany');
+  });
+
   test('leaderboard parses entries and page count', () async {
     final api = await loggedIn((_) => _json({
           'entries': [
