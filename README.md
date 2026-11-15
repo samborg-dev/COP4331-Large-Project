@@ -44,6 +44,19 @@ flutter run                                # Android emulator uses http://10.0.2
 flutter run --dart-define=API_URL=https://your-domain.com:5000
 ```
 
+Screens so far (`apps/mobile/lib/screens/`):
+
+| Route | Screen | API |
+| --- | --- | --- |
+| `/` | Log in (email + password) | `POST /api/auth/login`; a 403 (unverified) opens check-inbox |
+| `/register` | Sign up | `POST /api/auth/register` |
+| `/check-inbox` | "Check your inbox" + resend | `POST /api/auth/resend-verification` |
+| `/forgot-password` | Request a reset link (the reset itself happens on the web page from the email) | `POST /api/auth/forgot-password` |
+
+Until `/api/auth/login` is merged, login falls back to the demo `POST /api/login` (type a demo username into the Email field).
+
+Run the tests with `flutter test` (no API needed). CI runs `flutter analyze` and `flutter test` on every PR.
+
 ## Deployment
 
 Production (DigitalOcean + nginx + pm2) steps are in the course notes (MERN B). Build with `pnpm build`; serve `apps/web/dist` with nginx and run `node apps/api/dist/index.js` under pm2 with the same env vars. Set `VITE_API_URL` before building the web app.
