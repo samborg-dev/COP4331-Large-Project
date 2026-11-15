@@ -53,7 +53,7 @@ Screens so far (`apps/mobile/lib/screens/`):
 | `/check-inbox` | "Check your inbox" + resend | `POST /api/auth/resend-verification` |
 | `/forgot-password` | Request a reset link (the reset itself happens on the web page from the email) | `POST /api/auth/forgot-password` |
 
-Until `/api/auth/login` is merged, login falls back to the demo `POST /api/login` (type a demo username into the Email field).
+Login uses `POST /api/auth/login` with an email and password.
 
 Run the tests with `flutter test` (no API needed). CI runs `flutter analyze` and `flutter test` on every PR.
 

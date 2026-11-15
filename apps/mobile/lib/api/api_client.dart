@@ -34,16 +34,7 @@ class ApiClient {
     return 'http://localhost:5000';
   }
 
-  Future<Map<String, dynamic>> _post(String route, Map<String, dynamic> body) async {
-    final res = await http.post(
-      Uri.parse('$baseUrl/$route'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(body),
-    );
-    return jsonDecode(res.body) as Map<String, dynamic>;
-  }
-
-  /// Like [_post], but keeps the HTTP status, tolerates non-JSON bodies
+  /// POSTs JSON and returns the HTTP status with the decoded body. Tolerates tolerates non-JSON bodies
   /// (e.g. Express's HTML 404 page), and logs out on a 401.
   Future<(int, Map<String, dynamic>)> _send(String route, Map<String, dynamic> body) async {
     final res = await http
@@ -103,12 +94,7 @@ class ApiClient {
   /// Stores the JWT on success. Throws [ApiException]; a 403 means the
   /// account exists but the email hasn't been verified yet.
   Future<void> login(String email, String password) async {
-    var (status, json) = await _send('api/auth/login', {'email': email, 'password': password});
-    // TODO(arwa): remove once /api/auth/login is merged. Until then, fall back
-    // to the course demo route, which takes a username instead of an email.
-    if (status == 404) {
-      (status, json) = await _send('api/login', {'login': email, 'password': password});
-    }
+    final (status, json) = await _send('api/auth/login', {'email': email, 'password': password});
     _throwIfError(status, json);
     final accessToken = json['accessToken'];
     if (accessToken is! String) throw ApiException(status, 'Login failed');
@@ -148,31 +134,5 @@ class ApiClient {
   Future<void> forgotPassword(String email) async {
     final (status, json) = await _send('api/auth/forgot-password', {'email': email});
     _throwIfError(status, json);
-  }
-
-  /// Returns null on success, otherwise an error message.
-  Future<String?> addCard(int userId, String card) async {
-    final res = await _post('api/addcard', {
-      'userId': userId,
-      'card': card,
-      'jwtToken': await token,
-    });
-    final error = res['error'] as String? ?? '';
-    if (error.isNotEmpty) return error;
-    await _storeToken(res['jwtToken']);
-    return null;
-  }
-
-  /// Server-side partial match search. Throws on API error.
-  Future<List<String>> searchCards(int userId, String search) async {
-    final res = await _post('api/searchcards', {
-      'userId': userId,
-      'search': search,
-      'jwtToken': await token,
-    });
-    final error = res['error'] as String? ?? '';
-    if (error.isNotEmpty) throw Exception(error);
-    await _storeToken(res['jwtToken']);
-    return (res['results'] as List).cast<String>();
   }
 }
