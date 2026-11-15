@@ -434,9 +434,9 @@ export function GamePage({
           <h2 id="help-title">How to play</h2>
           <p>Find the mystery country before you run out of guesses.</p>
           <p>
-            Search for a country and choose a suggestion. Press Enter again or
-            click the Enter button to submit your guess.
-            You can also type an exact country name and press Enter.
+            Type a country name and press Enter to select the highlighted suggestion,
+            or the first result if none is highlighted. Press Enter again to submit
+            your guess, or click the Enter button after choosing a country.
             Smaller distances mean you’re closer. Arrows point toward the mystery country.
           </p>
           <p>

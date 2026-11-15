@@ -118,10 +118,12 @@ export function CountrySearch({
     }
     if (event.key === "Enter") {
       event.preventDefault();
-      if (event.repeat) return;
+      if (event.repeat || event.nativeEvent.isComposing || disabled || !canSearch) return;
       if (selected) onSelect?.(selected);
-      else if (open && active >= 0 && results[active]) choose(results[active]);
-      else if (exactMatch) onSelect?.(exactMatch);
+      else if (!loading) {
+        const suggestion = active >= 0 ? results[active] : exactMatch ?? results[0];
+        if (suggestion) choose(suggestion);
+      }
     }
   }
   return (
