@@ -93,11 +93,15 @@ class ApiClient {
   void _throwIfError(int status, Map<String, dynamic> json) {
     final error = json['error'];
     if (status >= 400 || (error is String && error.isNotEmpty)) {
-      throw ApiException(
-        status,
-        error is String && error.isNotEmpty ? error : 'Something went wrong (HTTP $status)',
-      );
+      throw ApiException(status, error is String && error.isNotEmpty ? error : _fallbackMessage(status));
     }
+  }
+
+  /// Same wording as the web app for errors without a server message.
+  static String _fallbackMessage(int status) {
+    if (status >= 500) return 'The server is unavailable right now. Please try again shortly.';
+    if (status == 404) return 'This service is not available yet. Please try again later.';
+    return 'The request failed. Please try again.';
   }
 
   Future<void> _storeToken(Object? jwtToken) async {

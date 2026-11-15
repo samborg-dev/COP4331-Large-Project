@@ -61,6 +61,18 @@ void main() {
     expect(jsonDecode(sent.single.body), {'email': 'ada@example.com', 'password': 'password1'});
   });
 
+  test('a server outage shows a friendly message', () async {
+    final api = clientReturning((_) => http.Response('<html>502 Bad Gateway</html>', 502));
+    await expectLater(
+      api.login('ada@example.com', 'password1'),
+      throwsA(isA<ApiException>().having(
+        (e) => e.message,
+        'message',
+        'The server is unavailable right now. Please try again shortly.',
+      )),
+    );
+  });
+
   test('country search sends the bearer token and encodes the query', () async {
     final api = await loggedIn((_) => _json([
           {'id': 'FR', 'name': 'France', 'iso2': 'FR', 'iso3': 'FRA', 'continent': 'Europe'},
