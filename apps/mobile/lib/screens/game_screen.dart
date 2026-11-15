@@ -334,7 +334,17 @@ class _GameScreenState extends State<GameScreen> {
         OutlinedButton(onPressed: _newRound, child: const Text('Try again')),
       ];
     }
-    if (_over) return [_RoundResult(won: _won, earned: _earned, answer: _answer, guesses: _guesses.length, onPlayAgain: _newRound)];
+    if (_over) {
+      return [
+        _RoundResult(
+          won: _won,
+          earned: _earned,
+          answer: _answer,
+          guesses: _guesses.length,
+          onPlayAgain: _newRound,
+        ),
+      ];
+    }
 
     return [
       Text(
@@ -374,23 +384,27 @@ class _GameScreenState extends State<GameScreen> {
         ),
       ),
       if (_suggestions.isNotEmpty)
-        Container(
-          margin: const EdgeInsets.only(top: 6),
-          decoration: BoxDecoration(
+        Padding(
+          padding: const EdgeInsets.only(top: 6),
+          // ListTile draws its tap highlight on the nearest Material
+          child: Material(
             color: AppColors.input,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.inputBorder),
-          ),
-          child: Column(
-            children: [
-              for (final c in _suggestions)
-                ListTile(
-                  dense: true,
-                  title: Text(c.name),
-                  subtitle: c.continent.isEmpty ? null : Text(c.continent),
-                  onTap: () => _select(c),
-                ),
-            ],
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: const BorderSide(color: AppColors.inputBorder),
+            ),
+            child: Column(
+              children: [
+                for (final c in _suggestions)
+                  ListTile(
+                    dense: true,
+                    title: Text(c.name),
+                    subtitle: c.continent.isEmpty ? null : Text(c.continent),
+                    onTap: () => _select(c),
+                  ),
+              ],
+            ),
           ),
         )
       else if (!_searching && _search.text.trim().isNotEmpty && _selected == null)
