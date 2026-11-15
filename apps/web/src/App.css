@@ -439,7 +439,7 @@ button:disabled {
   margin: 0;
   text-align: left;
 }
-.sample-heading > span {
+.sample-heading > span, .guess-actions > span {
   font-size: 12px;
   color: #b4bdce;
 }
@@ -743,3 +743,36 @@ body:has(.help-dialog[open]) {
 .preview-page .preview-caption a {
   text-decoration: underline;
 }
+
+/* Give up confirmation */
+.give-up-link {
+  display: block;
+  width: auto;
+  min-height: 44px;
+  margin: 6px 0 0 auto;
+  padding: 8px 12px;
+  background: transparent;
+  color: #b4bdce;
+  font-size: 13px;
+  font-weight: 500;
+}
+.give-up-link:hover {
+  color: #f2f4f8;
+  background: #a8bbff18;
+}
+.give-up-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.give-up-actions button {
+  flex: 1;
+  min-width: 130px;
+}
+.give-up-actions button:last-child {
+  background: #343e55;
+  color: #e0e5ef;
+}
+
+.guess-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.guess-actions .give-up-link { margin: 0; }

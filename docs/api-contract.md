@@ -54,7 +54,19 @@ All errors return `{ "error": "human-readable message" }` with standard HTTP sta
   - `403 Forbidden`: `{ "error": "Cannot access another user's game" }`
   - `404 Not Found`: `{ "error": "Game not found" }`
 
-Saved rounds use `active`, `won`, or `lost`, and each guess includes `country` and its ISO-8601 `at` timestamp. Database field names are internal. Completed rounds additionally include `answer`, the mystery country name; active rounds omit it. Winning guesses may use `range: "Correct"`, both here and in the submit-guess response.
+`status` uses `active`, `won`, or `lost`; guesses use `country` and include an ISO-8601 `at` timestamp. Database field names (`IN_PROGRESS`, `guessName`, `targetCountry`) are internal and are not returned by this endpoint.
+
+Completed rounds additionally include `answer`, the mystery country's name. Active rounds must omit it. `surrendered` is a boolean (default false) indicating that the player gave up. A winning guess may use `range: "Correct"`, both here and in the submit-guess response.
+
+### `POST /api/games/:id/give-up` (Bearer Auth)
+- **Request:** `{}`
+- **Responses:**
+  - `200 OK`: `{ "gameId": "string" }`
+  - `400 Bad Request`: `{ "error": "Game is already finished" }`
+  - `403 Forbidden`: `{ "error": "Cannot end another user's game" }`
+  - `404 Not Found`: `{ "error": "Game not found" }`
+
+Only the round's owner can give up an active round. The server marks it `lost`, sets `surrendered: true`, records zero points, and increments games played once. Repeated requests cannot award points or increment statistics again. The client then retrieves `GET /api/games/:id` for the completed result and answer. Confirmation is shown before submitting; canceling sends no request.
 
 ### `POST /api/games/:id/guesses` (Bearer Auth)
 - **Request:** `{ "countryId": "string" }`

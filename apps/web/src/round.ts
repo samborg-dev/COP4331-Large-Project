@@ -38,6 +38,7 @@ export const resumeRoundSchema = z.object({
   ),
   pointsEarned: z.number().int().nonnegative().optional(),
   answer: z.string().min(1).optional(),
+  surrendered: z.boolean().optional(),
 });
 
 export type Guess = {
@@ -54,6 +55,7 @@ export type Round = {
   guesses: Guess[];
   pointsEarned?: number;
   answer?: string;
+  surrendered?: boolean;
 };
 
 // Translate the documented API response into the UI's round shape.
