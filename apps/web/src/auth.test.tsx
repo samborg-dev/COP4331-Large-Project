@@ -4,20 +4,24 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { AuthPage, ProtectedPage } from "./pages/AuthPage";
+import { GameSessionProvider } from "./pages/GamePage";
 import { api, ApiError } from "./api";
 vi.mock("./env", () => ({ env: { VITE_API_URL: "http://localhost:5000" } }));
 function show(path = "/") {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <Routes>
-        <Route path="/game" element={<ProtectedPage />} />
-        <Route path="*" element={<AuthPage />} />
-      </Routes>
+      <GameSessionProvider>
+        <Routes>
+          <Route path="/game" element={<ProtectedPage />} />
+          <Route path="*" element={<AuthPage />} />
+        </Routes>
+      </GameSessionProvider>
     </MemoryRouter>,
   );
 }
 beforeEach(() => {
   localStorage.clear();
+  sessionStorage.clear();
 });
 afterEach(() => {
   cleanup();
