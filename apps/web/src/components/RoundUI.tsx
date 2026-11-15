@@ -1,7 +1,11 @@
 import type { Ref } from "react";
 import type { Round } from "../round";
 import { guessRank, guessesLeft } from "../round";
-export function GuessHistory({ round }: { round: Round | null }) {
+export function GuessHistory({ round, onGiveUp, disabled = false }: {
+  round: Round | null;
+  onGiveUp?: () => void;
+  disabled?: boolean;
+}) {
   const sorted = [...(round?.guesses ?? [])].sort(
     (a, b) => guessRank(a) - guessRank(b),
   );
@@ -9,9 +13,14 @@ export function GuessHistory({ round }: { round: Round | null }) {
     <section className="sample-guesses" aria-labelledby="guesses-title">
       <div className="sample-heading">
         <h2 id="guesses-title">Your guesses</h2>
+        <div className="guess-actions">
         {round && (
           <span aria-live="polite">{guessesLeft(round)} guesses left</span>
         )}
+        {round?.status === "active" && onGiveUp && (
+          <button className="give-up-link" type="button" disabled={disabled} onClick={onGiveUp}>Give up</button>
+        )}
+        </div>
       </div>
       {sorted.length ? (
         <ol className="guess-history">
@@ -52,7 +61,7 @@ export function RoundResult({
       <p className="preview-kicker">
         {won ? "COUNTRY FOUND" : "ROUND COMPLETE"}
       </p>
-      <h2 id="result-title">{won ? "You found it!" : "Out of guesses"}</h2>
+      <h2 id="result-title">{won ? "You found it!" : round.surrendered ? "Round ended" : "Out of guesses"}</h2>
       {round.answer && (
         <p>
           The mystery country was <strong>{round.answer}</strong>.

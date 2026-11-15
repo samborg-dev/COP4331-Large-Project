@@ -45,6 +45,38 @@ it("debounces input and preserves server results including partial matches", asy
     ["France", "Central African Republic"],
   );
 });
+it("submits a fully typed country name with Enter, ignoring case and surrounding spaces", async () => {
+  request.mockResolvedValue([{ id: "eg", name: "Egypt" }]);
+  const select = vi.fn();
+  render(<CountrySearch onSelect={select} />);
+  const input = screen.getByRole("combobox");
+  fireEvent.change(input, { target: { value: " egypt " } });
+  await tick();
+  fireEvent.keyDown(input, { key: "Enter", repeat: true });
+  expect(select).not.toHaveBeenCalled();
+  fireEvent.keyDown(input, { key: "Enter" });
+  expect(select).toHaveBeenCalledWith({ id: "eg", name: "Egypt" });
+});
+it("also lets the Enter button submit an exact full name", async () => {
+  request.mockResolvedValue([{ id: "eg", name: "Egypt" }]);
+  const select = vi.fn();
+  render(<CountrySearch onSelect={select} />);
+  fireEvent.change(screen.getByRole("combobox"), { target: { value: "Egypt" } });
+  await tick();
+  fireEvent.click(screen.getByRole("button", { name: "Enter" }));
+  expect(select).toHaveBeenCalledWith({ id: "eg", name: "Egypt" });
+});
+it("does not automatically submit a partial name", async () => {
+  request.mockResolvedValue([{ id: "eg", name: "Egypt" }]);
+  const select = vi.fn();
+  render(<CountrySearch onSelect={select} />);
+  const input = screen.getByRole("combobox");
+  fireEvent.change(input, { target: { value: "Egy" } });
+  await tick();
+  fireEvent.keyDown(input, { key: "Enter" });
+  expect(select).not.toHaveBeenCalled();
+  expect((screen.getByRole("button", { name: "Enter" }) as HTMLButtonElement).disabled).toBe(true);
+});
 it("selects with arrow keys and Enter without starting another search", async () => {
   request.mockResolvedValue([{ id: "fr", name: "France" }]);
   const select = vi.fn();

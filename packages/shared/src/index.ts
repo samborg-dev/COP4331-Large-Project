@@ -71,7 +71,7 @@ export interface StartGameResponse {
 export interface GameGuessRecord {
   countryId: string;
   country: string;
-  range: DistanceRange;
+  range: DistanceRange | 'Correct';
   at: string;
 }
 
@@ -82,6 +82,14 @@ export interface GetGameResponse {
   maxGuesses: number;
   guessesUsed: number;
   pointsEarned: number;
+  /** Included only after the round ends. */
+  answer?: string;
+  surrendered?: boolean;
+}
+
+/** POST /api/games/:id/give-up. Retrieve the ended round to reveal its answer. */
+export interface GiveUpGameResponse {
+  gameId: string;
 }
 
 // [P2 - POST /api/games/:id/guesses] { countryId } -> { country, range, solved, guessesUsed, pointsEarned? }
@@ -92,7 +100,7 @@ export type SubmitGuessInput = z.infer<typeof submitGuessSchema>;
 
 export interface SubmitGuessResponse {
   country: string;
-  range: DistanceRange;
+  range: DistanceRange | 'Correct';
   solved: boolean;
   guessesUsed: number;
   pointsEarned?: number;

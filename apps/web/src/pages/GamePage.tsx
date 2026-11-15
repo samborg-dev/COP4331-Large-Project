@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { Link, useLocation } from "react-router-dom";
-import type { SubmitGuessInput } from "@cop4331/shared";
+import type { GiveUpGameResponse, SubmitGuessInput } from "@cop4331/shared";
 import { api, ApiError, readPlayer, savedRoundKey } from "../api";
 import { CountrySearch, type CountryOption } from "../components/CountrySearch";
 import { GuessHistory, RoundResult } from "../components/RoundUI";
@@ -167,6 +167,7 @@ export function GamePage({
   const points = player ? session.points : undefined;
   const error = player ? session.error : "";
   const helpDialog = useRef<HTMLDialogElement>(null);
+  const giveUpDialog = useRef<HTMLDialogElement>(null);
   const restoreFocus = useRef(false);
   const searchInput = useRef<HTMLInputElement>(null);
   const startButton = useRef<HTMLButtonElement>(null);
@@ -289,6 +290,29 @@ export function GamePage({
     }
   }
 
+  async function giveUp() {
+    if (!round || round.status !== "active" || !beginRequest()) return;
+    giveUpDialog.current?.close();
+    restoreFocus.current = true;
+    try {
+      await api<GiveUpGameResponse>(`games/${encodeURIComponent(round.gameId)}/give-up`, {}, true);
+      // Preserve the ended state even if the following answer lookup fails.
+      setRound({ ...round, status: "lost", surrendered: true, pointsEarned: 0 });
+      const completed = savedRoundSchema.parse(
+        await api<unknown>(`games/${encodeURIComponent(round.gameId)}`, undefined, true),
+      );
+      if (completed.gameId !== round.gameId || completed.status !== "lost" || !completed.answer) {
+        throw new Error("The round ended, but its answer could not be loaded. Refresh to try again.");
+      }
+      setRound(completed);
+    } catch (cause) {
+      setError(cause instanceof Error && cause.name !== "ZodError"
+        ? cause.message : "The answer could not be loaded. Refresh to try again.");
+    } finally {
+      finishRequest();
+    }
+  }
+
   return (
     <main className="preview-page">
       <header className="preview-header">
@@ -322,7 +346,7 @@ export function GamePage({
 
       <section className="preview-game" aria-label="Country guessing game">
         <div className="game-search-area">
-          <p className="preview-kicker">FIND THE MYSTERY COUNTRY</p>
+          <h1 className="preview-kicker">FIND THE MYSTERY COUNTRY</h1>
           <p className="game-instructions">
             Each guess brings you closer. Follow the distance clues.
           </p>
@@ -348,12 +372,13 @@ export function GamePage({
             </button>
           )}
           {round?.status === "active" && (
+            <>
             <CountrySearch
               key={round.gameId + ":" + round.guessesUsed}
               disabled={busy}
-              inputRef={searchInput}
-              onSelect={submitGuess}
+              inputRef={searchInput}              onSelect={submitGuess}
             />
+            </>
           )}
           {error && (
             <p className="error" role="alert">
@@ -372,8 +397,19 @@ export function GamePage({
               playAgainRef={playAgainButton}
             />
           )}
-        <GuessHistory round={round} />
+        <GuessHistory round={round} disabled={busy} onGiveUp={() => giveUpDialog.current?.showModal()} />
       </section>
+
+      <dialog className="help-dialog" ref={giveUpDialog} aria-labelledby="give-up-title">
+        <div className="help-content">
+          <h2 id="give-up-title">Give up this round?</h2>
+          <p>This ends the round with 0 points and reveals the mystery country.</p>
+          <div className="give-up-actions">
+            <button type="button" autoFocus onClick={() => giveUpDialog.current?.close()}>Keep guessing</button>
+            <button type="button" onClick={giveUp}>Give up round</button>
+          </div>
+        </div>
+      </dialog>
 
       <dialog
         className="help-dialog"
@@ -398,6 +434,7 @@ export function GamePage({
           <p>
             Search for a country and choose a suggestion. Press Enter again or
             click the Enter button to submit your guess.
+            You can also type an exact country name and press Enter.
             Smaller distance ranges mean you’re closer.
           </p>
           <p>

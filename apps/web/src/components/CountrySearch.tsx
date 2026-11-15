@@ -32,6 +32,10 @@ export function CountrySearch({
   const [selected, setSelected] = useState<CountryOption | null>(null);
   const optionRefs = useRef<(HTMLLIElement | null)[]>([]);
   const inputElement = useRef<HTMLInputElement>(null);
+  const exactMatch = results.find(
+    (country) => country.name.trim().toLowerCase() === query.trim().toLowerCase(),
+  );
+  const readyCountry = selected ?? exactMatch;
   useImperativeHandle(inputRef, () => inputElement.current!);
   useEffect(() => {
     const controller = new AbortController();
@@ -117,6 +121,7 @@ export function CountrySearch({
       if (event.repeat) return;
       if (selected) onSelect?.(selected);
       else if (open && active >= 0 && results[active]) choose(results[active]);
+      else if (exactMatch) onSelect?.(exactMatch);
     }
   }
   return (
@@ -164,9 +169,9 @@ export function CountrySearch({
         />
         <button
           type="button"
-          disabled={disabled || !selected}
+          disabled={disabled || !readyCountry}
           onClick={() => {
-            if (selected) onSelect?.(selected);
+            if (readyCountry) onSelect?.(readyCountry);
           }}
         >
           Enter
