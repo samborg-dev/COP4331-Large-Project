@@ -371,6 +371,12 @@ button:disabled {
   pointer-events: none;
   font-size: 12px;
 }
+.round-complete .globe-map {
+  height: clamp(280px, 46svh, 480px);
+}
+.preview-game > .round-result {
+  margin: 12px auto 20px;
+}
 .game-globe .maplibregl-ctrl-attrib {
   text-align: left;
 }
@@ -756,6 +762,13 @@ body:has(.help-dialog[open]) {
   }
 }
 @media (max-width: 600px) {
+  .game-globe, .preview-game .map-space {
+    min-height: 0;
+  }
+  .game-globe .globe-map {
+    height: auto;
+    aspect-ratio: 1;
+  }
   .preview-header {
     flex-wrap: wrap;
     row-gap: 16px;

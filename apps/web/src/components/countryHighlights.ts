@@ -31,3 +31,8 @@ export function guessColor(guess: Guess) {
   }[guess.range];
 }
 
+export function withRevealedAnswer(guesses: Guess[], answer?: string): Guess[] {
+  if (!answer) return guesses;
+  return [...guesses.filter((guess) => countryKey(guess.name) !== countryKey(answer)),
+    { countryId: "revealed-answer", name: answer, range: "Correct", correct: true }];
+}

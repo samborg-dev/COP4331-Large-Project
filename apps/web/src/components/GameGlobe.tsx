@@ -1,15 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { createLandscapeLoader } from "./landscapeTiles";
 import type { Guess } from "../round";
-import { countryKey, guessColor } from "./countryHighlights";
+import { countryKey, guessColor, withRevealedAnswer } from "./countryHighlights";
 type CountryCollection = Extract<import("maplibre-gl").GeoJSONSourceSpecification["data"], { type: "FeatureCollection" }>;
 
-export function GameGlobe({ guesses = [], focusCountry, gameId }: { guesses?: Guess[]; focusCountry?: { name: string; requestId: string }; gameId?: string }) {
+export function GameGlobe({ guesses = [], focusCountry, answer, gameId }: { guesses?: Guess[]; focusCountry?: { name: string; requestId: string }; answer?: string; gameId?: string }) {
+  const highlights = useMemo(() => withRevealedAnswer(guesses, answer), [guesses, answer]);
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("maplibre-gl").Map | null>(null);
-  const latestGuesses = useRef(guesses);
+  const latestGuesses = useRef(highlights);
   const coloredCountries = useRef(new Set<string>());
   const centers = useRef(new Map<string, [number, number]>());
   const pendingFocus = useRef<typeof focusCountry>(undefined);
@@ -61,9 +62,9 @@ export function GameGlobe({ guesses = [], focusCountry, gameId }: { guesses?: Gu
     }) });
   }
   useEffect(() => {
-    latestGuesses.current = guesses;
-    if (mapRef.current) updateHighlights(mapRef.current, guesses);
-  }, [guesses]);
+    latestGuesses.current = highlights;
+    if (mapRef.current) updateHighlights(mapRef.current, highlights);
+  }, [highlights]);
   useEffect(() => {
     let disposed = false;
     let map: import("maplibre-gl").Map | undefined;

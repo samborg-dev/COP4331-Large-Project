@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -171,6 +172,12 @@ export function GamePage({
   const startButton = useRef<HTMLButtonElement>(null);
   const playAgainButton = useRef<HTMLButtonElement>(null);
   const [focusCountry, setFocusCountry] = useState<{ name: string; requestId: string }>();
+  const answer = round && round.status !== "active" ? round.answer : undefined;
+  const currentGameId = round?.gameId;
+  const globeFocus = useMemo(() => answer && currentGameId
+    ? { name: answer, requestId: `${currentGameId}:answer` }
+    : currentGameId && focusCountry?.requestId.startsWith(`${currentGameId}:`) ? focusCountry : undefined,
+  [answer, currentGameId, focusCountry]);
 
   useEffect(() => {
     if (busy || !restoreFocus.current) return;
@@ -354,9 +361,9 @@ export function GamePage({
             </p>
           )}
         </div>
-        <div className="map-space">
-          {(!round || round.status === "active") && <GameGlobe gameId={round?.gameId} guesses={round?.guesses}
-            focusCountry={round && focusCountry?.requestId.startsWith(`${round.gameId}:`) ? focusCountry : undefined} />}
+        <div className={`map-space${round && round.status !== "active" ? " round-complete" : ""}`}>
+          <GameGlobe gameId={round?.gameId} guesses={round?.guesses} answer={answer} focusCountry={globeFocus} />
+        </div>
           {round && (
             <RoundResult
               round={round}
@@ -365,7 +372,6 @@ export function GamePage({
               playAgainRef={playAgainButton}
             />
           )}
-        </div>
         <GuessHistory round={round} />
       </section>
 
