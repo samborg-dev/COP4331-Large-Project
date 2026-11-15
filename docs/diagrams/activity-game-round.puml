@@ -1,38 +1,89 @@
 @startuml activity-game-round
-title CountryGuesser - One game round
+title CountryGuesser - Web game round
 skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 13
+skinparam activity {
+  BackgroundColor #EEF2FF
+  BorderColor #52638B
+  DiamondBackgroundColor #FFF5D9
+  DiamondBorderColor #94753A
+  StartColor #52638B
+  EndColor #52638B
+}
 
 start
-:Player selects Start round;
-:Server chooses a mystery country\nand returns the round ID and guess limit;
-if (Round started?) then (yes)
-  :Show the country search field;
-else (no)
-  :Show the error and offer another attempt;
-  stop
+:Open the game screen\nwith a valid sign-in session;
+if (Saved round ID?) then (yes)
+  :GET saved round and player total;
+  while (Temporary reload failure?) is (yes)
+    :Show error; wait for Retry\nwithout discarding saved progress;
+    :Retry loading the saved round;
+  endwhile (no)
+  if (Round missing or forbidden?) then (yes)
+    :Discard the unusable saved round ID;
+  else (no)
+    :Restore guesses, clues, status and points;
+  endif
 endif
 
 repeat
-  :Player types a country name;
-  :Request matching countries\nand show suggestions;
-  if (Country selected?) then (yes)
-    :Submit the selected country ID;
-    if (Guess accepted?) then (yes)
-      :Show the server's distance clue\nand update guesses left;
-      if (Country found?) then (yes)
-        :Show the win and points earned;
-        stop
-      elseif (No guesses left?) then (yes)
-        :Show the loss;
-        stop
-      endif
-    else (no)
-      :Show the error without adding a guess;
-    endif
-  else (no)
-    :Player edits the search;
+  if (No round loaded?) then (yes)
+    :Automatically POST /api/games;
+    while (Start failed?) is (yes)
+      :Show error; wait for Try again;
+      :Retry starting a round;
+    endwhile (no)
+    :Save new round ID; clear old guesses\nand labels; reset the globe view;
   endif
-repeat while (Keep guessing?) is (yes)
-->no;
+
+  while (Round active?) is (yes)
+    if (Give up selected?) then (yes)
+      :Show Give up confirmation dialog;
+      if (Confirmed?) then (yes)
+        :POST /api/games/:id/give-up;
+        if (Give up accepted?) then (yes)
+          :End round with zero earned points;\nGET completed round to reveal answer;
+        else (no)
+          :Show error; keep current round;
+        endif
+      else (cancel)
+        :Keep guessing;
+      endif
+    else (guess)
+      :Type a country name; request\nserver-side partial-match suggestions;
+      :First Enter selects highlighted/top result\ninto the input, or click a suggestion;
+      :Second Enter or Enter button\nsubmits the selected country ID;
+      :POST /api/games/:id/guesses;
+      if (Guess accepted?) then (yes)
+        :Save country, range, distance and direction;\nupdate guesses left and closest-first history;
+        :Color and raise the country; show name/clue;\nmove and zoom the globe toward the guess;
+        if (Country found?) then (yes)
+          :Mark won; update earned points;
+        elseif (Guess limit reached?) then (yes)
+          :Mark lost; GET completed round\nto reveal the answer;
+        endif
+      else (no)
+        :Show error without adding a guess;
+      endif
+    endif
+  endwhile (no)
+
+  :Keep the globe visible; show result and points;\nhighlight the revealed answer in green;
+  note right
+    If answer lookup fails, keep the ended state
+    and show an error; refresh can retry loading.
+  end note
+  :Wait for Play again or leave game;
+  backward :POST a new round after Play again;\nkeep completed result and show error on failure;\non success replace saved ID, clear guesses/labels\nand reset the globe view;
+repeat while (Play again?) is (yes) not (no)
+
+:Leave game screen;
+note right
+  Navigation and refresh preserve the round.
+  Explicit sign-out clears the local saved round ID;
+  earned account points remain on the server.
+end note
 stop
 @enduml
