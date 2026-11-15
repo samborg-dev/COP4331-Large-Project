@@ -1,10 +1,16 @@
-import { Router } from 'express';
+import { Router, type Request } from 'express';
 import { ObjectId } from 'mongodb';
 import { getDb } from '../db.js';
 import type { GameDoc } from '../models/game.js';
+import type { AuthenticatedRequest } from '../middleware/requireAuth.js';
 
 const router = Router();
 const MAX_GUESSES = 6;
+
+function ownsGame(game: GameDoc, req: Request): boolean {
+  const userId = (req as AuthenticatedRequest).userId;
+  return Boolean(game.userId && userId && game.userId.toString() === userId);
+}
 
 // Haversine formula to calculate distance in kilometers between two lat/lng points
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -108,6 +114,10 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Game session not found' });
     }
 
+    if (!ownsGame(game, req)) {
+      return res.status(403).json({ error: "Cannot access another user's game" });
+    }
+
     return res.status(200).json({
       gameId: game._id.toString(),
       status: game.status,
@@ -136,6 +146,10 @@ router.post('/:id/guesses', async (req, res) => {
 
     if (!game) {
       return res.status(404).json({ error: 'Game session not found' });
+    }
+
+    if (!ownsGame(game, req)) {
+      return res.status(403).json({ error: "Cannot access another user's game" });
     }
 
     if (game.status !== 'IN_PROGRESS') {
