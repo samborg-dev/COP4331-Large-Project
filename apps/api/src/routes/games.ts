@@ -83,12 +83,6 @@ async function getAllNormalizedCountries(): Promise<NormalizedCountry[]> {
   return normalized;
 }
 
-function mapStatusToContract(status: GameDoc['status']): 'active' | 'won' | 'lost' {
-  if (status === 'WON') return 'won';
-  if (status === 'LOST') return 'lost';
-  return 'active';
-}
-
 // 1. POST /api/games - Start a new game session
 router.post('/', async (req: AuthenticatedRequest, res) => {
   try {
@@ -150,17 +144,16 @@ router.get('/:id', async (req: AuthenticatedRequest, res) => {
 
     return res.status(200).json({
       gameId: game._id.toString(),
-      status: mapStatusToContract(game.status),
+      status: game.status,
       guesses: game.guesses.map((g) => ({
         countryId: g.countryId ?? g.guessName,
-        country: g.guessName,
-        range: g.range ?? '< 500 km',
-        at: (g.createdAt instanceof Date ? g.createdAt : new Date(g.createdAt)).toISOString(),
+        guessName: g.guessName,
+        range: g.range === 'Correct' ? '< 500 km' : g.range ?? '< 500 km',
       })),
       maxGuesses: MAX_GUESSES,
       guessesUsed: game.guesses.length,
       pointsEarned: game.pointsEarned ?? 0,
-      ...(game.status !== 'IN_PROGRESS' ? { answer: game.targetCountry } : {}),
+      ...(game.status !== 'IN_PROGRESS' ? { targetCountry: game.targetCountry } : {}),
     });
   } catch (error) {
     console.error('Get game error:', error);
