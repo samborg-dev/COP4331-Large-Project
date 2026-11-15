@@ -33,18 +33,22 @@ Contracts live in `packages/shared/src/index.ts`. `GET /health` is a liveness ch
 
 ## Mobile (Flutter)
 
-Flutter is not set up by this repo's scripts. On a machine with the Flutter SDK:
+An Android app (iOS also builds) that uses the same REST API as the web app and
+matches its dark theme (`apps/mobile/lib/theme.dart` copies the colors from
+`apps/web/src/App.css`). Needs the Flutter SDK, plus Android Studio for the
+Android SDK and emulator.
 
 ```bash
 cd apps/mobile
-flutter create . --platforms=android,ios   # generates android/ and ios/ (keeps lib/ and pubspec.yaml)
 flutter pub get
-flutter run                                # Android emulator uses http://10.0.2.2:5000 automatically
-# or point at a deployed API:
-flutter run --dart-define=API_URL=https://your-domain.com:5000
+flutter run                                # Android emulator uses http://10.0.2.2:5000 (your machine's API)
+# against the deployed API:
+flutter run --dart-define=API_URL=https://cop4331-countryguesser.com
+# release APK for a phone (output: build/app/outputs/flutter-apk/app-release.apk):
+flutter build apk --release --dart-define=API_URL=https://cop4331-countryguesser.com
 ```
 
-Screens so far (`apps/mobile/lib/screens/`):
+Screens (`apps/mobile/lib/screens/`):
 
 | Route | Screen | API |
 | --- | --- | --- |
@@ -52,10 +56,15 @@ Screens so far (`apps/mobile/lib/screens/`):
 | `/register` | Sign up | `POST /api/auth/register` |
 | `/check-inbox` | "Check your inbox" + resend | `POST /api/auth/resend-verification` |
 | `/forgot-password` | Request a reset link (the reset itself happens on the web page from the email) | `POST /api/auth/forgot-password` |
+| `/home` | Game: search a country, guess, see the distance range; win or reveal the answer | `POST /api/games`, `GET /api/countries/search`, `POST /api/games/:id/guesses`, `GET /api/games/:id`, `GET /api/users/me` |
+| `/leaderboard` | Players ranked by points, 20 per page | `GET /api/leaderboard` |
 
-Login uses `POST /api/auth/login` with an email and password.
+Protected calls send `Authorization: Bearer <accessToken>`; the token is kept in
+secure storage, and a 401 logs out and returns to the login screen.
 
-Run the tests with `flutter test` (no API needed). CI runs `flutter analyze` and `flutter test` on every PR.
+Run the tests with `flutter test` (no API needed; HTTP is faked). They cover the
+validators, the API client's requests and parsing, the auth screens, and a full
+game round and the leaderboard. CI runs `flutter analyze` and `flutter test` on every PR.
 
 ## Deployment
 
