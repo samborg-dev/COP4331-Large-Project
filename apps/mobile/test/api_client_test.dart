@@ -113,17 +113,38 @@ void main() {
           'gameId': 'g1',
           'status': 'lost',
           'guesses': [
-            {'countryId': 'DE', 'country': 'Germany', 'range': '500–1,500 km', 'at': '2026-11-14T00:00:00Z'},
+            {
+              'countryId': 'DE',
+              'country': 'Germany',
+              'range': '500–1,500 km',
+              'distance': 520,
+              'direction': 'E',
+              'at': '2026-11-14T00:00:00Z',
+            },
           ],
           'maxGuesses': 10,
           'guessesUsed': 10,
           'pointsEarned': 0,
+          'surrendered': true,
           'answer': 'Poland',
         }));
     final game = await api.getGame('g1');
     expect(game.status, 'lost');
     expect(game.answer, 'Poland');
+    expect(game.surrendered, isTrue);
     expect(game.guesses.single.range, '500–1,500 km');
+    expect(game.guesses.single.distance, 520);
+    expect(game.guesses.single.direction, 'E');
+  });
+
+  test('giving up posts to the give-up route', () async {
+    final api = await loggedIn((req) => switch (req.url.path) {
+          '/api/games/g1/give-up' => _json({'gameId': 'g1'}),
+          _ => _json({'error': 'Not found'}, 404),
+        });
+    await api.giveUp('g1');
+    expect(sent.last.method, 'POST');
+    expect(sent.last.url.path, '/api/games/g1/give-up');
   });
 
   test('a finished round also parses the database-shaped response', () async {

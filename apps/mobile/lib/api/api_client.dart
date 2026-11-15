@@ -211,6 +211,11 @@ class ApiClient {
     return GuessResult.fromJson(json as Map<String, dynamic>);
   }
 
+  /// Ends the round as a loss. Call [getGame] afterwards for the answer.
+  Future<void> giveUp(String gameId) async {
+    await _authed('POST', 'api/games/${Uri.encodeComponent(gameId)}/give-up', const {});
+  }
+
   Future<LeaderboardPage> leaderboard({int page = 1, int limit = 20}) async {
     final json = await _authed('GET', 'api/leaderboard?page=$page&limit=$limit');
     return LeaderboardPage.fromJson(json as Map<String, dynamic>);
