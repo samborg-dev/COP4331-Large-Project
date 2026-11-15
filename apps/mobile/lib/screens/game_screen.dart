@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../api/api_client.dart';
 import '../api/models.dart';
+import '../globe/country_colors.dart';
+import '../globe/country_globe.dart';
 import '../theme.dart';
 
 /// The main screen after login. A round starts automatically: the player
@@ -41,6 +43,9 @@ class _GameScreenState extends State<GameScreen> {
   bool _lost = false;
   int? _earned;
   String? _answer;
+
+  /// The country the globe turns to: the latest guess
+  String? _focus;
 
   bool get _over => _won || _lost;
   int get _maxGuesses => _game?.maxGuesses ?? 10;
@@ -92,6 +97,7 @@ class _GameScreenState extends State<GameScreen> {
       _error = '';
       _game = null;
       _guesses.clear();
+      _focus = null;
       _won = _lost = false;
       _earned = _answer = null;
       _clearSearch();
@@ -174,6 +180,7 @@ class _GameScreenState extends State<GameScreen> {
       if (!mounted) return;
       setState(() {
         _guesses.insert(0, Guess(country: result.country, range: result.range));
+        _focus = result.country;
         _clearSearch();
         if (result.solved) {
           _won = true;
@@ -307,6 +314,25 @@ class _GameScreenState extends State<GameScreen> {
                               style: const TextStyle(color: AppColors.error),
                             ),
                           ],
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+                      child: Column(
+                        children: [
+                          CountryGlobe(
+                            key: const Key('globe'),
+                            guesses: _guesses,
+                            answer: _answer,
+                            focusCountry: _focus,
+                            roundId: _game?.gameId,
+                          ),
+                          const SizedBox(height: 8),
+                          const _GlobeLegend(),
                         ],
                       ),
                     ),
@@ -478,21 +504,40 @@ class _RoundResult extends StatelessWidget {
   }
 }
 
+/// Explains the globe colors: hotter is closer.
+class _GlobeLegend extends StatelessWidget {
+  const _GlobeLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    const style = TextStyle(color: AppColors.muted, fontSize: 12);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text('Closer', style: style),
+        const SizedBox(width: 8),
+        for (final color in [...rangeColors.values])
+          Container(
+            width: 18,
+            height: 8,
+            margin: const EdgeInsets.symmetric(horizontal: 1),
+            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+          ),
+        const SizedBox(width: 8),
+        const Text('Farther', style: style),
+      ],
+    );
+  }
+}
+
 class _GuessHistory extends StatelessWidget {
   const _GuessHistory({required this.guesses, required this.maxGuesses});
 
   final List<Guess> guesses;
   final int maxGuesses;
 
-  /// Closer ranges get warmer colors, like a hot/cold hint.
-  static Color _rangeColor(String range) {
-    if (range == 'Correct') return AppColors.success;
-    if (range.startsWith('<')) return const Color(0xFFFF9F6B);
-    if (range.startsWith('500')) return const Color(0xFFFFC36B);
-    if (range.startsWith('1,500')) return const Color(0xFFE6E36B);
-    if (range.startsWith('3,000')) return const Color(0xFF8FD3FF);
-    return AppColors.link;
-  }
+  /// Same colors as the globe (and the web app).
+  static Color _rangeColor(String range) => guessColor(range);
 
   @override
   Widget build(BuildContext context) {
