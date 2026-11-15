@@ -6,12 +6,41 @@ import type { Guess } from "../round";
 import { countryKey, guessColor } from "./countryHighlights";
 type CountryCollection = Extract<import("maplibre-gl").GeoJSONSourceSpecification["data"], { type: "FeatureCollection" }>;
 
-export function GameGlobe({ guesses = [] }: { guesses?: Guess[] }) {
+export function GameGlobe({ guesses = [], focusCountry, gameId }: { guesses?: Guess[]; focusCountry?: { name: string; requestId: string }; gameId?: string }) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("maplibre-gl").Map | null>(null);
   const latestGuesses = useRef(guesses);
   const coloredCountries = useRef(new Set<string>());
+  const centers = useRef(new Map<string, [number, number]>());
+  const pendingFocus = useRef<typeof focusCountry>(undefined);
+  const previousGameId = useRef(gameId);
   const [message, setMessage] = useState("Loading globe…");
+  useEffect(() => {
+    const previous = previousGameId.current;
+    previousGameId.current = gameId;
+    if (!previous || !gameId || previous === gameId) return;
+    pendingFocus.current = undefined;
+    const map = mapRef.current;
+    map?.stop();
+    map?.jumpTo({ center: [0, 20], zoom: 1.8, bearing: 0, pitch: 0 });
+  }, [gameId]);
+  function focusGuess() {
+    const map = mapRef.current;
+    const request = pendingFocus.current;
+    if (!map || !request) return;
+    const center = centers.current.get(countryKey(request.name));
+    if (!center) return;
+    pendingFocus.current = undefined;
+    // Choose the nearest longitude copy instead of spinning around the world.
+    const longitude = center[0] + 360 * Math.round((map.getCenter().lng - center[0]) / 360);
+    map.stop();
+    map.easeTo({ center: [longitude, center[1]], zoom: Math.max(map.getZoom(), 3),
+      duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1100 });
+  }
+  useEffect(() => {
+    pendingFocus.current = focusCountry;
+    focusGuess();
+  }, [focusCountry]);
   function updateHighlights(map: import("maplibre-gl").Map, next: Guess[]) {
     if (!map.getSource("game-countries")) return;
     for (const id of coloredCountries.current) map.removeFeatureState({ source: "game-countries", id });
@@ -60,9 +89,16 @@ export function GameGlobe({ guesses = [] }: { guesses?: Guess[] }) {
           if (disposed || !map) return;
           setMessage("");
           try {
-            const response = await fetch(`${import.meta.env.BASE_URL}data/countries.geojson`, { signal: controller.signal });
+            const [response, centerResponse] = await Promise.all([
+              fetch(`${import.meta.env.BASE_URL}data/countries.geojson`, { signal: controller.signal }),
+              fetch(`${import.meta.env.BASE_URL}data/country-centers.json`, { signal: controller.signal }),
+            ]);
             if (!response.ok) throw new Error("Country shapes could not load.");
             const data: CountryCollection = await response.json();
+            if (centerResponse.ok) {
+              const targets: Record<string, [number, number]> = await centerResponse.json();
+              centers.current = new globalThis.Map(Object.entries(targets).map(([name, point]) => [countryKey(name), point]));
+            }
             for (const feature of data.features) {
               feature.properties = { ...feature.properties, countryKey: countryKey(String(feature.properties?.name ?? "")) };
             }
@@ -87,6 +123,7 @@ export function GameGlobe({ guesses = [] }: { guesses?: Guess[] }) {
               "line-width": ["interpolate", ["linear"], ["zoom"], 0, 1.2, 4, 1.6, 9, 2],
             } });
             updateHighlights(map, latestGuesses.current);
+            focusGuess();
           } catch {
             if (!disposed) setMessage("Country highlights could not load. Refresh to try again.");
           }

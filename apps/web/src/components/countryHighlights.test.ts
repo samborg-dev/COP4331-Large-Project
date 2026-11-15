@@ -1,15 +1,18 @@
 import { describe, expect, it } from "vitest";
 import shapesText from "../../public/data/countries.geojson?raw";
+import targetsText from "../../public/data/country-centers.json?raw";
 import countriesCsv from "../../../api/scripts/Large_Project_DB.countries.csv?raw";
 import { countryKey, guessColor } from "./countryHighlights";
 
 describe("country highlights", () => {
-  it("matches all 197 seeded countries to a map shape", () => {
+  it("matches all 197 seeded countries to both a map shape and a camera/label target", () => {
     const shapes = JSON.parse(shapesText);
+    const targets = JSON.parse(targetsText);
     const keys = new Set(shapes.features.map((feature: { properties: { name: string } }) => countryKey(feature.properties.name)));
+    const targetKeys = new Set(Object.keys(targets).map(countryKey));
     const rows = countriesCsv.trim().split(/\r?\n/).slice(1);
     expect(rows).toHaveLength(197);
-    const missing = rows.map(row => row.split(",")[3]!).filter(name => !keys.has(countryKey(name)));
+    const missing = rows.map(row => row.split(",")[3]!).filter(name => !keys.has(countryKey(name)) || !targetKeys.has(countryKey(name)));
     expect(missing).toEqual([]);
   });
   it.each([

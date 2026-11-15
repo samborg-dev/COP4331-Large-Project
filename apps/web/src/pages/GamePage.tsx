@@ -170,6 +170,7 @@ export function GamePage({
   const searchInput = useRef<HTMLInputElement>(null);
   const startButton = useRef<HTMLButtonElement>(null);
   const playAgainButton = useRef<HTMLButtonElement>(null);
+  const [focusCountry, setFocusCountry] = useState<{ name: string; requestId: string }>();
 
   useEffect(() => {
     if (busy || !restoreFocus.current) return;
@@ -234,6 +235,7 @@ export function GamePage({
         : guess.guessesUsed >= round.maxGuesses
           ? "lost"
           : "active";
+      setFocusCountry({ name: guess.country, requestId: `${round.gameId}:${country.id}` });
       setRound({
         ...round,
         status,
@@ -353,7 +355,8 @@ export function GamePage({
           )}
         </div>
         <div className="map-space">
-          {(!round || round.status === "active") && <GameGlobe guesses={round?.guesses} />}
+          {(!round || round.status === "active") && <GameGlobe gameId={round?.gameId} guesses={round?.guesses}
+            focusCountry={round && focusCountry?.requestId.startsWith(`${round.gameId}:`) ? focusCountry : undefined} />}
           {round && (
             <RoundResult
               round={round}
