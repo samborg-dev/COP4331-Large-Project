@@ -63,7 +63,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
     const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 10));
 
     if (!q) {
-      return res.status(400).json({ error: 'Search query parameter "q" is required' });
+      return res.status(200).json([]);
     }
 
     const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -88,12 +88,12 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
         .toArray();
 
       if (atlasResults.length > 0) {
-        return res.status(200).json({
-          countries: atlasResults.map((doc: any) => ({
+        return res.status(200).json(
+          atlasResults.map((doc: any) => ({
             id: String(doc.ISO ?? doc.iso ?? doc._id),
             name: doc.COUNTRY ?? doc.name ?? 'Unknown',
           })),
-        });
+        );
       }
     } catch {
       // Fallback to standard regex query below if Atlas Search index is unavailable
@@ -127,7 +127,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
       if (matches.length >= limit) break;
     }
 
-    return res.status(200).json({ countries: matches });
+    return res.status(200).json(matches);
   } catch (error) {
     console.error('Country search error:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -147,27 +147,28 @@ app.get('/api/leaderboard', requireAuth, async (req, res) => {
     const [users, total] = await Promise.all([
       usersCol
         .find({})
-        .sort({ totalPoints: -1, gamesWon: -1 })
+        .sort({ totalPoints: -1, gamesWon: -1, _id: 1 })
         .skip(skip)
         .limit(limit)
         .toArray(),
       usersCol.countDocuments({}),
     ]);
 
-    const leaderboard = users.map((u: any, idx: number) => ({
+    const entries = users.map((u: any, idx: number) => ({
       rank: skip + idx + 1,
       userId: u._id.toString(),
-      name: u.username ?? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.email),
+      firstName: String(u.firstName ?? u.username ?? u.email ?? 'Player'),
+      lastName: String(u.lastName ?? ''),
       totalPoints: u.totalPoints ?? 0,
       gamesPlayed: u.gamesPlayed ?? 0,
       gamesWon: u.gamesWon ?? 0,
     }));
 
     return res.status(200).json({
+      entries,
       page,
       limit,
       total,
-      leaderboard,
     });
   } catch (error) {
     console.error('Leaderboard error:', error);
