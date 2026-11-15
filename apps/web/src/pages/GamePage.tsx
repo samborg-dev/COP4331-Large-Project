@@ -254,6 +254,8 @@ export function GamePage({
             countryId: country.id,
             name: guess.country,
             range: guess.range,
+            distance: guess.distance,
+            direction: guess.direction,
             correct: guess.solved,
           },
         ],
@@ -435,7 +437,7 @@ export function GamePage({
             Search for a country and choose a suggestion. Press Enter again or
             click the Enter button to submit your guess.
             You can also type an exact country name and press Enter.
-            Smaller distance ranges mean you’re closer.
+            Smaller distances mean you’re closer. Arrows point toward the mystery country.
           </p>
           <p>
             Find it in fewer guesses to earn more points. Your points add to

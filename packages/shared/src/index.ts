@@ -13,6 +13,8 @@ export type DistanceRange =
   | '3,000–6,000 km'
   | '> 6,000 km';
 
+export type GuessDirection = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'Correct';
+
 // [P1 - register] Validate with zod
 export const registerSchema = z.object({
   firstName: z.string().trim().min(1, 'First name is required'),
@@ -72,6 +74,9 @@ export interface GameGuessRecord {
   countryId: string;
   country: string;
   range: DistanceRange | 'Correct';
+  /** Approximate kilometers, rounded by the server to the nearest 10 km. */
+  distance?: number;
+  direction?: GuessDirection;
   at: string;
 }
 
@@ -101,6 +106,8 @@ export type SubmitGuessInput = z.infer<typeof submitGuessSchema>;
 export interface SubmitGuessResponse {
   country: string;
   range: DistanceRange | 'Correct';
+  distance?: number;
+  direction?: GuessDirection;
   solved: boolean;
   guessesUsed: number;
   pointsEarned?: number;
