@@ -12,6 +12,7 @@ import type { SubmitGuessInput } from "@cop4331/shared";
 import { api, ApiError, readPlayer, savedRoundKey } from "../api";
 import { CountrySearch, type CountryOption } from "../components/CountrySearch";
 import { GuessHistory, RoundResult } from "../components/RoundUI";
+import { GameGlobe } from "../components/GameGlobe";
 import { guessResponseSchema, savedRoundSchema, startRoundSchema, type Round } from "../round";
 
 function useGameState(initialPoints?: number, playerId?: string) {
@@ -352,6 +353,7 @@ export function GamePage({
           )}
         </div>
         <div className="map-space">
+          {(!round || round.status === "active") && <GameGlobe />}
           {round && (
             <RoundResult
               round={round}
