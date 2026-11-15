@@ -148,7 +148,7 @@ router.get('/:id', async (req: AuthenticatedRequest, res) => {
       guesses: game.guesses.map((g) => ({
         countryId: g.countryId ?? g.guessName,
         guessName: g.guessName,
-        range: g.range === 'Correct' ? '< 500 km' : g.range ?? '< 500 km',
+        range: g.range ?? '< 500 km',
       })),
       maxGuesses: MAX_GUESSES,
       guessesUsed: game.guesses.length,

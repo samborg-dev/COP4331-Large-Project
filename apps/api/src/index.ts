@@ -63,6 +63,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
     }
 
     const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const wildcardQuery = q.replace(/[\\*?]/g, '\\$&');
     const partialRegex = new RegExp(escaped, 'i');
     const db = getDb();
 
@@ -75,7 +76,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
             $search: {
               index: 'name',
               wildcard: {
-                query: `*${escaped.replace(/[\\*?]/g, '\\$&')}*`,
+                query: `*${wildcardQuery}*`,
                 path: 'COUNTRY',
                 allowAnalyzedField: true,
               },

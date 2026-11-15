@@ -50,7 +50,7 @@ All errors return `{ "error": "human-readable message" }` with standard HTTP sta
 
 ### `GET /api/games/:id` (Bearer Auth)
 - **Responses:**
-  - `200 OK`: `{ "gameId": "string", "status": "active | won | lost", "guesses": [{ "countryId": "string", "country": "string", "range": "< 500 km | 500–1,500 km | 1,500–3,000 km | 3,000–6,000 km | > 6,000 km", "at": "ISO-8601" }], "maxGuesses": 10, "guessesUsed": 1, "pointsEarned": 0 }`
+  - `200 OK`: `{ "gameId": "string", "status": "IN_PROGRESS | WON | LOST", "guesses": [{ "countryId": "string", "guessName": "string", "range": "Correct | < 500 km | 500–1,500 km | 1,500–3,000 km | 3,000–6,000 km | > 6,000 km" }], "maxGuesses": 10, "guessesUsed": 1, "pointsEarned": 0 }`; completed games also include `"targetCountry": "string"`
   - `403 Forbidden`: `{ "error": "Cannot access another user's game" }`
   - `404 Not Found`: `{ "error": "Game not found" }`
 
