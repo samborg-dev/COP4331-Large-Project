@@ -60,3 +60,8 @@ Run the tests with `flutter test` (no API needed). CI runs `flutter analyze` and
 ## Deployment
 
 Production (DigitalOcean + nginx + pm2) steps are in the course notes (MERN B). Build with `pnpm build`; serve `apps/web/dist` with nginx and run `node apps/api/dist/index.js` under pm2 with the same env vars. Set `VITE_API_URL` before building the web app.
+
+## Data Source
+repository: world-countries-centroids
+Author: Gavin Rehkemper,
+https:A//github.com/gavinr/world-countries-centroids

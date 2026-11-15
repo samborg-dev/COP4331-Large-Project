@@ -12,7 +12,8 @@ async function run() {
     
     const newUser = new User({
     email: "Jam@example.com",
-    username: "Jammar",
+    firstName: "Jam",
+    lastName: "mar",
     passwordHash: "$2a$10$Tk/3KIYESE8glgQCGug1BuJhAdZvVOmzEPAEQUbUMQtfHDuBM77P2",
     emailVerified: "true",
     totalPoints: 400,

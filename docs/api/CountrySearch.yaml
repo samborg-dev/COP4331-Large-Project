@@ -1,0 +1,75 @@
+openapi: 3.0.3
+info:
+  title: Countries Search API
+  description: API for autocompleting and searching country records via MongoDB Atlas Search.
+  version: 1.0.0
+
+servers:
+  - url: http://cop4331-countryguesser.com:80
+    description: Local development server
+
+paths:
+  /countries:
+    get:
+      summary: Search countries by name
+      description: Performs a MongoDB Atlas Search autocomplete query against the `COUNTRY` field and returns up to 10 matching documents.
+      operationId: searchCountries
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: Partial or full country name to search for.
+          schema:
+            type: string
+            example: United
+      responses:
+        '200':
+          description: A list of matching country documents (maximum 10).
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 10
+                items:
+                  $ref: '#/components/schemas/Country'
+        '400':
+          description: Missing required `name` query parameter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Please provide a country name query parameter (?name=...)
+        '500':
+          description: Internal server error during database aggregation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Atlas Search index 'name' not found
+
+components:
+  schemas:
+    Country:
+      type: object
+      description: Country document returned from MongoDB.
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId.
+          example: 65f1a2b3c4d5e6f7a8b9c0d1
+        COUNTRY:
+          type: string
+          description: Name of the country.
+          example: United States
+      additionalProperties: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Human-readable error message.

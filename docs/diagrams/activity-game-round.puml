@@ -1,0 +1,38 @@
+@startuml activity-game-round
+title CountryGuesser - One game round
+skinparam shadowing false
+
+start
+:Player selects Start round;
+:Server chooses a mystery country\nand returns the round ID and guess limit;
+if (Round started?) then (yes)
+  :Show the country search field;
+else (no)
+  :Show the error and offer another attempt;
+  stop
+endif
+
+repeat
+  :Player types a country name;
+  :Request matching countries\nand show suggestions;
+  if (Country selected?) then (yes)
+    :Submit the selected country ID;
+    if (Guess accepted?) then (yes)
+      :Show the server's distance clue\nand update guesses left;
+      if (Country found?) then (yes)
+        :Show the win and points earned;
+        stop
+      elseif (No guesses left?) then (yes)
+        :Show the loss;
+        stop
+      endif
+    else (no)
+      :Show the error without adding a guess;
+    endif
+  else (no)
+    :Player edits the search;
+  endif
+repeat while (Keep guessing?) is (yes)
+->no;
+stop
+@enduml

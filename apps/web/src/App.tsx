@@ -1,20 +1,30 @@
-import { BrowserRouter as Router, Route, Navigate, Routes } from 'react-router-dom';
-import './App.css';
-
-import LoginPage from './pages/LoginPage';
-import CardPage from './pages/CardPage';
-
-function App()
-{
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { AuthPage, ProtectedPage } from "./pages/AuthPage";
+import { GamePage, GameSessionProvider } from "./pages/GamePage";
+import { LeaderboardPage } from "./pages/LeaderboardPage";
+import "./App.css";
+export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/cards" element={<CardPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+    <BrowserRouter>
+      <GameSessionProvider>
+        <Routes>
+          {[
+            "/",
+            "/login",
+            "/register",
+            "/check-inbox",
+            "/verify-email",
+            "/forgot-password",
+            "/reset-password",
+          ].map((path) => (
+            <Route key={path} path={path} element={<AuthPage />} />
+          ))}
+          <Route path="/game" element={<ProtectedPage />} />
+          <Route path="/guest" element={<GamePage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </GameSessionProvider>
+    </BrowserRouter>
   );
 }
-
-export default App;

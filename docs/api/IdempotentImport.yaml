@@ -1,0 +1,101 @@
+openapi: 3.0.3
+info:
+  title: Countries Import API
+  version: 1.0.0
+  description: API for bulk importing country records from a local CSV file into a target MongoDB instance.
+
+servers:
+  - url: http://cop4331-countryguesser.com:80
+    description: Local server running on port 80
+
+paths:
+  /api/countries/import:
+    post:
+      summary: Import countries from CSV to MongoDB
+      description: >
+        Reads `./Large_Project_DB_Countries.csv` on the server and performs batched upsert operations (`bulkWrite` in batches of 1,000) into the `countries` collection of the specified MongoDB URI, matching records on the `COUNTRY` field.
+      operationId: importCountries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportRequest'
+      responses:
+        '200':
+          description: Countries imported successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportSuccessResponse'
+        '400':
+          description: Bad Request - Missing MongoDB URI
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: MongoDB URI is required in the request body.
+        '404':
+          description: Not Found - Source CSV file missing on server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "CSV file not found at path: ./Large_Project_DB_Countries.csv"
+        '500':
+          description: Internal Server Error - Database connection or bulk write failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+              example:
+                error: Failed to import countries.
+                details: connect ECONNREFUSED 127.0.0.1:27017
+
+components:
+  schemas:
+    ImportRequest:
+      type: object
+      required:
+        - uri
+      properties:
+        uri:
+          type: string
+          description: Target MongoDB connection string URI
+          example: mongodb+srv://user:password@cluster.mongodb.net/mydb
+
+    ImportSuccessResponse:
+      type: object
+      required:
+        - message
+        - totalProcessed
+      properties:
+        message:
+          type: string
+          example: Countries imported successfully.
+        totalProcessed:
+          type: integer
+          description: Total number of CSV rows upserted into the database
+          example: 197
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+
+    ServerErrorResponse:
+      type: object
+      required:
+        - error
+        - details
+      properties:
+        error:
+          type: string
+        details:
+          type: string
+          description: Underlying error message from Node.js or Mongoose
