@@ -1,0 +1,4 @@
+# Platform projects created by `flutter create`; collapsed in GitHub PR diffs.
+android/** linguist-generated=true
+ios/** linguist-generated=true
+.metadata linguist-generated=true
