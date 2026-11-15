@@ -61,7 +61,7 @@ describe("Round screens", () => {
       if (url.endsWith("/guesses")) return Promise.resolve(Response.json({ country: "France", range: "> 6,000 km", solved: false, guessesUsed: 1 }));
       if (url.endsWith("games/last-guess")) {
         if (lookupFails) return Promise.reject(new TypeError("Offline"));
-        return Promise.resolve(Response.json({ gameId: "last-guess", status: "LOST", maxGuesses: 1, guessesUsed: 1, guesses: [{ countryId: "FR", guessName: "France", range: "> 6,000 km" }], targetCountry: "Mauritius", pointsEarned: 0 }));
+        return Promise.resolve(Response.json({ gameId: "last-guess", status: "lost", maxGuesses: 1, guessesUsed: 1, guesses: [{ countryId: "FR", country: "France", range: "> 6,000 km", at: "2026-11-15T00:00:00Z" }], answer: "Mauritius", pointsEarned: 0 }));
       }
       throw new Error(`Unexpected request: ${url}`);
     });
@@ -277,12 +277,12 @@ describe("Game navigation", () => {
 describe("Restoring a saved round", () => {
   const snapshot = {
     gameId: "saved-round",
-    status: "IN_PROGRESS",
+    status: "active",
     maxGuesses: 6,
     guessesUsed: 2,
     guesses: [
-      { countryId: "ES", guessName: "Spain", range: "500–1,500 km" },
-      { countryId: "FR", guessName: "France", range: "< 500 km" },
+      { countryId: "ES", country: "Spain", range: "500–1,500 km", at: "2026-11-15T00:00:00Z" },
+      { countryId: "FR", country: "France", range: "< 500 km", at: "2026-11-15T00:00:00Z" },
     ],
   };
 
@@ -315,14 +315,14 @@ describe("Restoring a saved round", () => {
     expect(localStorage.getItem(savedRoundKey("john"))).toBe("fresh-round");
   });
 
-  it.each(["IN_PROGRESS", "WON"])("reloads a %s round and uses the server's points without awarding them again", async (status) => {
+  it.each(["active", "won"])("reloads a %s round and uses the server's points without awarding them again", async (status) => {
     keepLogin();
     sessionStorage.setItem(savedRoundKey("john"), "saved-round");
     window.history.replaceState(null, "", "/game");
     const fetcher = vi.fn((url: string) => {
       if (url.endsWith("games/saved-round")) return Promise.resolve(Response.json({
         ...snapshot, status,
-        ...(status === "WON" ? { pointsEarned: 90, targetCountry: "France" } : {}),
+        ...(status === "won" ? { pointsEarned: 90, answer: "France" } : {}),
       }));
       if (url.endsWith("users/me")) return Promise.resolve(Response.json({ totalPoints: 175 }));
       throw new Error(`Unexpected request: ${url}`);
@@ -334,8 +334,8 @@ describe("Restoring a saved round", () => {
     const history = screen.getByRole("region", { name: "Your guesses" });
     expect(within(history).getByText("Spain")).toBeTruthy();
     expect(within(history).getByText("France")).toBeTruthy();
-    expect(Boolean(screen.queryByText("You found it!"))).toBe(status === "WON");
-    expect(Boolean(screen.queryByRole("combobox"))).toBe(status === "IN_PROGRESS");
+    expect(Boolean(screen.queryByText("You found it!"))).toBe(status === "won");
+    expect(Boolean(screen.queryByRole("combobox"))).toBe(status === "active");
     expect(screen.queryByRole("button", { name: "Start round" })).toBeNull();
     expect(fetcher).toHaveBeenCalledTimes(2);
   });

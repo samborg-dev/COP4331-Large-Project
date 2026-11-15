@@ -54,6 +54,8 @@ All errors return `{ "error": "human-readable message" }` with standard HTTP sta
   - `403 Forbidden`: `{ "error": "Cannot access another user's game" }`
   - `404 Not Found`: `{ "error": "Game not found" }`
 
+Saved rounds use `active`, `won`, or `lost`, and each guess includes `country` and its ISO-8601 `at` timestamp. Database field names are internal. Completed rounds additionally include `answer`, the mystery country name; active rounds omit it. Winning guesses may use `range: "Correct"`, both here and in the submit-guess response.
+
 ### `POST /api/games/:id/guesses` (Bearer Auth)
 - **Request:** `{ "countryId": "string" }`
 - **Responses:**
