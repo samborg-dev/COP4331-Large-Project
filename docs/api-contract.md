@@ -50,14 +50,14 @@ All errors return `{ "error": "human-readable message" }` with standard HTTP sta
 
 ### `GET /api/games/:id` (Bearer Auth)
 - **Responses:**
-  - `200 OK`: `{ "gameId": "string", "status": "active | won | lost", "guesses": [{ "countryId": "string", "country": "string", "range": "< 500 km | 500–1,500 km | 1,500–3,000 km | 3,000–6,000 km | > 6,000 km", "at": "ISO-8601" }], "maxGuesses": 10, "guessesUsed": 1, "pointsEarned": 0 }`
+  - `200 OK`: `{ "gameId": "string", "status": "active | won | lost", "guesses": [{ "countryId": "string", "country": "string", "range": "< 500 km | 500–1,500 km | 1,500–3,000 km | 3,000–6,000 km | > 6,000 km", "distance": 1550, "direction": "NE", "at": "ISO-8601" }], "maxGuesses": 10, "guessesUsed": 1, "pointsEarned": 0 }`
   - `403 Forbidden`: `{ "error": "Cannot access another user's game" }`
   - `404 Not Found`: `{ "error": "Game not found" }`
 
 ### `POST /api/games/:id/guesses` (Bearer Auth)
 - **Request:** `{ "countryId": "string" }`
 - **Responses:**
-  - `200 OK`: `{ "country": "France", "range": "1,500–3,000 km", "solved": false, "guessesUsed": 1, "pointsEarned": 90 }` (`pointsEarned` included when `solved: true`)
+  - `200 OK`: `{ "country": "France", "range": "1,500–3,000 km", "distance": 1550, "direction": "NE", "solved": false, "guessesUsed": 1, "pointsEarned": 90 }` (`pointsEarned` included when `solved: true`)
   - `400 Bad Request`: `{ "error": "Game is already finished" }`
   - `403 Forbidden`: `{ "error": "Cannot guess on another user's game" }`
 

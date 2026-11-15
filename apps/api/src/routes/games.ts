@@ -30,7 +30,11 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return Math.round(R * c);
+  return R * c;
+}
+
+function roundDistance(distance: number): number {
+  return Math.round(distance / 10) * 10;
 }
 
 function calculateDirection(lat1: number, lon1: number, lat2: number, lon2: number): string {
@@ -170,7 +174,9 @@ router.get('/:id', async (req: AuthenticatedRequest, res) => {
         countryId: g.countryId ?? g.guessName,
         country: g.guessName,
         range: g.range ?? '< 500 km',
-        distance: g.distance ?? calculateDistance(g.lat, g.lng, game.targetLat, game.targetLng),
+        distance: roundDistance(
+          g.distance ?? calculateDistance(g.lat, g.lng, game.targetLat, game.targetLng),
+        ),
         direction:
           g.direction ??
           (g.range === 'Correct'
@@ -315,11 +321,17 @@ router.post('/:id/guesses', async (req: AuthenticatedRequest, res) => {
       return res.status(400).json({ error: 'Valid countryId or guess coordinates are required' });
     }
 
-    const distance = calculateDistance(resolvedLat, resolvedLng, game.targetLat, game.targetLng);
+    const exactDistance = calculateDistance(
+      resolvedLat,
+      resolvedLng,
+      game.targetLat,
+      game.targetLng,
+    );
+    const distance = roundDistance(exactDistance);
     const isSameCountry =
       resolvedName.toLowerCase() === game.targetCountry.toLowerCase() ||
       (resolvedId && game.targetIso && resolvedId.toLowerCase() === game.targetIso.toLowerCase());
-    const solved = Boolean(isSameCountry || distance <= 50);
+    const solved = Boolean(isSameCountry || exactDistance <= 50);
 
     const guessesUsed = game.guesses.length + 1;
     const isLost = !solved && guessesUsed >= MAX_GUESSES;
