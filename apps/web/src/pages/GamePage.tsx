@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -12,6 +13,7 @@ import type { GiveUpGameResponse, SubmitGuessInput } from "@cop4331/shared";
 import { api, ApiError, readPlayer, savedRoundKey } from "../api";
 import { CountrySearch, type CountryOption } from "../components/CountrySearch";
 import { GuessHistory, RoundResult } from "../components/RoundUI";
+import { GameGlobe } from "../components/GameGlobe";
 import { guessResponseSchema, savedRoundSchema, startRoundSchema, type Round } from "../round";
 
 function useGameState(initialPoints?: number, playerId?: string) {
@@ -170,6 +172,13 @@ export function GamePage({
   const searchInput = useRef<HTMLInputElement>(null);
   const startButton = useRef<HTMLButtonElement>(null);
   const playAgainButton = useRef<HTMLButtonElement>(null);
+  const [focusCountry, setFocusCountry] = useState<{ name: string; requestId: string }>();
+  const answer = round && round.status !== "active" ? round.answer : undefined;
+  const currentGameId = round?.gameId;
+  const globeFocus = useMemo(() => answer && currentGameId
+    ? { name: answer, requestId: `${currentGameId}:answer` }
+    : currentGameId && focusCountry?.requestId.startsWith(`${currentGameId}:`) ? focusCountry : undefined,
+  [answer, currentGameId, focusCountry]);
 
   useEffect(() => {
     if (busy || !restoreFocus.current) return;
@@ -234,6 +243,7 @@ export function GamePage({
         : guess.guessesUsed >= round.maxGuesses
           ? "lost"
           : "active";
+      setFocusCountry({ name: guess.country, requestId: `${round.gameId}:${country.id}` });
       setRound({
         ...round,
         status,
@@ -376,7 +386,9 @@ export function GamePage({
             </p>
           )}
         </div>
-        <div className="map-space">
+        <div className={`map-space${round && round.status !== "active" ? " round-complete" : ""}`}>
+          <GameGlobe gameId={round?.gameId} guesses={round?.guesses} answer={answer} focusCountry={globeFocus} />
+        </div>
           {round && (
             <RoundResult
               round={round}
@@ -385,7 +397,6 @@ export function GamePage({
               playAgainRef={playAgainButton}
             />
           )}
-        </div>
         <GuessHistory round={round} disabled={busy} onGiveUp={() => giveUpDialog.current?.showModal()} />
       </section>
 
