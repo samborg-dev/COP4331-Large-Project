@@ -94,6 +94,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 )
               else if (data != null)
                 Card(
+                  clipBehavior: Clip.antiAlias,
                   child: Column(
                     children: [
                       for (final (i, e) in data.entries.indexed)
