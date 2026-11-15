@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -41,6 +42,8 @@ class _GameScreenState extends State<GameScreen> {
   // Set when the round ends
   bool _won = false;
   bool _lost = false;
+  bool _gaveUp = false;
+  bool _givingUp = false;
   int? _earned;
   String? _answer;
 
@@ -98,7 +101,7 @@ class _GameScreenState extends State<GameScreen> {
       _game = null;
       _guesses.clear();
       _focus = null;
-      _won = _lost = false;
+      _won = _lost = _gaveUp = false;
       _earned = _answer = null;
       _clearSearch();
     });
@@ -179,7 +182,7 @@ class _GameScreenState extends State<GameScreen> {
       final result = await widget.api.guess(game.gameId, country.id);
       if (!mounted) return;
       setState(() {
-        _guesses.insert(0, Guess(country: result.country, range: result.range));
+        _guesses.insert(0, result.toGuess());
         _focus = result.country;
         _clearSearch();
         if (result.solved) {
@@ -196,6 +199,63 @@ class _GameScreenState extends State<GameScreen> {
       _handleError(e);
     } finally {
       if (mounted) setState(() => _guessing = false);
+    }
+  }
+
+  /// Enter guesses straight away: the picked country, an exact name match,
+  /// or else the top suggestion.
+  Future<void> _guessFromKeyboard() async {
+    final text = _search.text.trim();
+    if (_selected == null) {
+      if (text.isEmpty) return;
+      // The search may still be waiting for typing to pause; run it now
+      if ((_debounce?.isActive ?? false) || _searching) {
+        _debounce?.cancel();
+        await _runSearch(text);
+      }
+      if (!mounted || _suggestions.isEmpty) return;
+      final exact = _suggestions.where((c) => c.name.toLowerCase() == text.toLowerCase());
+      _select(exact.isNotEmpty ? exact.first : _suggestions.first);
+    }
+    await _submitGuess();
+  }
+
+  Future<void> _confirmGiveUp() async {
+    final game = _game;
+    if (game == null || _over || _givingUp) return;
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.card,
+        title: const Text('Give up this round?'),
+        content: const Text('You’ll see the mystery country and earn no points for this round.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep playing')),
+          TextButton(
+            key: const Key('confirm-give-up'),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Give up'),
+          ),
+        ],
+      ),
+    );
+    if (sure != true || !mounted) return;
+    setState(() {
+      _givingUp = true;
+      _error = '';
+    });
+    try {
+      await widget.api.giveUp(game.gameId);
+      if (!mounted) return;
+      setState(() {
+        _lost = _gaveUp = true;
+        _clearSearch();
+      });
+      await _revealAnswer(game.gameId);
+    } catch (e) {
+      _handleError(e);
+    } finally {
+      if (mounted) setState(() => _givingUp = false);
     }
   }
 
@@ -232,9 +292,9 @@ class _GameScreenState extends State<GameScreen> {
         title: const Text('How to play'),
         content: const Text(
           'Find the mystery country before you run out of guesses.\n\n'
-          'Type a country name and pick it from the list. After each guess you '
-          'see how far your guess is from the mystery country. Smaller distance '
-          'ranges mean you’re closer.\n\n'
+          'Type a country name and press Enter (or pick it from the list). After '
+          'each guess you see how far it is from the mystery country and which '
+          'way to go: the arrow points toward the mystery country.\n\n'
           'Find it in fewer guesses to earn more points. Your points add to '
           'your total on the leaderboard.',
         ),
@@ -365,6 +425,7 @@ class _GameScreenState extends State<GameScreen> {
       return [
         _RoundResult(
           won: _won,
+          gaveUp: _gaveUp,
           earned: _earned,
           answer: _answer,
           guesses: _guesses.length,
@@ -389,9 +450,7 @@ class _GameScreenState extends State<GameScreen> {
         textInputAction: TextInputAction.done,
         textCapitalization: TextCapitalization.words,
         onChanged: _onSearchChanged,
-        onSubmitted: (_) {
-          if (_selected == null && _suggestions.isNotEmpty) _select(_suggestions.first);
-        },
+        onSubmitted: (_) => _guessFromKeyboard(),
         decoration: InputDecoration(
           labelText: 'Country',
           hintText: 'Start typing, e.g. "fra"',
@@ -450,6 +509,14 @@ class _GameScreenState extends State<GameScreen> {
               )
             : Text(_selected == null ? 'Pick a country to guess' : 'Guess ${_selected!.name}'),
       ),
+      if (_guesses.isNotEmpty) ...[
+        const SizedBox(height: 4),
+        TextButton(
+          key: const Key('give-up-button'),
+          onPressed: _guessing || _givingUp ? null : _confirmGiveUp,
+          child: const Text('Give up'),
+        ),
+      ],
     ];
   }
 }
@@ -457,6 +524,7 @@ class _GameScreenState extends State<GameScreen> {
 class _RoundResult extends StatelessWidget {
   const _RoundResult({
     required this.won,
+    required this.gaveUp,
     required this.earned,
     required this.answer,
     required this.guesses,
@@ -464,6 +532,7 @@ class _RoundResult extends StatelessWidget {
   });
 
   final bool won;
+  final bool gaveUp;
   final int? earned;
   final String? answer;
   final int guesses;
@@ -483,7 +552,11 @@ class _RoundResult extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          won ? 'You found it!' : 'Out of guesses',
+          won
+              ? 'You found it!'
+              : gaveUp
+                  ? 'You gave up'
+                  : 'Out of guesses',
           textAlign: TextAlign.center,
           style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
@@ -584,14 +657,7 @@ class _GuessHistory extends StatelessWidget {
                           color: _rangeColor(g.range).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(999),
                         ),
-                        child: Text(
-                          g.range,
-                          style: TextStyle(
-                            color: _rangeColor(g.range),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                          ),
-                        ),
+                        child: _DistanceLabel(guess: g, color: _rangeColor(g.range)),
                       ),
                     ],
                   ),
@@ -599,6 +665,48 @@ class _GuessHistory extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// "~1,550 km" plus an arrow toward the mystery country, or the distance
+/// range when the server doesn't send an exact distance.
+class _DistanceLabel extends StatelessWidget {
+  const _DistanceLabel({required this.guess, required this.color});
+
+  final Guess guess;
+  final Color color;
+
+  static const _compass = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+  static String _km(int km) =>
+      km.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+$)'), (_) => ',');
+
+  @override
+  Widget build(BuildContext context) {
+    final style = TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 13);
+    final distance = guess.distance;
+    if (guess.range == 'Correct' || distance == null) return Text(guess.range, style: style);
+
+    final heading = _compass.indexOf(guess.direction ?? '');
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('~${_km(distance)} km', style: style),
+        if (heading >= 0) ...[
+          const SizedBox(width: 6),
+          Transform.rotate(
+            angle: heading * math.pi / 4,
+            child: Icon(
+              Icons.arrow_upward,
+              key: Key('direction-${guess.direction}'),
+              size: 16,
+              color: color,
+              semanticLabel: 'Go ${guess.direction}',
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
