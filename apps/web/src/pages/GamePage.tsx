@@ -353,7 +353,7 @@ export function GamePage({
           )}
         </div>
         <div className="map-space">
-          {(!round || round.status === "active") && <GameGlobe />}
+          {(!round || round.status === "active") && <GameGlobe guesses={round?.guesses} />}
           {round && (
             <RoundResult
               round={round}
