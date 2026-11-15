@@ -7,6 +7,7 @@ export interface GuessEntry {
   lng: number;
   distance: number;
   range?: string;
+  direction?: string;
   createdAt: Date;
 }
 
@@ -20,5 +21,6 @@ export interface GameDoc {
   guesses: GuessEntry[];
   status: 'IN_PROGRESS' | 'WON' | 'LOST';
   pointsEarned?: number;
+  surrendered?: boolean;
   createdAt: Date;
 }
