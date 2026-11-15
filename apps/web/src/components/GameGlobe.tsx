@@ -12,6 +12,7 @@ export function GameGlobe({ guesses = [], focusCountry, answer, gameId }: { gues
   const mapRef = useRef<import("maplibre-gl").Map | null>(null);
   const latestGuesses = useRef(highlights);
   const coloredCountries = useRef(new Set<string>());
+  const countryShapes = useRef<CountryCollection>({ type: "FeatureCollection", features: [] });
   const centers = useRef(new Map<string, [number, number]>());
   const pendingFocus = useRef<typeof focusCountry>(undefined);
   const previousGameId = useRef(gameId);
@@ -43,7 +44,11 @@ export function GameGlobe({ guesses = [], focusCountry, answer, gameId }: { gues
     focusGuess();
   }, [focusCountry]);
   function updateHighlights(map: import("maplibre-gl").Map, next: Guess[]) {
-    if (!map.getSource("game-countries")) return;
+    const source = map.getSource("game-countries") as import("maplibre-gl").GeoJSONSource | undefined;
+    if (!source) return;
+    const keys = new Set(next.map(guess => countryKey(guess.name)));
+    source.setData({ type: "FeatureCollection", features: countryShapes.current.features
+      .filter((feature: CountryCollection["features"][number]) => keys.has(String(feature.properties?.countryKey))) });
     for (const id of coloredCountries.current) map.removeFeatureState({ source: "game-countries", id });
     coloredCountries.current.clear();
     for (const guess of next) {
@@ -109,7 +114,8 @@ export function GameGlobe({ guesses = [], focusCountry, answer, gameId }: { gues
               feature.properties = { ...feature.properties, countryKey: countryKey(String(feature.properties?.name ?? "")) };
             }
             if (disposed) return;
-            map.addSource("game-countries", { type: "geojson", data, promoteId: "countryKey" });
+            countryShapes.current = data;
+            map.addSource("game-countries", { type: "geojson", data: { type: "FeatureCollection", features: [] }, promoteId: "countryKey" });
             map.addLayer({ id: "guessed-countries", type: "fill", source: "game-countries", paint: {
               "fill-color": ["coalesce", ["feature-state", "color"], "#000000"],
               "fill-opacity": ["case", ["boolean", ["feature-state", "guessed"], false], 0.55, 0],

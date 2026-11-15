@@ -1,5 +1,7 @@
 import {
   createContext,
+  lazy,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -13,8 +15,9 @@ import type { GiveUpGameResponse, SubmitGuessInput } from "@cop4331/shared";
 import { api, ApiError, readPlayer, savedRoundKey } from "../api";
 import { CountrySearch, type CountryOption } from "../components/CountrySearch";
 import { GuessHistory, RoundResult } from "../components/RoundUI";
-import { GameGlobe } from "../components/GameGlobe";
 import { guessResponseSchema, savedRoundSchema, startRoundSchema, type Round } from "../round";
+
+const GameGlobe = lazy(() => import("../components/GameGlobe").then(module => ({ default: module.GameGlobe })));
 
 function useGameState(initialPoints?: number, playerId?: string) {
   const [sessionToken] = useState(() => localStorage.getItem("token_data"));
@@ -389,7 +392,9 @@ export function GamePage({
           )}
         </div>
         <div className={`map-space${round && round.status !== "active" ? " round-complete" : ""}`}>
-          <GameGlobe gameId={round?.gameId} guesses={round?.guesses} answer={answer} focusCountry={globeFocus} />
+          <Suspense fallback={<div className="game-globe globe-map" role="status">Loading globe…</div>}>
+            <GameGlobe gameId={round?.gameId} guesses={round?.guesses} answer={answer} focusCountry={globeFocus} />
+          </Suspense>
         </div>
           {round && (
             <RoundResult
