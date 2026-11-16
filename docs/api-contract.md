@@ -9,7 +9,7 @@ All errors return `{ "error": "human-readable message" }` with standard HTTP sta
 ### `POST /api/auth/register` (Public)
 - **Request:** `{ "firstName": "string", "lastName": "string", "email": "string", "password": "string (min 8)" }`
 - **Responses:**
-  - `201 Created`: `{ "message": "Account created. Please check your email to verify." }`
+  - `201 Created`: `{ "message": "Account created. Check your email to verify." }`
   - `400 Bad Request`: `{ "error": "Validation error message" }`
   - `409 Conflict`: `{ "error": "Email already registered" }`
 
@@ -22,7 +22,7 @@ All errors return `{ "error": "human-readable message" }` with standard HTTP sta
 ### `POST /api/auth/resend-verification` (Public)
 - **Request:** `{ "email": "string" }`
 - **Responses:**
-  - `200 OK`: `{ "message": "If that account exists and is unverified, a verification link has been sent." }`
+  - `200 OK`: `{ "message": "If the email exists and is unverified, a verification link has been sent." }`
 
 ### `POST /api/auth/login` (Public)
 - **Request:** `{ "email": "string", "password": "string" }`
@@ -34,13 +34,13 @@ All errors return `{ "error": "human-readable message" }` with standard HTTP sta
 ### `POST /api/auth/forgot-password` (Public)
 - **Request:** `{ "email": "string" }`
 - **Responses:**
-  - `200 OK`: `{ "message": "If an account with that email exists, a password reset link has been sent." }`
+  - `200 OK`: `{ "message": "If that email address is in our database, we have sent a password reset link." }`
 
 ### `POST /api/auth/reset-password` (Public)
 - **Request:** `{ "token": "string", "password": "string (min 8)" }`
 - **Responses:**
   - `200 OK`: `{ "message": "Password reset successfully" }`
-  - `400 Bad Request`: `{ "error": "Invalid or expired reset token" }`
+  - `400 Bad Request`: `{ "error": "Invalid or expired password reset token" }`
 
 ## 2. Gameplay (`/api/games`)
 

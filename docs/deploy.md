@@ -3,8 +3,8 @@
 One DigitalOcean droplet (Ubuntu LTS) serves everything on one HTTPS origin:
 
 ```
-https://your-domain.com/         -> nginx serves apps/web/dist (React build)
-https://your-domain.com/api/...  -> nginx proxies to the API on 127.0.0.1:5000 (pm2)
+https://cop4331-countryguesser.com/         -> nginx serves apps/web/dist (React build)
+https://cop4331-countryguesser.com/api/...  -> nginx proxies to the API on 127.0.0.1:5000 (pm2)
 ```
 
 Because the web app and the API share an origin, the browser never makes a
@@ -20,7 +20,7 @@ in Discord to have your SSH key added.
 ## Deploy
 
 ```bash
-ssh deploy@your-domain.com
+ssh deploy@cop4331-countryguesser.com
 cd ~/app
 git pull
 pnpm install --frozen-lockfile
@@ -28,7 +28,7 @@ pnpm build
 pm2 restart api
 ```
 
-Then check it: `curl https://your-domain.com/health` should print `{"ok":true}`.
+Then check it: `curl https://cop4331-countryguesser.com/health` should print `{"status":"ok"}`.
 Also open the site in a browser.
 
 A web-only change needs only `pnpm build`, because nginx serves the new files
@@ -68,7 +68,7 @@ sudo tail -f /var/log/nginx/error.log
 | TXT | `resend._domainkey` | copied from Resend → Domains (DKIM) |
 | TXT | `_dmarc` | `v=DMARC1; p=none;` |
 
-Check the A record with `nslookup your-domain.com`. Resend shows the domain as
+Check the A record with `nslookup cop4331-countryguesser.com`. Resend shows the domain as
 **Verified** once its records have propagated.
 
 ### 2. Server packages
@@ -104,9 +104,9 @@ PORT=5000
 MONGODB_URI=<from Noah, by DM>
 ACCESS_TOKEN_SECRET=<node -e "console.log(require('crypto').randomBytes(48).toString('hex'))">
 RESEND_API_KEY=<from the Resend dashboard>
-MAIL_FROM=Country Guesser <noreply@your-domain.com>
-APP_URL=https://your-domain.com
-VITE_API_URL=https://your-domain.com
+MAIL_FROM=Country Guesser <noreply@cop4331-countryguesser.com>
+APP_URL=https://cop4331-countryguesser.com
+VITE_API_URL=https://cop4331-countryguesser.com
 ```
 
 `VITE_API_URL` is baked into the web build. After you change it, rerun
@@ -116,7 +116,7 @@ VITE_API_URL=https://your-domain.com
 
 ```bash
 sudo cp deploy/nginx/country-guesser.conf /etc/nginx/sites-available/country-guesser
-sudo sed -i 's/your-domain.com/<real domain>/g' /etc/nginx/sites-available/country-guesser
+sudo sed -i 's/cop4331-countryguesser.com/<real domain>/g' /etc/nginx/sites-available/country-guesser
 sudo ln -s /etc/nginx/sites-available/country-guesser /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t && sudo systemctl reload nginx
@@ -137,7 +137,7 @@ pm2 startup                            # run the command it prints, so the API c
 ### 6. Check it
 
 - `curl -I http://<domain>` returns a 301 redirect to https.
-- `curl https://<domain>/health` returns `{"ok":true}`.
+- `curl https://<domain>/health` returns `{"status":"ok"}`.
 - Opening `https://<domain>/verify-email?token=x` loads the app, not an nginx 404.
 - `pnpm --filter @cop4331/api mail:test <your gmail>`, and then the same with a UCF
   address, both arrive in the inbox. In Gmail, check **Show original**: SPF, DKIM
