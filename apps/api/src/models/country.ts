@@ -18,7 +18,7 @@ export interface CountryDoc {
   _id?: ObjectId;
   type?: string;
   features?: CountryFeature[];
-  // Supports flat country documents if imported via idempotentImport.js
+  // Flat country documents, as written by apps/api/scripts/idempotentImport.js
   name?: string;
   iso?: string;
   lat?: number;

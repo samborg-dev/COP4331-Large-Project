@@ -74,7 +74,7 @@ else not verified
   API --> App : 403 { error: "Account email is not verified" }
   App --> Player : Show error, offer resend
 else success
-  API -> API : Sign JWT { userId, firstName, lastName }\n(expires in 30 min)
+  API -> API : Sign JWT { userId }\n(expires in 24 h)
   API --> App : 200 { accessToken, user }
   App -> App : Store token\n(web: localStorage "token_data",\nmobile: flutter_secure_storage)
   App --> Player : Show game screen

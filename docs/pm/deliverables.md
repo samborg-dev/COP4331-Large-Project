@@ -1,7 +1,7 @@
 # Deliverables checklist
 
 Every graded or required item, who owns it, when it's due, and where the evidence
-lives. Sam updates the **Done** column at the Sunday and Wednesday syncs. Task
+lives. Sam updates the **Done** column at the Sunday and Wednesday syncs. ✅ done, 🟡 partly done, ☐ not done. Task
 detail is in [TASKS.md](../../TASKS.md) and dates are in [gantt.md](gantt.md).
 
 **Hard deadline: Sun Nov 15, 11:59 pm (WebCourses).** Internal dates leave Sunday
@@ -14,15 +14,15 @@ as the only buffer.
 | 1 | PowerPoint submitted on time, **by each member** | 5 | Everyone | Sat Nov 14 (hard: Sun Nov 15, 11:59 pm) | WebCourses submission (5 confirmations in Discord) | ☐ |
 | 2 | Professional slides | 5 | Sam | Fri Nov 13 | `.pptx` on USB + in Discord | ☐ |
 | 3 | All members participate | 5 | Everyone | Presentation | Run-of-show below | ☐ |
-| 4 | Gantt chart | 5 | Sam | Kept current, final Nov 13 | `docs/pm/gantt.svg` | ☐ |
-| 5 | ERD | 5 | Noah | Sun Nov 8 | `docs/diagrams/erd.puml` + PNG | ☐ |
-| 6a | Use case diagram | 5 (shared) | Sam | Wed Nov 4 | `docs/diagrams/use-case.puml` (draft exists) | ☐ |
-| 6b | Sequence diagram | ″ | Sam | Sun Nov 8 | `docs/diagrams/sequence-register-verify.puml` (draft exists) | ☐ |
-| 6c | Activity diagram | ″ | John | Thu Nov 12 | `docs/diagrams/activity-game-round.puml` | ☐ |
-| 7 | Email verification and password recovery | 5 | Sebastian | Fri Nov 6 | Works on the live domain | ☐ |
-| 8 | SwaggerHub demo (exactly 2 endpoints, ≥1 live) | 5 | Noah (spec), Sebastian (review) | Tue Nov 10 | `docs/api/openapi.yaml` + SwaggerHub link | ☐ |
-| 9 | Server-side partial-match search | 5 | Noah | Thu Nov 5 | `GET /api/countries/search` + tests | ☐ |
-| 10 | Prototypes (web **and** mobile) | 5 | John (web), Arwa (mobile) | Sat Oct 31 / Sun Nov 1 | Figma links in `docs/design.md` + exports | ☐ |
+| 4 | Gantt chart | 5 | Sam | Kept current, final Nov 13 | `docs/pm/gantt.svg` (regenerate with `node docs/pm/gantt.mjs`) | ✅ |
+| 5 | ERD | 5 | Noah | Sun Nov 8 | `docs/diagrams/erd.puml` + `ERD.png` | ✅ |
+| 6a | Use case diagram | 5 (shared) | Sam | Wed Nov 4 | `docs/diagrams/use-case.puml` + `.png` | ✅ |
+| 6b | Sequence diagram | ″ | Sam | Sun Nov 8 | `docs/diagrams/sequence-register-verify.puml` + `sequence-password-reset.puml`, with PNGs | ✅ |
+| 6c | Activity diagram | ″ | John | Thu Nov 12 | `docs/diagrams/activity-game-round.puml` + `.png` | ✅ |
+| 7 | Email verification and password recovery | 5 | Sebastian | Fri Nov 6 | API tests cover verify, resend, forgot, reset. **Still to check on the live domain** (inbox delivery) | 🟡 |
+| 8 | SwaggerHub demo (exactly 2 endpoints, ≥1 live) | 5 | Noah (spec), Sebastian (review) | Tue Nov 10 | `docs/api/openapi.yaml` is ready. **Still to import into SwaggerHub and test "Try it out"** against the live domain | 🟡 |
+| 9 | Server-side partial-match search | 5 | Noah | Thu Nov 5 | `GET /api/countries/search`, tests in `apps/api/test/search.test.ts` | ✅ |
+| 10 | Prototypes (web **and** mobile) | 5 | John (web), Arwa (mobile) | Sat Oct 31 / Sun Nov 1 | Figma links still missing in `docs/design.md` | ☐ |
 | 11 | Working demo: web | 20 (shared) | John + Sebastian | Wed Nov 11 | `https://<domain>` | ☐ |
 | 11 | Working demo: mobile | ″ | Arwa | Wed Nov 11 (APK Fri Nov 13) | Release APK on a real phone | ☐ |
 | 12 | Adherence to current standards | 5 | Everyone | Ongoing | HTTPS, bcrypt, JWT, hashed reset tokens, rate limiting, CI, typed contract, no secrets in git | ☐ |
@@ -33,14 +33,14 @@ as the only buffer.
 
 | Deliverable | Owner | Due | Location | Done |
 |---|---|---|---|---|
-| Class diagram (mobile) | Arwa | Thu Nov 12 | `docs/diagrams/class-mobile.puml` | ☐ |
-| Unit + integration test results: API | Sebastian | Thu Nov 12 | `docs/tests/api.png` | ☐ |
-| Test results: search / DB | Noah | Wed Nov 11 | `docs/tests/search.png` | ☐ |
-| Test results: web | John | Thu Nov 12 | `docs/tests/web.png` | ☐ |
-| Test results: mobile | Arwa | Fri Nov 13 | `docs/tests/mobile.png` | ☐ |
-| API contract | Sebastian | Fri Oct 30 | `docs/api-contract.md` + `packages/shared` | ☐ |
-| Data model | Noah | Tue Nov 3 | `docs/data-model.md` | ☐ |
-| Deploy guide | Sam | Mon Nov 2 | `docs/deploy.md` | ☐ |
+| Class diagram (mobile) | Arwa | Thu Nov 12 | `docs/diagrams/class-mobile.puml` + `.png` | ✅ |
+| Unit + integration test results: API | Sebastian | Thu Nov 12 | `docs/tests/api.png` (47 passing) | ✅ |
+| Test results: search / DB | Noah | Wed Nov 11 | Covered by `docs/tests/api.png` (search and game tests) | ✅ |
+| Test results: web | John | Thu Nov 12 | `docs/tests/web.png` still to capture | ☐ |
+| Test results: mobile | Arwa | Fri Nov 13 | `docs/tests/mobile.png` still to capture | ☐ |
+| API contract | Sebastian | Fri Oct 30 | `docs/api-contract.md` + `packages/shared` | ✅ |
+| Data model | Noah | Tue Nov 3 | `docs/data-model.md` + `pnpm --filter @cop4331/api db:indexes` | ✅ |
+| Deploy guide | Sam | Mon Nov 2 | `docs/deploy.md` | ✅ |
 
 ## Slide outline
 
