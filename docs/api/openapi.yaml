@@ -7,87 +7,25 @@ info:
     The server secretly picks a country; the player searches for countries and
     guesses, and the server answers each guess with a distance range.
 
-    This spec documents the two endpoints demonstrated in the SwaggerHub demo,
-    plus the login and start-game helpers used to obtain a bearer token and
-    active game ID:
+    This spec documents the two endpoints demonstrated in the SwaggerHub demo:
 
     1. `GET /api/countries/search`: server-side, case-insensitive partial-match search.
     2. `POST /api/games/{id}/guesses`: submit a guess and get distance feedback.
-    3. `POST /api/auth/login`: authenticate a verified demo account.
-    4. `POST /api/games`: start an active round for the guess demo.
 
-    **Authorization:** both endpoints need a JWT. Log in with
-    `POST /api/auth/login` (the web or mobile app does this), copy the
-    `accessToken`, click **Authorize** and paste it. The token expires after 24 hours.
-    The other endpoints (register, verify-email, password reset, leaderboard,
-    rounds) are described in `docs/api-contract.md`.
+    **Authorization:** both endpoints need a JWT. Use a pre-verified demo account
+    in the web app, copy its access token, click **Authorize**, and enter
+    `Bearer <accessToken>`. Use an active game ID from the web app for the guess
+    demonstration. The full authentication and round setup endpoints are
+    described in `docs/api-contract.md`.
 servers:
   - url: https://cop4331-countryguesser.com
     description: Production (DigitalOcean, nginx + pm2)
   - url: http://localhost:5000
     description: Local development
 tags:
-  - name: Auth
   - name: Countries
   - name: Games
 paths:
-  /api/auth/login:
-    post:
-      tags: [Auth]
-      operationId: login
-      summary: Log in and obtain a JWT
-      description: |
-        Log in with a verified account, copy the returned `accessToken`, then
-        click **Authorize** and enter `Bearer <accessToken>` to call the
-        protected SwaggerHub endpoints.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
-            example:
-              email: demo@example.com
-              password: your-password
-      responses:
-        '200':
-          description: Login succeeded. The token expires after 24 hours.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoginResponse'
-        '400':
-          description: Invalid request body.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                error: Invalid email or password
-        '401':
-          description: Invalid email or password.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                error: Invalid email or password
-        '403':
-          description: The account email has not been verified.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                error: Account email is not verified
-        '429':
-          description: Too many authentication requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          $ref: '#/components/responses/ServerError'
   /api/countries/search:
     get:
       tags: [Countries]
@@ -147,28 +85,6 @@ paths:
                 $ref: '#/components/schemas/Error'
               example:
                 error: Search query parameter "q" is required
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-  /api/games:
-    post:
-      tags: [Games]
-      operationId: startGame
-      summary: Start a new round
-      description: Creates an active round and returns the game ID required by the guess endpoint.
-      security:
-        - bearerAuth: []
-      responses:
-        '201':
-          description: A new active round.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StartGameResponse'
-              example:
-                gameId: 6af8c654db2afb40c3cf70a8
-                maxGuesses: 10
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -287,52 +203,6 @@ components:
           example:
             error: Internal server error
   schemas:
-    LoginRequest:
-      type: object
-      required: [email, password]
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          format: password
-          minLength: 1
-    LoginResponse:
-      type: object
-      required: [accessToken, user]
-      properties:
-        accessToken:
-          type: string
-          description: JWT bearer token, valid for 24 hours.
-        user:
-          $ref: '#/components/schemas/AuthUser'
-    StartGameResponse:
-      type: object
-      required: [gameId, maxGuesses]
-      properties:
-        gameId:
-          type: string
-          description: Use this value as the `id` path parameter for submitting a guess.
-        maxGuesses:
-          type: integer
-          example: 10
-    AuthUser:
-      type: object
-      required: [id, firstName, lastName, email, totalPoints]
-      properties:
-        id:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-          format: email
-        totalPoints:
-          type: integer
-          minimum: 0
     Error:
       type: object
       required: [error]
