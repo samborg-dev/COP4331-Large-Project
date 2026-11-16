@@ -41,6 +41,7 @@ package "api" {
     + startGame(): Future<Game>
     + getGame(gameId): Future<Game>
     + guess(gameId, countryId): Future<GuessResult>
+    + giveUp(gameId): Future<void>
     + leaderboard(page, limit): Future<LeaderboardPage>
     - _request(method, route, body, auth)
   }
@@ -59,10 +60,13 @@ package "api" {
     + status: String
     + pointsEarned: int
     + answer: String?
+    + surrendered: bool
   }
   class Guess {
     + country: String
     + range: String
+    + distance: int?
+    + direction: String?
   }
   class GuessResult {
     + country: String
@@ -70,6 +74,8 @@ package "api" {
     + solved: bool
     + guessesUsed: int
     + pointsEarned: int?
+    + distance: int?
+    + direction: String?
   }
   class LeaderboardPage {
     + page: int
@@ -107,7 +113,9 @@ package "screens" {
     - _newRound()
     - _onSearchChanged(text)
     - _submitGuess()
+    - _confirmGiveUp()
     - _revealAnswer(gameId)
+    - _logout()
   }
   class LeaderboardScreen <<StatefulWidget>> {
     - _data: LeaderboardPage?
@@ -115,9 +123,27 @@ package "screens" {
   }
 }
 
+package "globe" {
+  class CountryGlobe <<StatefulWidget>> {
+    + guesses: List<Guess>
+    + answer: String?
+    + focusCountry: String?
+    + roundId: String?
+  }
+  class GlobeData {
+    + countries: Map<String, CountryShape>
+  }
+  class CountryShape {
+    + name: String
+    + rings: List<Float32List>
+    + center: List<double>
+  }
+}
+
 package "widgets / utils" {
   class AuthScaffold <<StatelessWidget>>
   class LoadingButton <<StatelessWidget>>
+  class FormMessage <<StatelessWidget>>
   class Validators <<functions>> {
     + validateEmail(value): String?
     + validateNewPassword(value): String?
@@ -146,6 +172,11 @@ RegisterScreen ..> AuthScaffold
 CheckInboxScreen ..> AuthScaffold
 ForgotPasswordScreen ..> AuthScaffold
 AuthScaffold ..> LoadingButton
+LoginScreen ..> FormMessage
+GameScreen --> CountryGlobe : shows guesses on
+CountryGlobe ..> GlobeData : loads
+GlobeData "1" *-- "0..*" CountryShape
+CountryGlobe ..> Guess
 LoginScreen ..> Validators
 RegisterScreen ..> Validators
 
