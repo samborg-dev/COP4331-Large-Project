@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { createLandscapeLoader } from "./landscapeTiles";
-import { guessClue, type Guess } from "../round";
+import { compareGuesses, guessClue, type Guess } from "../round";
 import { correctCountryColor, countryKey, distanceColors, guessColor, withRevealedAnswer } from "./countryHighlights";
 type CountryCollection = Extract<import("maplibre-gl").GeoJSONSourceSpecification["data"], { type: "FeatureCollection" }>;
 
@@ -60,9 +60,9 @@ export function GameGlobe({ guesses = [], focusCountry, answer, gameId }: { gues
       map.setFilter("raised-guessed-countries", ["in", ["get", "countryKey"], ["literal", [...coloredCountries.current]]]);
     }
     const labelSource = map.getSource("guessed-country-labels") as import("maplibre-gl").GeoJSONSource | undefined;
-    labelSource?.setData({ type: "FeatureCollection", features: next.flatMap((guess) => {
+    labelSource?.setData({ type: "FeatureCollection", features: [...next].sort(compareGuesses).flatMap((guess, index) => {
       const point = centers.current.get(countryKey(guess.name));
-      return point ? [{ type: "Feature" as const, properties: { name: guess.name, clue: guessClue(guess, { showDirection: false }) },
+      return point ? [{ type: "Feature" as const, properties: { priority: index, name: guess.name, clue: guessClue(guess, { showDirection: false }) },
         geometry: { type: "Point" as const, coordinates: point } }] : [];
     }) });
   }
@@ -157,15 +157,20 @@ export function GameGlobe({ guesses = [], focusCountry, answer, gameId }: { gues
               "text-size": ["interpolate", ["linear"], ["zoom"], 0, 12.5, 5, 13, 9, 14],
               "text-max-width": 12,
               "text-line-height": 1.15,
-              "text-allow-overlap": true,
-              "text-ignore-placement": true,
+              "symbol-sort-key": ["get", "priority"],
+              "text-anchor": "center",
+              "text-offset": [0, 0],
+              "text-padding": 4,
+              "text-allow-overlap": false,
+              "text-ignore-placement": false,
               "text-pitch-alignment": "viewport",
               "text-rotation-alignment": "viewport",
               "icon-image": "country-label-background",
               "icon-text-fit": "both",
               "icon-text-fit-padding": [3, 6, 3, 6],
-              "icon-allow-overlap": true,
-              "icon-ignore-placement": true,
+              "icon-padding": 4,
+              "icon-allow-overlap": false,
+              "icon-ignore-placement": false,
               "icon-pitch-alignment": "viewport",
               "icon-rotation-alignment": "viewport",
             }, paint: { "text-color": "#ffffff", "text-halo-color": "#10141f", "text-halo-width": 0.3 } });
