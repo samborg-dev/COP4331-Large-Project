@@ -5,8 +5,8 @@ Evidence for the "unit and integration test results" slide.
 | Suite | Result | Evidence |
 |---|---|---|
 | API (Vitest + supertest) | 47 passed, 4 files | [api.png](api.png), full log [api.txt](api.txt) |
-| Web (Vitest + Testing Library) | **TODO (John):** capture a run | `web.png` |
-| Mobile (Flutter) | **TODO (Arwa):** capture a run | `mobile.png` |
+| Web (Vitest + Testing Library) | 71 passed, 6 files | [web.png](web.png), log [web.txt](web.txt) |
+| Mobile (Flutter) | 33 passed, 5 files | [mobile.png](mobile.png), log [mobile.txt](mobile.txt) |
 
 ## How to capture a run
 
@@ -21,8 +21,8 @@ pnpm --filter @cop4331/web test
 cd apps/mobile && flutter test
 ```
 
-Take a screenshot of the terminal output and save it here as `web.png` / `mobile.png`.
-For a text log: `pnpm --filter @cop4331/web exec vitest run --reporter=verbose > docs/tests/web.txt`.
+`web.png` and `mobile.png` were built from the GitHub Actions run on `main` (run 43791521541, commit 374eb8c),
+where both suites passed on every test. Retake them from a local run or a newer CI run if the code changes.
 
 ## What the API suite covers
 
