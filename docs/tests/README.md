@@ -4,7 +4,7 @@ Evidence for the "unit and integration test results" slide.
 
 | Suite | Result | Evidence |
 |---|---|---|
-| API (Vitest + supertest) | 47 passed, 4 files | [api.png](api.png), full log [api.txt](api.txt) |
+| API (Vitest + supertest) | 48 passed, 4 files | [api.png](api.png), full log [api.txt](api.txt) |
 | Web (Vitest + Testing Library) | 71 passed, 6 files | [web.png](web.png), log [web.txt](web.txt) |
 | Mobile (Flutter) | 33 passed, 5 files | [mobile.png](mobile.png), log [mobile.txt](mobile.txt) |
 

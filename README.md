@@ -122,7 +122,7 @@ Run the tests with `flutter test` (no API needed; HTTP is faked).
 
 | Suite | Command | Covers |
 |---|---|---|
-| API (47 tests) | `pnpm --filter @cop4331/api test` | Registration, verification, login, password reset, JWT checks, search, game scoring, ownership checks, give-up, leaderboard, rate limiting. Runs against an in-memory fake of the MongoDB driver, so no database is needed |
+| API (48 tests) | `pnpm --filter @cop4331/api test` | Registration, verification, login, password reset, JWT checks, search, game scoring, ownership checks, give-up, leaderboard, rate limiting. Runs against an in-memory fake of the MongoDB driver, so no database is needed |
 | Web | `pnpm --filter @cop4331/web test` | Auth screens, search input, round logic, game page, give-up flow |
 | Mobile | `cd apps/mobile && flutter test` | Validators, API client, auth screens, game round, globe |
 

@@ -65,6 +65,22 @@ describe('GET /api/games/:id (resume)', () => {
     expect(res.body.answer).toBeUndefined();
   });
 
+  it('includes the rounded distance and a compass direction for every guess (issue #46)', async () => {
+    const id = await newRound();
+    const posted = await guess(id, JAPAN);
+    expect(posted.body.distance % 10).toBe(0); // rounded to the nearest 10 km
+    expect(posted.body.distance).toBeGreaterThan(9000);
+    expect(posted.body.direction).toMatch(/^(N|NE|E|SE|S|SW|W|NW)$/);
+
+    const res = await request(app).get(`/api/games/${id}`).set(auth);
+    expect(res.body.guesses[0]).toMatchObject({
+      country: 'Japan',
+      range: '> 6,000 km', // the range is still sent for the globe colors
+      distance: posted.body.distance,
+      direction: posted.body.direction,
+    });
+  });
+
   it('returns 404 for unknown or malformed ids', async () => {
     await request(app).get(`/api/games/${new ObjectId()}`).set(auth).expect(404);
     await request(app).get('/api/games/not-an-id').set(auth).expect(404);

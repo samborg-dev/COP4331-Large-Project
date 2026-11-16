@@ -34,7 +34,7 @@ as the only buffer.
 | Deliverable | Owner | Due | Location | Done |
 |---|---|---|---|---|
 | Class diagram (mobile) | Arwa | Thu Nov 12 | `docs/diagrams/class-mobile.puml` + `.png` | ✅ |
-| Unit + integration test results: API | Sebastian | Thu Nov 12 | `docs/tests/api.png` (47 passing) | ✅ |
+| Unit + integration test results: API | Sebastian | Thu Nov 12 | `docs/tests/api.png` (48 passing) | ✅ |
 | Test results: search / DB | Noah | Wed Nov 11 | Covered by `docs/tests/api.png` (search and game tests) | ✅ |
 | Test results: web | John | Thu Nov 12 | `docs/tests/web.png` still to capture | ☐ |
 | Test results: mobile | Arwa | Fri Nov 13 | `docs/tests/mobile.png` still to capture | ☐ |
