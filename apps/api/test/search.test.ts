@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { app, bearer, createUser, db, resetData } from './setup.js';
 
@@ -31,6 +32,19 @@ describe('GET /api/countries/search (server-side partial match)', () => {
   it('is case-insensitive', async () => {
     const res = await search('JAPAN');
     expect(res.body.map((c: any) => c.name)).toEqual(['Japan']);
+  });
+
+  it('matches accented country names when the query omits accents', async () => {
+    db.collection('countries').rows.push(
+      { _id: new ObjectId(), name: "Côte d'Ivoire", iso: 'CI' },
+      { _id: new ObjectId(), name: 'São Tomé and Príncipe', iso: 'ST' },
+    );
+
+    const cote = await search('cote');
+    const sao = await search('sao');
+
+    expect(cote.body.map((c: any) => c.name)).toEqual(["Côte d'Ivoire"]);
+    expect(sao.body.map((c: any) => c.name)).toEqual(['São Tomé and Príncipe']);
   });
 
   it('returns id, name and iso codes for each result', async () => {
