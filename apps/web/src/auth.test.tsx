@@ -193,3 +193,20 @@ it.each(['/login', '/LOGIN/'])('preserves the expired session message at %s', (p
   expect(screen.getByRole('heading', {name:'Sign in to play'})).toBeTruthy();
   expect(screen.getByText('Your session expired. Please sign in again.')).toBeTruthy();
 });
+
+it.each(['/', '/login', '/LOGIN/'])('opens the game directly for an existing session at %s', (path) => {
+  const payload = btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }));
+  localStorage.setItem('token_data', `e30.${payload}.signature`);
+  localStorage.setItem('user_data', JSON.stringify({ firstName: 'John' }));
+  show(path);
+  expect(screen.getByRole('region', { name: 'Country guessing game' })).toBeTruthy();
+  expect(screen.queryByRole('heading', { name: 'Sign in to play' })).toBeNull();
+});
+
+it.each(['/verify-email?token=test', '/reset-password?token=test'])('keeps email-link screens accessible while signed in at %s', (path) => {
+  const payload = btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }));
+  localStorage.setItem('token_data', `e30.${payload}.signature`);
+  show(path);
+  expect(screen.queryByRole('region', { name: 'Country guessing game' })).toBeNull();
+  expect(screen.getByRole('heading', { level: 1 })).toBeTruthy();
+});
