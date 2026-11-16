@@ -45,7 +45,7 @@ it("debounces input and preserves server results including partial matches", asy
     ["France", "Central African Republic"],
   );
 });
-it("submits a fully typed country name with Enter, ignoring case and surrounding spaces", async () => {
+it("selects a full name first, then submits on the next Enter", async () => {
   request.mockResolvedValue([{ id: "eg", name: "Egypt" }]);
   const select = vi.fn();
   render(<CountrySearch onSelect={select} />);
@@ -55,7 +55,10 @@ it("submits a fully typed country name with Enter, ignoring case and surrounding
   fireEvent.keyDown(input, { key: "Enter", repeat: true });
   expect(select).not.toHaveBeenCalled();
   fireEvent.keyDown(input, { key: "Enter" });
-  expect(select).toHaveBeenCalledWith({ id: "eg", name: "Egypt" });
+  expect(select).not.toHaveBeenCalled();
+  expect((input as HTMLInputElement).value).toBe("Egypt");
+  fireEvent.keyDown(input, { key: "Enter" });
+  expect(select).toHaveBeenCalledExactlyOnceWith({ id: "eg", name: "Egypt" });
 });
 it("also lets the Enter button submit an exact full name", async () => {
   request.mockResolvedValue([{ id: "eg", name: "Egypt" }]);
@@ -66,7 +69,7 @@ it("also lets the Enter button submit an exact full name", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Enter" }));
   expect(select).toHaveBeenCalledWith({ id: "eg", name: "Egypt" });
 });
-it("does not automatically submit a partial name", async () => {
+it("fills the first result into the input, then submits on a second Enter", async () => {
   request.mockResolvedValue([{ id: "eg", name: "Egypt" }]);
   const select = vi.fn();
   render(<CountrySearch onSelect={select} />);
@@ -75,27 +78,41 @@ it("does not automatically submit a partial name", async () => {
   await tick();
   fireEvent.keyDown(input, { key: "Enter" });
   expect(select).not.toHaveBeenCalled();
-  expect((screen.getByRole("button", { name: "Enter" }) as HTMLButtonElement).disabled).toBe(true);
+  expect((input as HTMLInputElement).value).toBe("Egypt");
+  fireEvent.keyDown(input, { key: "Enter" });
+  expect(select).toHaveBeenCalledExactlyOnceWith({ id: "eg", name: "Egypt" });
+  expect((screen.getByRole("button", { name: "Enter" }) as HTMLButtonElement).disabled).toBe(false);
 });
-it("selects with arrow keys and Enter without starting another search", async () => {
-  request.mockResolvedValue([{ id: "fr", name: "France" }]);
+it("selects the keyboard-highlighted result and ignores held Enter", async () => {
+  request.mockResolvedValue([{ id: "fr", name: "France" }, { id: "fi", name: "Finland" }]);
   const select = vi.fn();
   render(<CountrySearch onSelect={select} />);
   const input = screen.getByRole("combobox");
   fireEvent.change(input, { target: { value: "fra" } });
   await tick();
   fireEvent.keyDown(input, { key: "ArrowDown" });
+  fireEvent.keyDown(input, { key: "ArrowDown" });
   expect(input.getAttribute("aria-activedescendant")).toBeTruthy();
   fireEvent.keyDown(input, { key: "Enter" });
   expect(select).not.toHaveBeenCalled();
-  expect((input as HTMLInputElement).value).toBe("France");
-  expect(screen.queryByRole("listbox")).toBeNull();
+  expect((input as HTMLInputElement).value).toBe("Finland");
   await tick();
   expect(request).toHaveBeenCalledTimes(1);
   fireEvent.keyDown(input, { key: "Enter", repeat: true });
   expect(select).not.toHaveBeenCalled();
   fireEvent.keyDown(input, { key: "Enter" });
-  expect(select).toHaveBeenCalledWith({ id: "fr", name: "France" });
+  expect(select).toHaveBeenCalledExactlyOnceWith({ id: "fi", name: "Finland" });
+});
+it("does not guess from stale results while the new query is loading", async () => {
+  request.mockResolvedValueOnce([{ id: "fr", name: "France" }]);
+  const select = vi.fn();
+  render(<CountrySearch onSelect={select} />);
+  const input = screen.getByRole("combobox");
+  fireEvent.change(input, { target: { value: "fra" } });
+  await tick();
+  fireEvent.change(input, { target: { value: "egy" } });
+  fireEvent.keyDown(input, { key: "Enter" });
+  expect(select).not.toHaveBeenCalled();
 });
 it("lets Tab focus a suggestion, then selects before the Enter button submits", async () => {
   request.mockResolvedValue([{ id: "fr", name: "France" }]);

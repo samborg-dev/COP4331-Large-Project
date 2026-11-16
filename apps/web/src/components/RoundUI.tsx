@@ -1,14 +1,12 @@
 import type { Ref } from "react";
 import type { Round } from "../round";
-import { guessRank, guessesLeft } from "../round";
+import { compareGuesses, guessClue, guessesLeft } from "../round";
 export function GuessHistory({ round, onGiveUp, disabled = false }: {
   round: Round | null;
   onGiveUp?: () => void;
   disabled?: boolean;
 }) {
-  const sorted = [...(round?.guesses ?? [])].sort(
-    (a, b) => guessRank(a) - guessRank(b),
-  );
+  const sorted = [...(round?.guesses ?? [])].sort(compareGuesses);
   return (
     <section className="sample-guesses" aria-labelledby="guesses-title">
       <div className="sample-heading">
@@ -27,7 +25,7 @@ export function GuessHistory({ round, onGiveUp, disabled = false }: {
           {sorted.map((guess) => (
             <li key={guess.countryId}>
               <span>{guess.name}</span>
-              <strong>{guess.correct ? "Correct country" : guess.range}</strong>
+              <strong title={guess.direction && guess.direction !== "Correct" ? `Direction: ${guess.direction}` : undefined}>{guessClue(guess)}</strong>
             </li>
           ))}
         </ol>

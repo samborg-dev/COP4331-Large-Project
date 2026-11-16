@@ -1,5 +1,7 @@
 import {
   createContext,
+  lazy,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -13,8 +15,9 @@ import type { GiveUpGameResponse, SubmitGuessInput } from "@cop4331/shared";
 import { api, ApiError, readPlayer, savedRoundKey } from "../api";
 import { CountrySearch, type CountryOption } from "../components/CountrySearch";
 import { GuessHistory, RoundResult } from "../components/RoundUI";
-import { GameGlobe } from "../components/GameGlobe";
 import { guessResponseSchema, savedRoundSchema, startRoundSchema, type Round } from "../round";
+
+const GameGlobe = lazy(() => import("../components/GameGlobe").then(module => ({ default: module.GameGlobe })));
 
 function useGameState(initialPoints?: number, playerId?: string) {
   const [sessionToken] = useState(() => localStorage.getItem("token_data"));
@@ -254,6 +257,8 @@ export function GamePage({
             countryId: country.id,
             name: guess.country,
             range: guess.range,
+            distance: guess.distance,
+            direction: guess.direction,
             correct: guess.solved,
           },
         ],
@@ -387,7 +392,9 @@ export function GamePage({
           )}
         </div>
         <div className={`map-space${round && round.status !== "active" ? " round-complete" : ""}`}>
-          <GameGlobe gameId={round?.gameId} guesses={round?.guesses} answer={answer} focusCountry={globeFocus} />
+          <Suspense fallback={<div className="game-globe globe-map" role="status">Loading globe…</div>}>
+            <GameGlobe gameId={round?.gameId} guesses={round?.guesses} answer={answer} focusCountry={globeFocus} />
+          </Suspense>
         </div>
           {round && (
             <RoundResult
@@ -432,10 +439,10 @@ export function GamePage({
           <h2 id="help-title">How to play</h2>
           <p>Find the mystery country before you run out of guesses.</p>
           <p>
-            Search for a country and choose a suggestion. Press Enter again or
-            click the Enter button to submit your guess.
-            You can also type an exact country name and press Enter.
-            Smaller distance ranges mean you’re closer.
+            Type a country name and press Enter to select the highlighted suggestion,
+            or the first result if none is highlighted. Press Enter again to submit
+            your guess, or click the Enter button after choosing a country.
+            Smaller distances mean you’re closer. Arrows point toward the mystery country.
           </p>
           <p>
             Find it in fewer guesses to earn more points. Your points add to
