@@ -123,20 +123,3 @@ export const leaderboardQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
-
-// ---- Legacy Demo Scaffolding (Keep only until John removes CardPage from apps/web) ----
-export const tokenPayloadSchema = z.object({
-  userId: z.number(),
-  firstName: z.string(),
-  lastName: z.string(),
-});
-export type TokenPayload = z.infer<typeof tokenPayloadSchema>;
-export const loginRequestSchema = z.object({ login: z.string().min(1), password: z.string().min(1) });
-export type LoginRequest = z.infer<typeof loginRequestSchema>;
-export interface LoginResponse { accessToken?: string; error?: string; }
-export const addCardRequestSchema = z.object({ userId: z.number(), card: z.string().min(1), jwtToken: z.string() });
-export type AddCardRequest = z.infer<typeof addCardRequestSchema>;
-export interface AddCardResponse { error: string; jwtToken: { accessToken: string } | null; }
-export const searchCardsRequestSchema = z.object({ userId: z.number(), search: z.string(), jwtToken: z.string() });
-export type SearchCardsRequest = z.infer<typeof searchCardsRequestSchema>;
-export interface SearchCardsResponse { results: string[]; error: string; jwtToken: { accessToken: string } | null; }
