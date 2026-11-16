@@ -1,0 +1,55 @@
+@startuml activity-game-round-landscape
+' Slide version of activity-game-round.puml: the same round, condensed and drawn left to right
+' so it fits a 16:9 slide. The detailed version (retries, error handling) is
+' activity-game-round.puml.
+title CountryGuesser: one game round (web)
+left to right direction
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 17
+skinparam nodesep 35
+skinparam ranksep 45
+skinparam activity {
+  BackgroundColor #EEF2FF
+  BorderColor #52638B
+  DiamondBackgroundColor #FFF5D9
+  DiamondBorderColor #94753A
+  StartColor #52638B
+  EndColor #52638B
+}
+
+(*) --> "Open game screen\n(signed in)" as Open
+Open --> if "Saved\nround?" then
+  -->[yes] "Resume round\nGET /api/games/:id" as Resume
+else
+  -->[no] "Start round\nPOST /api/games" as Start
+endif
+
+Resume --> "Type a country\n(server-side partial\nmatch suggestions)" as Type
+Start --> Type
+
+Type --> "Submit guess\nPOST .../guesses" as Submit
+Submit --> "Show distance, direction\nand range; color the globe" as Feedback
+
+Feedback --> if "Country\nfound?" then
+  -->[yes] "Win: points added\non the server" as Win
+else
+  -->[no] if "10 guesses\nused?" then
+    -->[yes] "Lose: reveal\nthe answer" as Lose
+  else
+    -->[no] Type
+  endif
+endif
+
+Type --> "Give up\nPOST .../give-up" as GiveUp
+GiveUp --> Lose
+
+Win --> "Show result and points" as Result
+Lose --> Result
+Result --> if "Play\nagain?" then
+  -->[yes] Start
+else
+  -->[no] (*)
+endif
+@enduml

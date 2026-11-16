@@ -22,7 +22,7 @@ as the only buffer.
 | 7 | Email verification and password recovery | 5 | Sebastian | Fri Nov 6 | API tests cover verify, resend, forgot, reset. **Still to check on the live domain** (inbox delivery) | 🟡 |
 | 8 | SwaggerHub demo (exactly 2 endpoints, ≥1 live) | 5 | Noah (spec), Sebastian (review) | Tue Nov 10 | `docs/api/openapi.yaml` is ready. **Still to import into SwaggerHub and test "Try it out"** against the live domain | 🟡 |
 | 9 | Server-side partial-match search | 5 | Noah | Thu Nov 5 | `GET /api/countries/search`, tests in `apps/api/test/search.test.ts` | ✅ |
-| 10 | Prototypes (web **and** mobile) | 5 | John (web), Arwa (mobile) | Sat Oct 31 / Sun Nov 1 | Figma links still missing in `docs/design.md` | ☐ |
+| 10 | Prototypes (web **and** mobile) | 5 | John (web), Arwa (mobile) | Sat Oct 31 / Sun Nov 1 | Web and mobile wireframes: `docs/design/wireframes/web.png` and `mobile.png` (Figma links optional) | ✅ |
 | 11 | Working demo: web | 20 (shared) | John + Sebastian | Wed Nov 11 | `https://<domain>` | ☐ |
 | 11 | Working demo: mobile | ″ | Arwa | Wed Nov 11 (APK Fri Nov 13) | Release APK on a real phone | ☐ |
 | 12 | Adherence to current standards | 5 | Everyone | Ongoing | HTTPS, bcrypt, JWT, hashed reset tokens, rate limiting, CI, typed contract, no secrets in git | ☐ |
