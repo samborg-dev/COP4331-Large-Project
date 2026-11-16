@@ -1,0 +1,80 @@
+@startuml erd
+' ERD for the MongoDB database. Matches apps/api/src/models/*.ts and the auth routes.
+' Render at https://www.plantuml.com/plantuml or with the VS Code PlantUML extension.
+title Country Distance Guessing Game: ERD (MongoDB collections)
+
+hide circle
+skinparam shadowing false
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #f8fafc
+  BorderColor #1e293b
+  ArrowColor #1e293b
+}
+
+entity "users" as users {
+  * _id : ObjectId <<PK>>
+  --
+  * firstName : string
+  * lastName : string
+  * email : string <<unique>>
+  * passwordHash : string  (bcrypt)
+  * emailVerified : boolean
+  * totalPoints : int  (indexed, desc)
+  * gamesPlayed : int
+  * gamesWon : int
+  * createdAt : date
+}
+
+entity "tokens" as tokens {
+  * _id : ObjectId <<PK>>
+  --
+  * userId : ObjectId <<FK users>>
+  * type : "verify" | "reset"
+  * tokenHash : string  (SHA-256)
+  * expiresAt : date  (TTL index)
+}
+
+entity "games" as games {
+  * _id : ObjectId <<PK>>
+  --
+  * userId : ObjectId <<FK users>>
+  * targetCountry : string <<FK countries.name>>
+  targetIso : string
+  * targetLat : double
+  * targetLng : double
+  * status : "IN_PROGRESS" | "WON" | "LOST"
+  pointsEarned : int
+  surrendered : boolean
+  * createdAt : date
+  --
+  guesses : GuessEntry[]  (embedded)
+}
+
+entity "GuessEntry\n(embedded in games.guesses)" as guess {
+  countryId : string
+  * guessName : string
+  * lat : double
+  * lng : double
+  * distance : double  (km)
+  range : string
+  direction : string
+  * createdAt : date
+}
+
+entity "countries" as countries {
+  * _id : ObjectId <<PK>>
+  --
+  * name : string  (searched, partial match)
+  * iso : string
+  * lat : double  (centroid)
+  * lng : double  (centroid)
+}
+
+users ||--o{ games : plays
+users ||--o{ tokens : "owns (verify / reset)"
+games ||--o{ guess : "embeds 0..10"
+games }o--|| countries : "target"
+guess }o..|| countries : "guessed"
+@enduml
