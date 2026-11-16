@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../api/api_client.dart';
 import '../api/models.dart';
+import '../api/search_aliases.dart';
 import '../globe/country_colors.dart';
 import '../globe/country_globe.dart';
 import '../theme.dart';
@@ -142,7 +143,17 @@ class _GameScreenState extends State<GameScreen> {
   Future<void> _runSearch(String text) async {
     final seq = ++_searchSeq;
     try {
-      final results = await widget.api.searchCountries(text);
+      // Also search for any other name the player may mean ("ivory" -> Côte d'Ivoire)
+      final lists = await Future.wait([
+        widget.api.searchCountries(text),
+        for (final extra in extraSearchesFor(text)) widget.api.searchCountries(extra),
+      ]);
+      final ids = <String>{};
+      final results = [
+        for (final list in lists)
+          for (final c in list)
+            if (ids.add(c.id)) c,
+      ];
       // Ignore responses for text the player has since changed
       if (!mounted || seq != _searchSeq) return;
       final guessed = _guesses.map((g) => g.country.toLowerCase()).toSet();

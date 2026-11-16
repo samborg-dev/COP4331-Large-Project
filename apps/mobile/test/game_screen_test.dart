@@ -23,6 +23,7 @@ http.Response _json(Object body, [int status = 200]) =>
 const _countries = [
   {'id': 'FR', 'name': 'France', 'iso2': 'FR', 'iso3': 'FRA', 'continent': 'Europe'},
   {'id': 'DE', 'name': 'Germany', 'iso2': 'DE', 'iso3': 'DEU', 'continent': 'Europe'},
+  {'id': 'CI', 'name': "Côte d'Ivoire", 'iso2': 'CI', 'iso3': 'CIV', 'continent': 'Africa'},
 ];
 
 /// A fake API where the mystery country is France and the round allows
@@ -115,6 +116,19 @@ void main() {
     // "an" matches the middle of both names
     expect(find.widgetWithText(ListTile, 'France'), findsOneWidget);
     expect(find.widgetWithText(ListTile, 'Germany'), findsOneWidget);
+  });
+
+  testWidgets('other names find a country the server stores differently', (tester) async {
+    await tester.pumpWidget(_app(GameScreen(api: fakeApi())));
+    await tester.pumpAndSettle();
+
+    // Like the real server, the fake one only matches the letters typed
+    for (final typed in ['ivory coast', 'cote']) {
+      await tester.enterText(find.byKey(const Key('country-search')), typed);
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pumpAndSettle();
+      expect(find.widgetWithText(ListTile, "Côte d'Ivoire"), findsOneWidget, reason: typed);
+    }
   });
 
   testWidgets('a wrong guess shows its distance and direction', (tester) async {
