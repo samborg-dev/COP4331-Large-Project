@@ -7,20 +7,15 @@ info:
     The server secretly picks a country; the player searches for countries and
     guesses, and the server answers each guess with a distance range.
 
-    This spec documents the two endpoints demonstrated in the SwaggerHub demo,
-    plus the login and start-game helpers used to obtain a bearer token and
-    active game ID:
+    This spec documents the two endpoints demonstrated in the SwaggerHub demo:
 
-    1. `GET /api/countries/search`: server-side, case-insensitive partial-match search.
-    2. `POST /api/games/{id}/guesses`: submit a guess and get distance feedback.
-    3. `POST /api/auth/login`: authenticate a verified demo account.
-    4. `POST /api/games`: start an active round for the guess demo.
+    1. `POST /api/auth/login`: log in with a verified account and get a JWT.
+    2. `GET /api/countries/search`: server-side, case-insensitive partial-match search.
 
-    **Authorization:** both endpoints need a JWT. Log in with
-    `POST /api/auth/login` (the web or mobile app does this), copy the
+    **Authorization:** search needs a JWT. Call `POST /api/auth/login`, copy the
     `accessToken`, click **Authorize** and paste it. The token expires after 24 hours.
-    The other endpoints (register, verify-email, password reset, leaderboard,
-    rounds) are described in `docs/api-contract.md`.
+    The other endpoints (register, verify-email, password reset, games, guesses,
+    leaderboard) are described in `docs/api-contract.md`.
 servers:
   - url: https://cop4331-countryguesser.com
     description: Production (DigitalOcean, nginx + pm2)
@@ -29,7 +24,6 @@ servers:
 tags:
   - name: Auth
   - name: Countries
-  - name: Games
 paths:
   /api/auth/login:
     post:
@@ -38,8 +32,7 @@ paths:
       summary: Log in and obtain a JWT
       description: |
         Log in with a verified account, copy the returned `accessToken`, then
-        click **Authorize** and enter `Bearer <accessToken>` to call the
-        protected SwaggerHub endpoints.
+        click **Authorize** and paste it to call the search endpoint.
       requestBody:
         required: true
         content:
@@ -151,118 +144,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
-  /api/games:
-    post:
-      tags: [Games]
-      operationId: startGame
-      summary: Start a new round
-      description: Creates an active round and returns the game ID required by the guess endpoint.
-      security:
-        - bearerAuth: []
-      responses:
-        '201':
-          description: A new active round.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StartGameResponse'
-              example:
-                gameId: 6af8c654db2afb40c3cf70a8
-                maxGuesses: 10
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-  /api/games/{id}/guesses:
-    post:
-      tags: [Games]
-      operationId: submitGuess
-      summary: Submit a guess for an active round
-      description: |
-        Guess a country (use an `id` from the search endpoint). The server computes
-        the great-circle (haversine) distance to the secret country and returns a
-        range, the rounded distance and a compass direction. The target is never
-        revealed while the round is active. A correct guess scores
-        `max(10, 100 - 10 x (guesses - 1))` points, added to the player's total on the
-        server. The round is lost after 10 wrong guesses.
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: The `gameId` returned by `POST /api/games`.
-          schema:
-            type: string
-          example: 6af8c654db2afb40c3cf70a8
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GuessRequest'
-            example:
-              countryId: 6aed5e40d455f880d20e4667
-      responses:
-        '200':
-          description: Feedback for the guess.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GuessResponse'
-              examples:
-                wrongGuess:
-                  summary: Wrong guess
-                  value:
-                    country: Japan
-                    range: '> 6,000 km'
-                    distance: 9700
-                    direction: W
-                    solved: false
-                    guessesUsed: 1
-                correctGuess:
-                  summary: Correct guess on the first try
-                  value:
-                    country: France
-                    range: Correct
-                    distance: 0
-                    direction: Correct
-                    solved: true
-                    guessesUsed: 1
-                    pointsEarned: 100
-        '400':
-          description: The round is already finished, or the guess has no valid country.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                error: Game is already finished
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          description: The round belongs to another player.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                error: Cannot guess on another user's game
-        '404':
-          description: Unknown round or unknown country.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                game:
-                  value:
-                    error: Game not found
-                country:
-                  value:
-                    error: Guessed country not found
-        '500':
-          $ref: '#/components/responses/ServerError'
 components:
   securitySchemes:
     bearerAuth:
@@ -307,16 +188,6 @@ components:
           description: JWT bearer token, valid for 24 hours.
         user:
           $ref: '#/components/schemas/AuthUser'
-    StartGameResponse:
-      type: object
-      required: [gameId, maxGuesses]
-      properties:
-        gameId:
-          type: string
-          description: Use this value as the `id` path parameter for submitting a guess.
-        maxGuesses:
-          type: integer
-          example: 10
     AuthUser:
       type: object
       required: [id, firstName, lastName, email, totalPoints]
@@ -355,45 +226,3 @@ components:
           type: string
         continent:
           type: string
-    GuessRequest:
-      type: object
-      required: [countryId]
-      properties:
-        countryId:
-          type: string
-          description: The `id` of a country from the search endpoint.
-    GuessResponse:
-      type: object
-      required: [country, range, distance, direction, solved, guessesUsed]
-      properties:
-        country:
-          type: string
-          example: France
-        range:
-          type: string
-          description: Distance bucket, or `Correct` when solved.
-          enum:
-            - '< 500 km'
-            - 500–1,500 km
-            - 1,500–3,000 km
-            - 3,000–6,000 km
-            - '> 6,000 km'
-            - Correct
-        distance:
-          type: integer
-          description: Kilometres to the secret country, rounded to the nearest 10.
-          example: 1550
-        direction:
-          type: string
-          description: Compass direction from the guess toward the secret country, or `Correct`.
-          enum: [N, NE, E, SE, S, SW, W, NW, Correct]
-        solved:
-          type: boolean
-        guessesUsed:
-          type: integer
-          minimum: 1
-          maximum: 10
-        pointsEarned:
-          type: integer
-          description: Only present when `solved` is true.
-          example: 90
