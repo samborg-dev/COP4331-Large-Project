@@ -45,7 +45,7 @@ it("debounces input and preserves server results including partial matches", asy
     ["France", "Central African Republic"],
   );
 });
-it("selects a full name first, then submits on the next Enter", async () => {
+it("submits a single full-name result on the first Enter", async () => {
   request.mockResolvedValue([{ id: "eg", name: "Egypt" }]);
   const select = vi.fn();
   render(<CountrySearch onSelect={select} />);
@@ -55,9 +55,7 @@ it("selects a full name first, then submits on the next Enter", async () => {
   fireEvent.keyDown(input, { key: "Enter", repeat: true });
   expect(select).not.toHaveBeenCalled();
   fireEvent.keyDown(input, { key: "Enter" });
-  expect(select).not.toHaveBeenCalled();
   expect((input as HTMLInputElement).value).toBe("Egypt");
-  fireEvent.keyDown(input, { key: "Enter" });
   expect(select).toHaveBeenCalledExactlyOnceWith({ id: "eg", name: "Egypt" });
 });
 it("also lets the Enter button submit an exact full name", async () => {
@@ -69,7 +67,7 @@ it("also lets the Enter button submit an exact full name", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Enter" }));
   expect(select).toHaveBeenCalledWith({ id: "eg", name: "Egypt" });
 });
-it("fills the first result into the input, then submits on a second Enter", async () => {
+it("submits a single partial-name result on the first Enter", async () => {
   request.mockResolvedValue([{ id: "eg", name: "Egypt" }]);
   const select = vi.fn();
   render(<CountrySearch onSelect={select} />);
@@ -77,9 +75,7 @@ it("fills the first result into the input, then submits on a second Enter", asyn
   fireEvent.change(input, { target: { value: "Egy" } });
   await tick();
   fireEvent.keyDown(input, { key: "Enter" });
-  expect(select).not.toHaveBeenCalled();
   expect((input as HTMLInputElement).value).toBe("Egypt");
-  fireEvent.keyDown(input, { key: "Enter" });
   expect(select).toHaveBeenCalledExactlyOnceWith({ id: "eg", name: "Egypt" });
   expect((screen.getByRole("button", { name: "Enter" }) as HTMLButtonElement).disabled).toBe(false);
 });

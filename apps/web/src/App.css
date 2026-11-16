@@ -915,3 +915,24 @@ body:has(.help-dialog[open]) {
   }
 }
 
+.country-search-heading {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 20px;
+  margin-bottom: 8px;
+}
+.preview-game .country-search-heading label {
+  margin: 0;
+  line-height: 18px;
+}
+.country-search-heading .search-status {
+  margin: 0;
+  height: 18px;
+  line-height: 18px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
