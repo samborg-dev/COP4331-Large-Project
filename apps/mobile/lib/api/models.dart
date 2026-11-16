@@ -16,18 +16,26 @@ class Country {
 }
 
 class Guess {
-  const Guess({required this.country, required this.range});
+  const Guess({required this.country, required this.range, this.distance, this.direction});
 
   factory Guess.fromJson(Map<String, dynamic> json) => Guess(
         // The contract says `country`; the server has also sent `guessName`
         country: '${json['country'] ?? json['guessName'] ?? ''}',
         range: '${json['range'] ?? ''}',
+        distance: (json['distance'] as num?)?.round(),
+        direction: json['direction'] as String?,
       );
 
   final String country;
 
   /// A distance bucket such as "1,500–3,000 km", or "Correct".
   final String range;
+
+  /// Kilometers to the mystery country, rounded to 10 km. Older servers omit it.
+  final int? distance;
+
+  /// Compass direction from this guess to the mystery country, e.g. "NE".
+  final String? direction;
 }
 
 class Game {
@@ -38,6 +46,7 @@ class Game {
     this.guesses = const [],
     this.pointsEarned = 0,
     this.answer,
+    this.surrendered = false,
   });
 
   factory Game.fromJson(Map<String, dynamic> json) => Game(
@@ -51,6 +60,7 @@ class Game {
         pointsEarned: (json['pointsEarned'] as num?)?.toInt() ?? 0,
         // The contract says `answer`; the server has also sent `targetCountry`
         answer: (json['answer'] ?? json['targetCountry']) as String?,
+        surrendered: json['surrendered'] == true,
       );
 
   /// Accepts the contract's `active`/`won`/`lost` and the database's
@@ -71,6 +81,9 @@ class Game {
 
   /// The mystery country; the server only includes it once the round is over.
   final String? answer;
+
+  /// True when the player gave up.
+  final bool surrendered;
 }
 
 class GuessResult {
@@ -80,11 +93,15 @@ class GuessResult {
     required this.solved,
     required this.guessesUsed,
     this.pointsEarned,
+    this.distance,
+    this.direction,
   });
 
   factory GuessResult.fromJson(Map<String, dynamic> json) => GuessResult(
         country: '${json['country'] ?? ''}',
         range: '${json['range'] ?? ''}',
+        distance: (json['distance'] as num?)?.round(),
+        direction: json['direction'] as String?,
         solved: json['solved'] == true,
         guessesUsed: (json['guessesUsed'] as num?)?.toInt() ?? 0,
         pointsEarned: (json['pointsEarned'] as num?)?.toInt(),
@@ -97,6 +114,11 @@ class GuessResult {
 
   /// Only present when [solved].
   final int? pointsEarned;
+
+  final int? distance;
+  final String? direction;
+
+  Guess toGuess() => Guess(country: country, range: range, distance: distance, direction: direction);
 }
 
 class LeaderboardEntry {

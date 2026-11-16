@@ -46,10 +46,15 @@ ApiClient fakeApi({int maxGuesses = 10}) {
       return _json({
         'country': solved ? 'France' : 'Germany',
         'range': solved ? 'Correct' : '500–1,500 km',
+        'distance': solved ? 0 : 1050,
+        'direction': solved ? 'Correct' : 'SW',
         'solved': solved,
         'guessesUsed': used,
         if (solved) 'pointsEarned': 100,
       });
+    }
+    if (path == '/api/games/g1/give-up') {
+      return _json({'gameId': 'g1'});
     }
     if (path == '/api/games/g1') {
       return _json({'gameId': 'g1', 'status': 'lost', 'guesses': [], 'maxGuesses': maxGuesses, 'answer': 'France'});
@@ -112,14 +117,56 @@ void main() {
     expect(find.widgetWithText(ListTile, 'Germany'), findsOneWidget);
   });
 
-  testWidgets('a wrong guess shows its distance range', (tester) async {
+  testWidgets('a wrong guess shows its distance and direction', (tester) async {
     await tester.pumpWidget(_app(GameScreen(api: fakeApi())));
     await tester.pumpAndSettle();
 
     await _guess(tester, 'ger', 'Germany');
 
-    expect(find.text('500–1,500 km'), findsOneWidget);
+    expect(find.text('~1,050 km'), findsOneWidget);
+    expect(find.byKey(const Key('direction-SW')), findsOneWidget);
     expect(find.text('Guess 2 of 10'), findsOneWidget);
+  });
+
+  testWidgets('first Enter picks the top suggestion, second Enter guesses it', (tester) async {
+    await tester.pumpWidget(_app(GameScreen(api: fakeApi())));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byKey(const Key('country-search')), 'ger');
+    // Pressing Enter before the search has run still works
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.text('Guess Germany'), findsOneWidget);
+    expect(find.text('Guess 1 of 10'), findsOneWidget);
+
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.text('Guess 2 of 10'), findsOneWidget);
+    expect(find.byKey(const Key('guess-row-0')), findsOneWidget);
+  });
+
+  testWidgets('giving up asks first, then reveals the answer', (tester) async {
+    await tester.pumpWidget(_app(GameScreen(api: fakeApi())));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('give-up-button')), findsNothing);
+
+    await _guess(tester, 'ger', 'Germany');
+    await tester.ensureVisible(find.byKey(const Key('give-up-button')));
+    await tester.tap(find.byKey(const Key('give-up-button')));
+    await tester.pumpAndSettle();
+
+    // Canceling keeps the round going
+    await tester.tap(find.text('Keep playing'));
+    await tester.pumpAndSettle();
+    expect(find.text('Guess 2 of 10'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('give-up-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('confirm-give-up')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('You gave up'), findsOneWidget);
+    expect(find.text('The mystery country was France.'), findsOneWidget);
   });
 
   testWidgets('the right guess wins and updates points', (tester) async {
