@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 const TITLE = "Country Distance Guessing Game: COP4331 Large Project";
 const CHART_START = "2026-10-26"; // Monday of the first week shown
 const CHART_END = "2026-11-22"; // Sunday of the last week shown
-const STATUS_DATE = "2026-11-05"; // the "status as of" date in the subtitle; move it forward when you update `done`
+const STATUS_DATE = "2026-11-15"; // the "status as of" date in the subtitle; move it forward when you update `done`
 const DEADLINE = "Sun Nov 15, 11:59 pm"; // WebCourses due date
 
 const OWNERS = {
@@ -32,46 +32,46 @@ const PHASES = [
 
 // kind: "task" (default) | "milestone" | "buffer".  done: percent complete, 0-100.
 const TASKS = [
-  { id: "S1", owner: "sam", name: "Push repo, protect main, issue board", start: "2026-10-27", end: "2026-10-28", done: 60 },
-  { id: "S2", owner: "sam", name: "Droplet, domain, DNS, HTTPS", start: "2026-10-27", end: "2026-10-30", done: 40 },
-  { id: "S3", owner: "sam", name: "nginx + pm2 deploy, deploy.md", start: "2026-10-31", end: "2026-11-02", deps: ["S2"], done: 40 },
-  { id: "S4", owner: "sam", name: "CI on PRs (typecheck/build/test)", start: "2026-11-01", end: "2026-11-03", deps: ["S1"], done: 70 },
-  { id: "S5", owner: "sam", name: "Use case diagram", start: "2026-11-01", end: "2026-11-04", done: 90 },
-  { id: "S6", owner: "sam", name: "Sequence diagram (register/verify)", start: "2026-11-05", end: "2026-11-08", deps: ["B3"], done: 40 },
-  { id: "S7", owner: "sam", name: "Slide deck", start: "2026-11-06", end: "2026-11-13" },
-  { id: "S8", owner: "sam", name: "Rehearsals, USB, campus domain check", start: "2026-11-12", end: "2026-11-15", deps: ["M4"] },
-  { id: "S9", owner: "sam", name: "Standups, Gantt upkeep, commit checks", start: "2026-10-27", end: "2026-11-15", done: 40 },
+  { id: "S1", owner: "sam", name: "Push repo, protect main, issue board", start: "2026-10-27", end: "2026-10-28", done: 100 },
+  { id: "S2", owner: "sam", name: "Droplet, domain, DNS, HTTPS", start: "2026-10-27", end: "2026-10-30", done: 100 },
+  { id: "S3", owner: "sam", name: "nginx + pm2 deploy, deploy.md", start: "2026-10-31", end: "2026-11-02", deps: ["S2"], done: 100 },
+  { id: "S4", owner: "sam", name: "CI on PRs (typecheck/build/test)", start: "2026-11-01", end: "2026-11-03", deps: ["S1"], done: 100 },
+  { id: "S5", owner: "sam", name: "Use case diagram", start: "2026-11-01", end: "2026-11-04", done: 100 },
+  { id: "S6", owner: "sam", name: "Sequence diagram (register/verify)", start: "2026-11-05", end: "2026-11-08", deps: ["B3"], done: 100 },
+  { id: "S7", owner: "sam", name: "Slide deck", start: "2026-11-06", end: "2026-11-13", done: 100 },
+  { id: "S8", owner: "sam", name: "Rehearsals, USB, campus domain check", start: "2026-11-12", end: "2026-11-15", deps: ["M4"], done: 100 },
+  { id: "S9", owner: "sam", name: "Standups, Gantt upkeep, commit checks", start: "2026-10-27", end: "2026-11-15", done: 100 },
 
-  { id: "N1", owner: "noah", name: "Atlas cluster, app user, allowlist", start: "2026-10-27", end: "2026-10-29" },
-  { id: "N2", owner: "noah", name: "Country dataset + seed script", start: "2026-10-30", end: "2026-11-02", deps: ["N1"] },
-  { id: "N3", owner: "noah", name: "Data model doc + indexes", start: "2026-10-30", end: "2026-11-03", deps: ["N1"] },
-  { id: "N4", owner: "noah", name: "Country search endpoint", start: "2026-11-03", end: "2026-11-05", deps: ["N2"] },
-  { id: "N5", owner: "noah", name: "ERD", start: "2026-11-04", end: "2026-11-08", deps: ["N3"] },
-  { id: "N6", owner: "noah", name: "OpenAPI spec + SwaggerHub live", start: "2026-11-06", end: "2026-11-10", deps: ["N4"] },
-  { id: "N7", owner: "noah", name: "Search integration tests", start: "2026-11-06", end: "2026-11-11", deps: ["N4"] },
+  { id: "N1", owner: "noah", name: "Atlas cluster, app user, allowlist", start: "2026-10-27", end: "2026-10-29", done: 100 },
+  { id: "N2", owner: "noah", name: "Country dataset + seed script", start: "2026-10-30", end: "2026-11-02", deps: ["N1"], done: 100 },
+  { id: "N3", owner: "noah", name: "Data model doc + indexes", start: "2026-10-30", end: "2026-11-03", deps: ["N1"], done: 100 },
+  { id: "N4", owner: "noah", name: "Country search endpoint", start: "2026-11-03", end: "2026-11-05", deps: ["N2"], done: 100 },
+  { id: "N5", owner: "noah", name: "ERD", start: "2026-11-04", end: "2026-11-08", deps: ["N3"], done: 100 },
+  { id: "N6", owner: "noah", name: "OpenAPI spec + SwaggerHub live", start: "2026-11-06", end: "2026-11-10", deps: ["N4"], done: 100 },
+  { id: "N7", owner: "noah", name: "Search integration tests", start: "2026-11-06", end: "2026-11-11", deps: ["N4"], done: 100 },
 
-  { id: "B1", owner: "sebastian", name: "API contract + shared zod schemas", start: "2026-10-27", end: "2026-10-30" },
-  { id: "B2", owner: "sam", name: "Email provider + sendMail()", start: "2026-10-31", end: "2026-11-02", deps: ["S2"], done: 70 },
-  { id: "B3", owner: "sebastian", name: "Register, verify, login, JWT", start: "2026-10-31", end: "2026-11-04", deps: ["B1", "N1"] },
-  { id: "B4", owner: "sebastian", name: "Forgot / reset password", start: "2026-11-03", end: "2026-11-06", deps: ["B2"] },
-  { id: "B5", owner: "sebastian", name: "Game start + guess + scoring", start: "2026-11-05", end: "2026-11-08", deps: ["B3", "N2"] },
-  { id: "B6", owner: "sebastian", name: "API tests (Vitest + supertest)", start: "2026-11-09", end: "2026-11-12", deps: ["B5"] },
-  { id: "B7", owner: "sebastian", name: "Rate limits, errors, remove demo", start: "2026-11-09", end: "2026-11-11" },
+  { id: "B1", owner: "sebastian", name: "API contract + shared zod schemas", start: "2026-10-27", end: "2026-10-30", done: 100 },
+  { id: "B2", owner: "sam", name: "Email provider + sendMail()", start: "2026-10-31", end: "2026-11-02", deps: ["S2"], done: 100 },
+  { id: "B3", owner: "sebastian", name: "Register, verify, login, JWT", start: "2026-10-31", end: "2026-11-04", deps: ["B1", "N1"], done: 100 },
+  { id: "B4", owner: "sebastian", name: "Forgot / reset password", start: "2026-11-03", end: "2026-11-06", deps: ["B2"], done: 100 },
+  { id: "B5", owner: "sebastian", name: "Game start + guess + scoring", start: "2026-11-05", end: "2026-11-08", deps: ["B3", "N2"], done: 100 },
+  { id: "B6", owner: "sebastian", name: "API tests (Vitest + supertest)", start: "2026-11-09", end: "2026-11-12", deps: ["B5"], done: 100 },
+  { id: "B7", owner: "sebastian", name: "Rate limits, errors, remove demo", start: "2026-11-09", end: "2026-11-11", done: 100 },
 
-  { id: "J1", owner: "john", name: "Figma web prototype + design tokens", start: "2026-10-27", end: "2026-10-31" },
-  { id: "J2", owner: "john", name: "Auth pages + protected routes", start: "2026-11-01", end: "2026-11-05", deps: ["B1", "J1"] },
-  { id: "J3", owner: "john", name: "Game page (autocomplete, guesses)", start: "2026-11-06", end: "2026-11-10", deps: ["J2", "N4"] },
-  { id: "J4", owner: "john", name: "Leaderboard (paginated) + header", start: "2026-11-09", end: "2026-11-11", deps: ["A3"] },
-  { id: "J5", owner: "john", name: "Responsive, a11y, component tests", start: "2026-11-10", end: "2026-11-12" },
-  { id: "J6", owner: "john", name: "Activity diagram (game round)", start: "2026-11-09", end: "2026-11-12" },
+  { id: "J1", owner: "john", name: "Figma web prototype + design tokens", start: "2026-10-27", end: "2026-10-31", done: 100 },
+  { id: "J2", owner: "john", name: "Auth pages + protected routes", start: "2026-11-01", end: "2026-11-05", deps: ["B1", "J1"], done: 100 },
+  { id: "J3", owner: "john", name: "Game page (autocomplete, guesses)", start: "2026-11-06", end: "2026-11-10", deps: ["J2", "N4"], done: 100 },
+  { id: "J4", owner: "john", name: "Leaderboard (paginated) + header", start: "2026-11-09", end: "2026-11-11", deps: ["A3"], done: 100 },
+  { id: "J5", owner: "john", name: "Responsive, a11y, component tests", start: "2026-11-10", end: "2026-11-12", done: 100 },
+  { id: "J6", owner: "john", name: "Activity diagram (game round)", start: "2026-11-09", end: "2026-11-12", done: 100 },
 
-  { id: "A1", owner: "arwa", name: "Flutter SDK + emulator + scaffold", start: "2026-10-27", end: "2026-10-30" },
-  { id: "A2", owner: "arwa", name: "Figma mobile prototype", start: "2026-10-28", end: "2026-11-01" },
-  { id: "A3", owner: "arwa", name: "API: /users/me + /leaderboard", start: "2026-11-05", end: "2026-11-08", deps: ["B3", "N3"] },
-  { id: "A4", owner: "arwa", name: "Mobile auth screens + token storage", start: "2026-10-31", end: "2026-11-05", deps: ["A1", "B1"] },
-  { id: "A5", owner: "arwa", name: "Mobile game screen", start: "2026-11-06", end: "2026-11-10", deps: ["A4", "N4"] },
-  { id: "A6", owner: "arwa", name: "Mobile leaderboard + class diagram", start: "2026-11-09", end: "2026-11-12", deps: ["A3"] },
-  { id: "A7", owner: "arwa", name: "Widget tests + release APK", start: "2026-11-11", end: "2026-11-13", deps: ["A5"] },
+  { id: "A1", owner: "arwa", name: "Flutter SDK + emulator + scaffold", start: "2026-10-27", end: "2026-10-30", done: 100 },
+  { id: "A2", owner: "arwa", name: "Figma mobile prototype", start: "2026-10-28", end: "2026-11-01", done: 100 },
+  { id: "A3", owner: "arwa", name: "API: /users/me + /leaderboard", start: "2026-11-05", end: "2026-11-08", deps: ["B3", "N3"], done: 100 },
+  { id: "A4", owner: "arwa", name: "Mobile auth screens + token storage", start: "2026-10-31", end: "2026-11-05", deps: ["A1", "B1"], done: 100 },
+  { id: "A5", owner: "arwa", name: "Mobile game screen", start: "2026-11-06", end: "2026-11-10", deps: ["A4", "N4"], done: 100 },
+  { id: "A6", owner: "arwa", name: "Mobile leaderboard + class diagram", start: "2026-11-09", end: "2026-11-12", deps: ["A3"], done: 100 },
+  { id: "A7", owner: "arwa", name: "Widget tests + release APK", start: "2026-11-11", end: "2026-11-13", deps: ["A5"], done: 100 },
 
   { id: "M1", owner: "team", name: "M1 Domain live on HTTPS", start: "2026-10-31", kind: "milestone", deps: ["S2"] },
   { id: "M2", owner: "team", name: "M2 Sign-up + email verify live", start: "2026-11-04", kind: "milestone", deps: ["B2", "B3"] },
