@@ -52,11 +52,16 @@ const _accents = {
   'ç': 'c', 'ñ': 'n', 'ý': 'y',
 };
 
+/// Lowercase with accents and punctuation removed: "Côte d'Ivoire" -> "cote d ivoire".
+String foldName(String name) {
+  final folded = name.toLowerCase().split('').map((c) => _accents[c] ?? c).join();
+  return folded.replaceAll(RegExp('[^a-z0-9]+'), ' ').trim();
+}
+
 /// A normalized key so "Côte d'Ivoire", "cote d ivoire" and "Ivory Coast"
 /// all find the same shape.
 String countryKey(String name) {
-  final folded = name.toLowerCase().split('').map((c) => _accents[c] ?? c).join();
-  final key = folded.replaceAll(RegExp('[^a-z0-9]+'), ' ').trim();
+  final key = foldName(name);
   return _aliases[key] ?? key;
 }
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../api/api_client.dart';
 import '../api/models.dart';
+import '../api/search_aliases.dart';
 import '../globe/country_colors.dart';
 import '../globe/country_globe.dart';
 import '../theme.dart';
@@ -142,7 +143,17 @@ class _GameScreenState extends State<GameScreen> {
   Future<void> _runSearch(String text) async {
     final seq = ++_searchSeq;
     try {
-      final results = await widget.api.searchCountries(text);
+      // Also search for any other name the player may mean ("ivory" -> Côte d'Ivoire)
+      final lists = await Future.wait([
+        widget.api.searchCountries(text),
+        for (final extra in extraSearchesFor(text)) widget.api.searchCountries(extra),
+      ]);
+      final ids = <String>{};
+      final results = [
+        for (final list in lists)
+          for (final c in list)
+            if (ids.add(c.id)) c,
+      ];
       // Ignore responses for text the player has since changed
       if (!mounted || seq != _searchSeq) return;
       final guessed = _guesses.map((g) => g.country.toLowerCase()).toSet();
@@ -205,6 +216,8 @@ class _GameScreenState extends State<GameScreen> {
 
   /// Like the website: the first Enter picks an exact name match or else the
   /// top suggestion, so the player can check it; the second Enter guesses it.
+  /// When the search found only one country there's nothing to check, so
+  /// Enter guesses it right away.
   Future<void> _onEnter() async {
     if (_selected != null) return _submitGuess();
     final text = _search.text.trim();
@@ -216,7 +229,9 @@ class _GameScreenState extends State<GameScreen> {
     }
     if (!mounted || _suggestions.isEmpty) return;
     final exact = _suggestions.where((c) => c.name.toLowerCase() == text.toLowerCase());
+    final onlyOne = _suggestions.length == 1;
     _select(exact.isNotEmpty ? exact.first : _suggestions.first);
+    if (onlyOne) await _submitGuess();
   }
 
   Future<void> _confirmGiveUp() async {

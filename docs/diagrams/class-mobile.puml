@@ -76,6 +76,7 @@ package "api" {
     + pointsEarned: int?
     + distance: int?
     + direction: String?
+    + toGuess(): Guess
   }
   class LeaderboardPage {
     + page: int
@@ -112,6 +113,7 @@ package "screens" {
     - _selected: Country?
     - _newRound()
     - _onSearchChanged(text)
+    - _onEnter()
     - _submitGuess()
     - _confirmGiveUp()
     - _revealAnswer(gameId)
@@ -129,21 +131,27 @@ package "globe" {
     + answer: String?
     + focusCountry: String?
     + roundId: String?
-  }
-  class GlobeData {
-    + countries: Map<String, CountryShape>
+    - _focus(name)
+    - _onScaleUpdate(details): spin and zoom
   }
   class CountryShape {
     + name: String
     + rings: List<Float32List>
     + center: List<double>
   }
+  class GlobeData {
+    + countries: Map<String, CountryShape>
+    + {static} load(): Future<GlobeData>
+  }
+  class CountryColors <<functions>> {
+    + guessColor(range): Color
+    + countryKey(name): String
+  }
 }
 
 package "widgets / utils" {
   class AuthScaffold <<StatelessWidget>>
   class LoadingButton <<StatelessWidget>>
-  class FormMessage <<StatelessWidget>>
   class Validators <<functions>> {
     + validateEmail(value): String?
     + validateNewPassword(value): String?
@@ -172,11 +180,6 @@ RegisterScreen ..> AuthScaffold
 CheckInboxScreen ..> AuthScaffold
 ForgotPasswordScreen ..> AuthScaffold
 AuthScaffold ..> LoadingButton
-LoginScreen ..> FormMessage
-GameScreen --> CountryGlobe : shows guesses on
-CountryGlobe ..> GlobeData : loads
-GlobeData "1" *-- "0..*" CountryShape
-CountryGlobe ..> Guess
 LoginScreen ..> Validators
 RegisterScreen ..> Validators
 
@@ -189,4 +192,8 @@ Game "1" *-- "0..*" Guess
 LeaderboardPage "1" *-- "0..*" LeaderboardEntry
 GameScreen o-- Game
 GameScreen o-- "0..*" Country : suggestions
+GameScreen --> CountryGlobe
+CountryGlobe ..> GlobeData : shapes from assets/countries.json
+GlobeData "1" *-- "0..*" CountryShape
+CountryGlobe ..> CountryColors
 @enduml
