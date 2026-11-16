@@ -117,6 +117,7 @@ package "screens" {
     - _submitGuess()
     - _confirmGiveUp()
     - _revealAnswer(gameId)
+    - _logout()
   }
   class LeaderboardScreen <<StatefulWidget>> {
     - _data: LeaderboardPage?

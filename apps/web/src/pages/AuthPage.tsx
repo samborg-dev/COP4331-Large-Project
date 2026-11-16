@@ -64,6 +64,7 @@ export function AuthPage() {
   const location = useLocation();
   const pathname = location.pathname.toLowerCase().replace(/\/+$/, "") || "/";
   const path = pathname === "/login" ? "/" : pathname;
+  if (path === "/" && readPlayer()) return <Navigate to="/game" replace />;
   return <AuthForm key={location.key} path={path} />;
 }
 function PasswordInput(props: InputHTMLAttributes<HTMLInputElement>) {

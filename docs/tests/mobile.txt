@@ -1,0 +1,37 @@
+flutter test   (apps/mobile, GitHub Actions run 43791521541, commit 374eb8c)
+
+api_client_test.dart: login posts email and password and saves the user
+api_client_test.dart: login surfaces the server error and status
+api_client_test.dart: a server outage shows a friendly message
+api_client_test.dart: country search sends the bearer token and encodes the query
+api_client_test.dart: a round starts, takes a guess, and reports the result
+api_client_test.dart: a finished round includes the answer
+api_client_test.dart: giving up posts to the give-up route
+api_client_test.dart: a finished round also parses the database-shaped response
+api_client_test.dart: leaderboard parses entries and page count
+api_client_test.dart: a 401 on a protected route logs the user out
+validators_test.dart: validateEmail rejects empty input
+validators_test.dart: validateEmail rejects malformed emails
+validators_test.dart: validateEmail accepts valid emails, ignoring surrounding spaces
+validators_test.dart: validateNewPassword requires at least 8 characters
+validators_test.dart: requiredField names the field in its message
+auth_screens_test.dart: login shows validation errors when submitted empty
+auth_screens_test.dart: "Sign up" opens the register screen and "Log in" returns
+auth_screens_test.dart: register validates every field before calling the API
+auth_screens_test.dart: "Forgot password?" opens the reset request screen
+auth_screens_test.dart: password visibility toggle works
+game_screen_test.dart: a round starts and partial search suggests countries
+game_screen_test.dart: a wrong guess shows its distance and direction
+globe_test.dart: countryKey ignores case, accents and punctuation
+globe_test.dart: countryKey maps common alternate names to the shape names
+globe_test.dart: guess colors match the web app
+globe_test.dart: the revealed answer is added in green, once
+globe_test.dart: every country has a shape and a label position
+game_screen_test.dart: first Enter picks the top suggestion, second Enter guesses it
+game_screen_test.dart: giving up asks first, then reveals the answer
+game_screen_test.dart: the right guess wins and updates points
+globe_test.dart: the globe draws guesses and survives spinning
+game_screen_test.dart: running out of guesses reveals the answer
+game_screen_test.dart: leaderboard lists players and highlights you
+
+33 tests passed.

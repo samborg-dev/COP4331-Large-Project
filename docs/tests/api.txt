@@ -1,0 +1,172 @@
+
+ RUN  v5.1.0 C:/Users/Sam/Desktop/dev/COP4331-Large-Project/apps/api
+
+ ✓ test/rateLimit.test.ts > authRateLimiter > answers 429 with the standard error shape after 25 requests 119ms
+stdout | test/games.test.ts > GET /api/games/:id (resume) > returns progress so far and omits the answer while the round is active
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37a1 body: { countryId: '6afa6ac78cb74b04df3d379a' }
+
+stdout | test/games.test.ts > GET /api/games/:id (resume) > includes the rounded distance and a compass direction for every guess (issue #46)
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37a3 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+ ✓ test/search.test.ts > GET /api/countries/search (server-side partial match) > requires a bearer token 48ms
+ ✓ test/search.test.ts > GET /api/countries/search (server-side partial match) > matches a prefix 11ms
+ ✓ test/search.test.ts > GET /api/countries/search (server-side partial match) > matches in the middle of a name 6ms
+ ✓ test/search.test.ts > GET /api/countries/search (server-side partial match) > is case-insensitive 7ms
+ ✓ test/search.test.ts > GET /api/countries/search (server-side partial match) > returns id, name and iso codes for each result 8ms
+ ✓ test/search.test.ts > GET /api/countries/search (server-side partial match) > returns an empty array when nothing matches 6ms
+ ✓ test/search.test.ts > GET /api/countries/search (server-side partial match) > rejects an empty query with 400 12ms
+ ✓ test/games.test.ts > POST /api/games > requires a bearer token 45ms
+ ✓ test/games.test.ts > POST /api/games > starts a round and never reveals the target 11ms
+ ✓ test/games.test.ts > GET /api/games/:id (resume) > returns progress so far and omits the answer while the round is active 33ms
+stdout | test/games.test.ts > POST /api/games/:id/guesses > returns a distance range for a wrong guess and awards nothing
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37a7 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > buckets a nearby country into the "500–1,500 km" range
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37a9 body: { countryId: '6afa6ac78cb74b04df3d379a' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > scores a first-guess win at 100 and updates the account atomically
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37ab body: { countryId: '6afa6ac78cb74b04df3d3799' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > loses 10 points per extra guess
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37ad body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > loses 10 points per extra guess
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37ad body: { countryId: '6afa6ac78cb74b04df3d379a' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > loses 10 points per extra guess
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37ad body: { countryId: '6afa6ac78cb74b04df3d3799' }
+
+ ✓ test/search.test.ts > GET /api/countries/search (server-side partial match) > treats regex characters literally instead of as a pattern 22ms
+ ✓ test/search.test.ts > GET /api/countries/search (server-side partial match) > honours the limit parameter 7ms
+ ✓ test/search.test.ts > GET /api/users/me > returns the signed-in user's profile without secrets 7ms
+ ✓ test/search.test.ts > GET /api/leaderboard > ranks players by points and paginates 13ms
+ ✓ test/search.test.ts > GET /api/leaderboard > requires a bearer token 4ms
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points
+[DEBUG GUESS] gameId: 6afa6ac78cb74b04df3d37af body: { countryId: '6afa6ac78cb74b04df3d3799' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+ ✓ test/games.test.ts > GET /api/games/:id (resume) > includes the rounded distance and a compass direction for every guess (issue #46) 15ms
+ ✓ test/games.test.ts > GET /api/games/:id (resume) > returns 404 for unknown or malformed ids 9ms
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > returns a distance range for a wrong guess and awards nothing 9ms
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > buckets a nearby country into the "500–1,500 km" range 7ms
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > scores a first-guess win at 100 and updates the account atomically 7ms
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > loses 10 points per extra guess 13ms
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > never scores below 10 points 38ms
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d379b' }
+
+ ✓ test/auth.test.ts > POST /api/auth/register > creates an unverified account, stores only a token hash, and emails the raw token 129ms
+ ✓ test/auth.test.ts > POST /api/auth/register > rejects a duplicate email with 409, ignoring case 80ms
+ ✓ test/auth.test.ts > POST /api/auth/register > returns 400 for short password 4ms
+ ✓ test/auth.test.ts > POST /api/auth/register > returns 400 for bad email 4ms
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b1 body: { countryId: '6afa6ac78cb74b04df3d3799' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > rejects guesses on a finished round without scoring twice
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b3 body: { countryId: '6afa6ac78cb74b04df3d3799' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > rejects guesses on a finished round without scoring twice
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b3 body: { countryId: '6afa6ac78cb74b04df3d3799' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > can't touch another player's round
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b6 body: { countryId: '6afa6ac78cb74b04df3d3799' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > ignores points sent by the client
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37b8 body: {
+  countryId: '6afa6ac78cb74b04df3d379b',
+  pointsEarned: 9999,
+  totalPoints: 9999
+}
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > returns 404 for an unknown country or round, and 401 without a token
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37ba body: { countryId: 'Atlantis' }
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > returns 404 for an unknown country or round, and 401 without a token
+[DEBUG GUESS] Country not found for: Atlantis
+
+stdout | test/games.test.ts > POST /api/games/:id/guesses > returns 404 for an unknown country or round, and 401 without a token
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37bb body: { countryId: '6afa6ac78cb74b04df3d3799' }
+
+stdout | test/games.test.ts > POST /api/games/:id/give-up > is refused after the round was already won
+[DEBUG GUESS] gameId: 6afa6ac88cb74b04df3d37c1 body: { countryId: '6afa6ac78cb74b04df3d3799' }
+
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > ends the round as lost after 10 wrong guesses and then reveals the answer 37ms
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > rejects guesses on a finished round without scoring twice 8ms
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > can't touch another player's round 11ms
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > ignores points sent by the client 5ms
+ ✓ test/games.test.ts > POST /api/games/:id/guesses > returns 404 for an unknown country or round, and 401 without a token 10ms
+ ✓ test/games.test.ts > POST /api/games/:id/give-up > ends the round with zero points and reveals the answer 7ms
+ ✓ test/games.test.ts > POST /api/games/:id/give-up > cannot be repeated to bump statistics 7ms
+ ✓ test/games.test.ts > POST /api/games/:id/give-up > is refused after the round was already won 8ms
+ ✓ test/auth.test.ts > POST /api/auth/register > returns 400 for missing first name 3ms
+ ✓ test/auth.test.ts > POST /api/auth/verify-email > verifies the account once, then rejects the reused token 76ms
+ ✓ test/auth.test.ts > POST /api/auth/verify-email > rejects an expired token 4ms
+ ✓ test/auth.test.ts > POST /api/auth/verify-email > rejects a missing or made-up token 4ms
+ ✓ test/auth.test.ts > POST /api/auth/resend-verification > sends a fresh link to an unverified user and replaces the old token 73ms
+ ✓ test/auth.test.ts > POST /api/auth/resend-verification > answers 200 without sending anything for unknown or already verified emails 6ms
+ ✓ test/auth.test.ts > POST /api/auth/login > blocks an unverified account with 403 5ms
+ ✓ test/auth.test.ts > POST /api/auth/login > gives the same 401 for a wrong password and an unknown email 7ms
+ ✓ test/auth.test.ts > POST /api/auth/login > returns a signed JWT and the user after registering and verifying 139ms
+ ✓ test/auth.test.ts > password recovery > answers 200 for unknown emails without sending mail (no account enumeration) 3ms
+ ✓ test/auth.test.ts > password recovery > resets the password with a one-time token 206ms
+ ✓ test/auth.test.ts > password recovery > rejects a too-short new password and an expired reset token 5ms
+ ✓ test/auth.test.ts > requireAuth > rejects missing, malformed, tampered and expired tokens with 401 16ms
+
+ Test Files  4 passed (4)
+      Tests  48 passed (48)
+   Start at  21:30:30
+   Duration  2.53s (import 77%, tests 20%, transform 2%, worker 1%)
+

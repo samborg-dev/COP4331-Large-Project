@@ -6,6 +6,7 @@ import { connectDB, getDb } from './db.js';
 import authRouter from './routes/auth.js';
 import gamesRouter from './routes/games.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/requireAuth.js';
+import { countryNameMatches } from './utils/countryName.js';
 
 dotenv.config();
 
@@ -52,7 +53,8 @@ app.get('/api/users/me', requireAuth, async (req: AuthenticatedRequest, res) => 
 });
 
 // GET /api/countries/search?q=fra&limit=10 (Bearer Auth)
-// Returns top-level array: [{ id, name, iso2, iso3, continent }] matching any part of country name
+// Returns top-level array: [{ id, name, iso2, iso3, continent }] matching any part of a
+// country name, including accent-insensitive names.
 app.get('/api/countries/search', requireAuth, async (req, res) => {
   try {
     const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
@@ -64,7 +66,6 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
 
     const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const wildcardQuery = q.replace(/[\\*?]/g, '\\$&');
-    const partialRegex = new RegExp(escaped, 'i');
     const db = getDb();
 
     // 1. Try MongoDB Atlas Search index "name" for partial matches first
@@ -84,7 +85,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
           },
           {
             $match: {
-              COUNTRY: { $regex: partialRegex },
+              COUNTRY: { $regex: escaped, $options: 'i' },
             },
           },
           { $limit: limit },
@@ -124,7 +125,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
       if (Array.isArray(doc.features)) {
         for (const f of doc.features) {
           const name = String(f?.properties?.COUNTRY ?? f?.properties?.name ?? '');
-          if (partialRegex.test(name)) {
+          if (countryNameMatches(name, q)) {
             const iso2 = String(f?.properties?.ISO ?? f?.properties?.ISO_A2 ?? '');
             const iso3 = String(f?.properties?.ISO_A3 ?? f?.properties?.iso3 ?? iso2);
             matches.push({
@@ -139,7 +140,7 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
         }
       } else {
         const name = String(doc.COUNTRY ?? doc.name ?? doc?.properties?.COUNTRY ?? '');
-        if (partialRegex.test(name)) {
+        if (countryNameMatches(name, q)) {
           const iso2 = String(doc.ISO ?? doc.iso ?? doc.iso2 ?? '');
           const iso3 = String(doc.ISO_A3 ?? doc.iso3 ?? iso2);
           matches.push({

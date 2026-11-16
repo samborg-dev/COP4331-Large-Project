@@ -1,0 +1,26 @@
+> vitest run   (apps/web, GitHub Actions run 43791521541, commit 374eb8c)
+
+ RUN  v5.1.0 apps/web
+
+ ✓ src/search.test.tsx (11 tests) 620ms
+ ✓ src/auth.test.tsx (14 tests) 1140ms
+   ✓ Account screens (7)
+     ✓ sends credentials and keeps a login error visible 461ms
+     ✓ rejects mismatched passwords without making a request 302ms
+ ✓ src/round.test.ts (12 tests) 42ms
+ ✓ src/components/countryHighlights.test.ts (14 tests) 79ms
+ ✓ src/give-up.test.tsx (1 test) 504ms
+   ✓ only gives up after confirmation, reveals the answer, and keeps the guesses counter 502ms
+ ✓ src/game.test.tsx (19 tests) 3322ms
+   ✓ Round screens (9)
+     ✓ finishes a loss and fetches its answer (lookup fails: false) 708ms
+     ✓ finishes a loss and fetches its answer (lookup fails: true) 457ms
+     ✓ starts a real round request, submits the selected country id, and starts another round 444ms
+   ✓ Game navigation (2)
+     ✓ keeps an in-flight guess and the same round when visiting the leaderboard 512ms
+     ✓ keeps the win and points on return, then clears the round for another login 679ms
+
+ Test Files  6 passed (6)
+      Tests  71 passed (71)
+   Start at  02:20:34
+   Duration  5.00s (tests 43%, environment 40%, import 11%, transform 6%)

@@ -2,6 +2,7 @@
 ' Use case diagram. Owner: Sam. Render at https://www.plantuml.com/plantuml or with the VS Code PlantUML extension.
 title Country Distance Guessing Game: Use Case Diagram
 
+!pragma layout smetana
 left to right direction
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -28,6 +29,8 @@ rectangle "Country Distance Guessing Game (web + mobile)" {
   usecase "Search countries\n(partial match)" as Search
   usecase "Get distance range" as Feedback
   usecase "Earn points" as Points
+  usecase "Give up\n(reveal answer)" as GiveUp
+  usecase "Resume saved round" as Resume
   usecase "View leaderboard" as Leaderboard
   usecase "View profile and points" as Profile
   usecase "Log out" as Logout
@@ -54,4 +57,6 @@ Play ..> Guess : <<include>>
 Guess ..> Search : <<include>>
 Guess ..> Feedback : <<include>>
 Points .> Guess : <<extend>>\n(correct guess)
+GiveUp .> Play : <<extend>>\n(player quits round)
+Resume .> Play : <<extend>>\n(round already in progress)
 @enduml
