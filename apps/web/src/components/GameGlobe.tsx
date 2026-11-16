@@ -3,7 +3,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { createLandscapeLoader } from "./landscapeTiles";
 import { guessClue, type Guess } from "../round";
-import { countryKey, guessColor, withRevealedAnswer } from "./countryHighlights";
+import { correctCountryColor, countryKey, distanceColors, guessColor, withRevealedAnswer } from "./countryHighlights";
 type CountryCollection = Extract<import("maplibre-gl").GeoJSONSourceSpecification["data"], { type: "FeatureCollection" }>;
 
 export function GameGlobe({ guesses = [], focusCountry, answer, gameId }: { guesses?: Guess[]; focusCountry?: { name: string; requestId: string }; answer?: string; gameId?: string }) {
@@ -62,7 +62,7 @@ export function GameGlobe({ guesses = [], focusCountry, answer, gameId }: { gues
     const labelSource = map.getSource("guessed-country-labels") as import("maplibre-gl").GeoJSONSource | undefined;
     labelSource?.setData({ type: "FeatureCollection", features: next.flatMap((guess) => {
       const point = centers.current.get(countryKey(guess.name));
-      return point ? [{ type: "Feature" as const, properties: { name: guess.name, clue: guessClue(guess) },
+      return point ? [{ type: "Feature" as const, properties: { name: guess.name, clue: guessClue(guess, { showDirection: false }) },
         geometry: { type: "Point" as const, coordinates: point } }] : [];
     }) });
   }
@@ -187,6 +187,17 @@ export function GameGlobe({ guesses = [], focusCountry, answer, gameId }: { gues
   }, []);
   return (
     <div className="game-globe">
+      <div className="globe-legend" aria-label="Country highlight colors">
+        <span className="correct-guide"><i style={{ backgroundColor: correctCountryColor }} aria-hidden="true" />Correct</span>
+        <div className="distance-guide">
+          <div className="distance-guide-labels"><span>Closest</span><span>Farthest</span></div>
+          <div className="distance-guide-colors" role="img" aria-label={`Closest to farthest: ${Object.keys(distanceColors).join(", ")}`}>
+            {Object.entries(distanceColors).map(([range, color]) => (
+              <span key={range} style={{ backgroundColor: color }} title={range} aria-hidden="true" />
+            ))}
+          </div>
+        </div>
+      </div>
       <div className="globe-map" ref={container} aria-label="World map. Drag to move; scroll or pinch to zoom." />
       {message && <p className="globe-message" role="status">{message}</p>}
     </div>

@@ -28,6 +28,11 @@ describe("Documented saved-round responses", () => {
     expect(guessClue({ countryId: "a", name: "A", range: "< 500 km", distance: 0 })).toBe("~0 km");
     expect(guessClue({ countryId: "a", name: "A", range: "Correct", direction: "Correct", correct: true })).toBe("Correct country");
   });
+  it("omits direction on map labels while preserving it in history clues", () => {
+    const guess: Guess = { countryId: "fr", name: "France", range: "1,500–3,000 km", distance: 1550, direction: "NE" };
+    expect(guessClue(guess, { showDirection: false })).toBe("~1,550 km");
+    expect(guessClue(guess)).toBe("~1,550 km ↗");
+  });
 
   it("restores the documented response and recognizes a winning guess", () => {
     const round = savedRoundSchema.parse({
