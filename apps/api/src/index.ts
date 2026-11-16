@@ -6,6 +6,7 @@ import { connectDB, getDb } from './db.js';
 import authRouter from './routes/auth.js';
 import gamesRouter from './routes/games.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/requireAuth.js';
+import { matchesCountry } from './countrySearch.js';
 
 dotenv.config();
 
@@ -66,6 +67,13 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
     const wildcardQuery = q.replace(/[\\*?]/g, '\\$&');
     const partialRegex = new RegExp(escaped, 'i');
     const db = getDb();
+    const matches: Array<{
+      id: string;
+      name: string;
+      iso2: string;
+      iso3: string;
+      continent: string;
+    }> = [];
 
     // 1. Try MongoDB Atlas Search index "name" for partial matches first
     try {
@@ -91,44 +99,38 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
         ])
         .toArray();
 
-      if (atlasResults.length > 0) {
-        return res.status(200).json(
-          atlasResults.map((doc: any) => {
-            const iso2 = String(doc.ISO ?? doc.iso2 ?? doc.ISO_A2 ?? '');
-            const iso3 = String(doc.ISO_A3 ?? doc.iso3 ?? iso2);
-            return {
-              id: String(doc._id ?? iso2),
-              name: String(doc.COUNTRY ?? doc.name ?? 'Unknown'),
-              iso2,
-              iso3,
-              continent: String(doc.CONTINENT ?? doc.continent ?? ''),
-            };
-          })
-        );
+      for (const doc of atlasResults as any[]) {
+        const iso2 = String(doc.ISO ?? doc.iso2 ?? doc.ISO_A2 ?? '');
+        const iso3 = String(doc.ISO_A3 ?? doc.iso3 ?? iso2);
+        matches.push({
+          id: String(doc._id ?? iso2),
+          name: String(doc.COUNTRY ?? doc.name ?? 'Unknown'),
+          iso2,
+          iso3,
+          continent: String(doc.CONTINENT ?? doc.continent ?? ''),
+        });
       }
+      if (matches.length >= limit) return res.status(200).json(matches);
     } catch {
       // Fallback to collection scan below if Atlas Search index is unavailable
     }
 
-    // 2. Fallback partial regex over countries collection
+    // 2. Fill up with a scan that ignores accents and punctuation and knows common
+    // other names, so "cote" and "ivory coast" both find Côte d'Ivoire
     const docs = await db.collection('countries').find({}).toArray();
-    const matches: Array<{
-      id: string;
-      name: string;
-      iso2: string;
-      iso3: string;
-      continent: string;
-    }> = [];
+    const seen = new Set(matches.map((m) => m.id));
 
     for (const doc of docs as any[]) {
       if (Array.isArray(doc.features)) {
         for (const f of doc.features) {
           const name = String(f?.properties?.COUNTRY ?? f?.properties?.name ?? '');
-          if (partialRegex.test(name)) {
+          const id = String(f?.properties?.ISO ?? doc._id);
+          if (!seen.has(id) && matchesCountry(name, q)) {
+            seen.add(id);
             const iso2 = String(f?.properties?.ISO ?? f?.properties?.ISO_A2 ?? '');
             const iso3 = String(f?.properties?.ISO_A3 ?? f?.properties?.iso3 ?? iso2);
             matches.push({
-              id: String(f?.properties?.ISO ?? doc._id),
+              id,
               name,
               iso2,
               iso3,
@@ -139,11 +141,13 @@ app.get('/api/countries/search', requireAuth, async (req, res) => {
         }
       } else {
         const name = String(doc.COUNTRY ?? doc.name ?? doc?.properties?.COUNTRY ?? '');
-        if (partialRegex.test(name)) {
-          const iso2 = String(doc.ISO ?? doc.iso ?? doc.iso2 ?? '');
+        const iso2 = String(doc.ISO ?? doc.iso ?? doc.iso2 ?? '');
+        const id = String(doc._id ?? iso2);
+        if (!seen.has(id) && matchesCountry(name, q)) {
+          seen.add(id);
           const iso3 = String(doc.ISO_A3 ?? doc.iso3 ?? iso2);
           matches.push({
-            id: String(doc._id ?? iso2),
+            id,
             name,
             iso2,
             iso3,
