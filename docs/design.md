@@ -4,15 +4,17 @@ Web and mobile share one look: a dark background, rounded cards, blue primary bu
 and system sans-serif type. Account forms use explicit labels, keyboard focus
 indicators and inline errors.
 
-## Prototypes (Figma)
+## Wireframes
 
-| Platform | Figma link | Frames |
+Low-fidelity wireframes for every screen, built from the real screens' labels and routes. They are
+generated from `docs/design/wireframes/generate.py` (edit that and re-run it), with PNG exports for the slides.
+
+| Platform | Sheet | Screens |
 |---|---|---|
-| Web | **TODO (John): paste the Figma link and export PNGs to `docs/design/`** | Login/register, check inbox, verify result, forgot/reset password, game, win/lose, leaderboard |
-| Mobile | **TODO (Arwa): paste the Figma link and export PNGs to `docs/design/`** | Login, register, check inbox, forgot password, game, leaderboard |
+| Web | [web.png](design/wireframes/web.png) ([web.svg](design/wireframes/web.svg)) | Sign in, create account, verify email, forgot and reset password, game, round over and give-up dialog, leaderboard |
+| Mobile | [mobile.png](design/wireframes/mobile.png) ([mobile.svg](design/wireframes/mobile.svg)) | Log in, create account, check your inbox, forgot password, game, round over and give-up dialog, leaderboard |
 
-The prototypes are a graded item (5 points) and have to appear in the slides. The built
-screens are described below and match the tokens here.
+If the team also has Figma prototypes, link them here: **Figma (web):** _add link_, **Figma (mobile):** _add link_.
 
 ## Design tokens
 
