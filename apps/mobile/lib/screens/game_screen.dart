@@ -205,6 +205,8 @@ class _GameScreenState extends State<GameScreen> {
 
   /// Like the website: the first Enter picks an exact name match or else the
   /// top suggestion, so the player can check it; the second Enter guesses it.
+  /// When the search found only one country there's nothing to check, so
+  /// Enter guesses it right away.
   Future<void> _onEnter() async {
     if (_selected != null) return _submitGuess();
     final text = _search.text.trim();
@@ -216,7 +218,9 @@ class _GameScreenState extends State<GameScreen> {
     }
     if (!mounted || _suggestions.isEmpty) return;
     final exact = _suggestions.where((c) => c.name.toLowerCase() == text.toLowerCase());
+    final onlyOne = _suggestions.length == 1;
     _select(exact.isNotEmpty ? exact.first : _suggestions.first);
+    if (onlyOne) await _submitGuess();
   }
 
   Future<void> _confirmGiveUp() async {

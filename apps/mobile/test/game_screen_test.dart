@@ -132,15 +132,28 @@ void main() {
     await tester.pumpWidget(_app(GameScreen(api: fakeApi())));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byKey(const Key('country-search')), 'ger');
+    // "an" matches France and Germany, so the first Enter only picks France
+    await tester.enterText(find.byKey(const Key('country-search')), 'an');
     // Pressing Enter before the search has run still works
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
-    expect(find.text('Guess Germany'), findsOneWidget);
+    expect(find.text('Guess France'), findsOneWidget);
     expect(find.text('Guess 1 of 10'), findsOneWidget);
 
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
+    expect(find.text('You found it!'), findsOneWidget);
+  });
+
+  testWidgets('Enter guesses straight away when only one country matches', (tester) async {
+    await tester.pumpWidget(_app(GameScreen(api: fakeApi())));
+    await tester.pumpAndSettle();
+
+    // "germ" matches only Germany
+    await tester.enterText(find.byKey(const Key('country-search')), 'germ');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
     expect(find.text('Guess 2 of 10'), findsOneWidget);
     expect(find.byKey(const Key('guess-row-0')), findsOneWidget);
   });
