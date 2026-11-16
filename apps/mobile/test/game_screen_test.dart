@@ -128,7 +128,7 @@ void main() {
     expect(find.text('Guess 2 of 10'), findsOneWidget);
   });
 
-  testWidgets('Enter guesses the top suggestion without picking it first', (tester) async {
+  testWidgets('first Enter picks the top suggestion, second Enter guesses it', (tester) async {
     await tester.pumpWidget(_app(GameScreen(api: fakeApi())));
     await tester.pumpAndSettle();
 
@@ -136,9 +136,13 @@ void main() {
     // Pressing Enter before the search has run still works
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
+    expect(find.text('Guess Germany'), findsOneWidget);
+    expect(find.text('Guess 1 of 10'), findsOneWidget);
 
-    expect(find.text('Germany'), findsOneWidget);
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
     expect(find.text('Guess 2 of 10'), findsOneWidget);
+    expect(find.byKey(const Key('guess-row-0')), findsOneWidget);
   });
 
   testWidgets('giving up asks first, then reveals the answer', (tester) async {

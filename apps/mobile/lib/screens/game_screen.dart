@@ -195,6 +195,7 @@ class _GameScreenState extends State<GameScreen> {
       });
       if (_won) _syncPoints();
       if (_lost) _revealAnswer(game.gameId);
+      if (!_over) _searchFocus.requestFocus();
     } catch (e) {
       _handleError(e);
     } finally {
@@ -202,22 +203,20 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  /// Enter guesses straight away: the picked country, an exact name match,
-  /// or else the top suggestion.
-  Future<void> _guessFromKeyboard() async {
+  /// Like the website: the first Enter picks an exact name match or else the
+  /// top suggestion, so the player can check it; the second Enter guesses it.
+  Future<void> _onEnter() async {
+    if (_selected != null) return _submitGuess();
     final text = _search.text.trim();
-    if (_selected == null) {
-      if (text.isEmpty) return;
-      // The search may still be waiting for typing to pause; run it now
-      if ((_debounce?.isActive ?? false) || _searching) {
-        _debounce?.cancel();
-        await _runSearch(text);
-      }
-      if (!mounted || _suggestions.isEmpty) return;
-      final exact = _suggestions.where((c) => c.name.toLowerCase() == text.toLowerCase());
-      _select(exact.isNotEmpty ? exact.first : _suggestions.first);
+    if (text.isEmpty) return;
+    // The search may still be waiting for typing to pause; run it now
+    if ((_debounce?.isActive ?? false) || _searching) {
+      _debounce?.cancel();
+      await _runSearch(text);
     }
-    await _submitGuess();
+    if (!mounted || _suggestions.isEmpty) return;
+    final exact = _suggestions.where((c) => c.name.toLowerCase() == text.toLowerCase());
+    _select(exact.isNotEmpty ? exact.first : _suggestions.first);
   }
 
   Future<void> _confirmGiveUp() async {
@@ -292,9 +291,10 @@ class _GameScreenState extends State<GameScreen> {
         title: const Text('How to play'),
         content: const Text(
           'Find the mystery country before you run out of guesses.\n\n'
-          'Type a country name and press Enter (or pick it from the list). After '
-          'each guess you see how far it is from the mystery country and which '
-          'way to go: the arrow points toward the mystery country.\n\n'
+          'Type a country name and press Enter to pick the top match (or tap one '
+          'in the list), then press Enter again to guess it. After each guess you '
+          'see how far it is from the mystery country, and the arrow points '
+          'toward it.\n\n'
           'Find it in fewer guesses to earn more points. Your points add to '
           'your total on the leaderboard.',
         ),
@@ -450,7 +450,9 @@ class _GameScreenState extends State<GameScreen> {
         textInputAction: TextInputAction.done,
         textCapitalization: TextCapitalization.words,
         onChanged: _onSearchChanged,
-        onSubmitted: (_) => _guessFromKeyboard(),
+        // Keep the keyboard open between the two Enters
+        onEditingComplete: () {},
+        onSubmitted: (_) => _onEnter(),
         decoration: InputDecoration(
           labelText: 'Country',
           hintText: 'Start typing, e.g. "fra"',
