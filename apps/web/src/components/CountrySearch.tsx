@@ -36,6 +36,8 @@ export function CountrySearch({
     (country) => country.name.trim().toLowerCase() === query.trim().toLowerCase(),
   );
   const readyCountry = selected ?? exactMatch;
+  const showSearchStatus = (!canSearch && Boolean(query.trim()))
+    || (!loading && Boolean(message) && results.length === 0 && !selected);
   useImperativeHandle(inputRef, () => inputElement.current!);
   useEffect(() => {
     const controller = new AbortController();
@@ -227,7 +229,7 @@ export function CountrySearch({
         </ul>
       )}
       <p
-        className="search-status"
+        className={`search-status${showSearchStatus ? "" : " search-status-quiet"}`}
         id={`${listId}-status`}
         role="status"
         aria-busy={loading}
