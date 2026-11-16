@@ -1,0 +1,234 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2030 940" width="2030" height="940" font-family="Segoe UI, Helvetica, Arial, sans-serif"><rect width="2030" height="940" fill="#ffffff"/>
+<text x="30" y="38" font-size="24" font-weight="700" fill="#1f2937" text-anchor="start">CountryGuesser: web wireframes</text>
+<text x="30" y="60" font-size="13" font-weight="400" fill="#64748b" text-anchor="start">React + Tailwind, desktop layout. Low fidelity; labels and routes match the built app.</text>
+<text x="30" y="90" font-size="14" font-weight="700" fill="#1f2937" text-anchor="start">1  Sign in</text>
+<rect x="30" y="100" width="470" height="340" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<rect x="30" y="100" width="470" height="28" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<rect x="30" y="120" width="470" height="8" rx="0" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="0"/>
+<circle cx="46" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="60" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="74" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<rect x="100" y="106" width="380" height="17" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="110" y="118" font-size="10" font-weight="400" fill="#64748b" text-anchor="start">https://cop4331-countryguesser.com/</text>
+<line x1="30" y1="128" x2="500" y2="128" stroke="#475569" stroke-width="1"/>
+<text x="265.0" y="166" font-size="15" font-weight="700" fill="#1f2937" text-anchor="middle">COUNTRYGUESSER</text>
+<rect x="140.0" y="180" width="250" height="228" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<rect x="148.0" y="190" width="116" height="26" rx="5" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="206.0" y="207" font-size="11" font-weight="600" fill="#fff" text-anchor="middle">Sign in</text>
+<rect x="266.0" y="190" width="116" height="26" rx="5" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="324.0" y="207" font-size="11" font-weight="600" fill="#1f2937" text-anchor="middle">Create account</text>
+<text x="157.0" y="235" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Email</text>
+<rect x="157.0" y="240" width="216" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="165.0" y="258.0" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">you@example.com</text>
+<text x="157.0" y="291" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Password</text>
+<rect x="157.0" y="296" width="216" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="165.0" y="314.0" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">••••••••</text>
+<rect x="157.0" y="336" width="216" height="30" rx="5" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="265.0" y="355.0" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle">Sign in</text>
+<text x="157.0" y="390" font-size="11" font-weight="400" fill="#334155" text-anchor="start" text-decoration="underline">Forgot password?</text>
+<text x="373.0" y="390" font-size="11" font-weight="400" fill="#334155" text-anchor="end" text-decoration="underline">Continue as guest</text>
+<text x="42" y="432" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">Landing page: sign in or register (required)</text>
+<text x="530" y="90" font-size="14" font-weight="700" fill="#1f2937" text-anchor="start">2  Create account</text>
+<rect x="530" y="100" width="470" height="340" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<rect x="530" y="100" width="470" height="28" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<rect x="530" y="120" width="470" height="8" rx="0" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="0"/>
+<circle cx="546" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="560" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="574" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<rect x="600" y="106" width="380" height="17" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="610" y="118" font-size="10" font-weight="400" fill="#64748b" text-anchor="start">https://cop4331-countryguesser.com/register</text>
+<line x1="530" y1="128" x2="1000" y2="128" stroke="#475569" stroke-width="1"/>
+<rect x="640.0" y="146" width="250" height="268" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="657.0" y="165" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">First name</text>
+<rect x="657.0" y="170" width="100" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="773.0" y="165" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Last name</text>
+<rect x="773.0" y="170" width="100" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="657.0" y="217" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Email</text>
+<rect x="657.0" y="222" width="216" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="665.0" y="240.0" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">you@example.com</text>
+<text x="657.0" y="269" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Password</text>
+<rect x="657.0" y="274" width="216" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="665.0" y="292.0" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">At least 8 characters</text>
+<text x="657.0" y="321" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Confirm password</text>
+<rect x="657.0" y="326" width="216" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<rect x="657.0" y="372" width="216" height="30" rx="5" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="765.0" y="391.0" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle">Create account</text>
+<text x="542" y="432" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">Inline errors; mismatched passwords send no request</text>
+<text x="1030" y="90" font-size="14" font-weight="700" fill="#1f2937" text-anchor="start">3  Verify email</text>
+<rect x="1030" y="100" width="470" height="340" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<rect x="1030" y="100" width="470" height="28" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<rect x="1030" y="120" width="470" height="8" rx="0" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="0"/>
+<circle cx="1046" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="1060" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="1074" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<rect x="1100" y="106" width="380" height="17" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="1110" y="118" font-size="10" font-weight="400" fill="#64748b" text-anchor="start">https://cop4331-countryguesser.com/verify-email?token=…</text>
+<line x1="1030" y1="128" x2="1500" y2="128" stroke="#475569" stroke-width="1"/>
+<rect x="1115.0" y="142" width="300" height="128" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="1265.0" y="166" font-size="14" font-weight="700" fill="#1f2937" text-anchor="middle">Check your inbox</text>
+<text x="1265.0" y="186" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="middle">We sent a verification link to you@example.com</text>
+<rect x="1175.0" y="206" width="180" height="28" rx="5" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1265.0" y="224.0" font-size="11" font-weight="600" fill="#1f2937" text-anchor="middle">Resend verification email</text>
+<text x="1265.0" y="256" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle" font-style="italic">After registering, before the first login</text>
+<rect x="1115.0" y="284" width="140" height="124" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="1185.0" y="308" font-size="12" font-weight="700" fill="#1f2937" text-anchor="middle">Email verified</text>
+<rect x="1135.0" y="328" width="100" height="26" rx="5" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="1185.0" y="345.0" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">Sign in</text>
+<text x="1185.0" y="390" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="middle" font-style="italic">token valid</text>
+<rect x="1275.0" y="284" width="140" height="124" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="1345.0" y="308" font-size="11" font-weight="700" fill="#1f2937" text-anchor="middle">Link invalid or expired</text>
+<text x="1345.0" y="342" font-size="10.5" font-weight="400" fill="#334155" text-anchor="middle" text-decoration="underline">Request a new link</text>
+<text x="1345.0" y="390" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="middle" font-style="italic">expired / used</text>
+<text x="1530" y="90" font-size="14" font-weight="700" fill="#1f2937" text-anchor="start">4  Forgot / reset password</text>
+<rect x="1530" y="100" width="470" height="340" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<rect x="1530" y="100" width="470" height="28" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<rect x="1530" y="120" width="470" height="8" rx="0" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="0"/>
+<circle cx="1546" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="1560" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="1574" cy="114" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<rect x="1600" y="106" width="380" height="17" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="1610" y="118" font-size="10" font-weight="400" fill="#64748b" text-anchor="start">https://cop4331-countryguesser.com/forgot-password   /reset-password</text>
+<line x1="1530" y1="128" x2="2000" y2="128" stroke="#475569" stroke-width="1"/>
+<rect x="1550.0" y="144" width="205" height="266" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="1653.0" y="168" font-size="13" font-weight="700" fill="#1f2937" text-anchor="middle">Forgot password?</text>
+<text x="1565.0" y="195" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Email</text>
+<rect x="1565.0" y="200" width="175" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1573.0" y="218.0" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">you@example.com</text>
+<rect x="1565.0" y="248" width="175" height="30" rx="5" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="1652.5" y="267.0" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle">Send reset link</text>
+<text x="1653.0" y="304" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle" font-style="italic">Always the same reply,</text>
+<text x="1653.0" y="318" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle" font-style="italic">so accounts can&#x27;t be guessed</text>
+<rect x="1775.0" y="144" width="205" height="266" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="1877.0" y="168" font-size="13" font-weight="700" fill="#1f2937" text-anchor="middle">Choose a new password</text>
+<text x="1790.0" y="195" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">New password</text>
+<rect x="1790.0" y="200" width="175" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1790.0" y="251" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Confirm password</text>
+<rect x="1790.0" y="256" width="175" height="28" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<rect x="1790.0" y="304" width="175" height="30" rx="5" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="1877.5" y="323.0" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle">Reset password</text>
+<text x="1877.0" y="360" font-size="10" font-weight="400" fill="#64748b" text-anchor="middle" font-style="italic">One-time link, expires in 1 hour</text>
+<text x="30" y="490" font-size="14" font-weight="700" fill="#1f2937" text-anchor="start">5  Game: guess the mystery country</text>
+<rect x="30" y="500" width="970" height="430" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<rect x="30" y="500" width="970" height="28" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<rect x="30" y="520" width="970" height="8" rx="0" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="0"/>
+<circle cx="46" cy="514" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="60" cy="514" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="74" cy="514" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<rect x="100" y="506" width="880" height="17" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="110" y="518" font-size="10" font-weight="400" fill="#64748b" text-anchor="start">https://cop4331-countryguesser.com/game</text>
+<line x1="30" y1="528" x2="1000" y2="528" stroke="#475569" stroke-width="1"/>
+<rect x="44" y="540" width="942" height="30" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="56" y="560" font-size="12" font-weight="700" fill="#1f2937" text-anchor="start">COUNTRYGUESSER</text>
+<text x="515.0" y="560" font-size="11" font-weight="600" fill="#1f2937" text-anchor="middle">Points: 120</text>
+<rect x="750" y="543" width="90" height="24" rx="5" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="795.0" y="559.0" font-size="10.5" font-weight="600" fill="#1f2937" text-anchor="middle">Leaderboard</text>
+<rect x="850" y="543" width="40" height="24" rx="5" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="870.0" y="559.0" font-size="11" font-weight="600" fill="#1f2937" text-anchor="middle">?</text>
+<rect x="898" y="543" width="78" height="24" rx="5" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="937.0" y="559.0" font-size="10.5" font-weight="600" fill="#1f2937" text-anchor="middle">Sign out</text>
+<circle cx="280" cy="743" r="140" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<ellipse cx="280" cy="743" rx="63.0" ry="140" fill="none" stroke="#94a3b8" stroke-width="1"/>
+<ellipse cx="280" cy="743" rx="140" ry="49.0" fill="none" stroke="#94a3b8" stroke-width="1"/>
+<line x1="140" y1="743" x2="420" y2="743" stroke="#94a3b8" stroke-width="1"/>
+<ellipse cx="231.0" cy="715.0" rx="28.0" ry="22.400000000000002" fill="#cbd5e1" stroke="#475569" stroke-width="1"/>
+<ellipse cx="308.0" cy="764.0" rx="23.8" ry="19.040000000000003" fill="#94a3b8" stroke="#475569" stroke-width="1"/>
+<ellipse cx="287.0" cy="680.0" rx="18.2" ry="14.56" fill="#e2e8f0" stroke="#475569" stroke-width="1"/>
+<text x="280" y="913" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="middle" font-style="italic">Rotating globe: guessed countries are colored by distance</text>
+<text x="510" y="594" font-size="12" font-weight="700" fill="#1f2937" text-anchor="start">FIND THE MYSTERY COUNTRY</text>
+<text x="510" y="618" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Your next guess</text>
+<rect x="510" y="626" width="330" height="30" rx="4" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="518" y="646" font-size="11" font-weight="400" fill="#94a3b8" text-anchor="start">Search for a country</text>
+<rect x="850" y="626" width="70" height="30" rx="5" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="885.0" y="645.0" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">Guess</text>
+<rect x="510" y="660" width="330" height="66" rx="4" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="520" y="678" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">France</text>
+<text x="520" y="698" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">Central African Republic</text>
+<text x="520" y="718" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">French Polynesia</text>
+<text x="850" y="678" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">Server-side partial match</text>
+<text x="850" y="692" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">on every keystroke</text>
+<text x="510" y="756" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Guesses left: 7 / 10</text>
+<text x="510" y="782" font-size="11" font-weight="700" fill="#1f2937" text-anchor="start">Your guesses</text>
+<rect x="840" y="766" width="80" height="24" rx="5" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="880.0" y="782.0" font-size="10.5" font-weight="600" fill="#1f2937" text-anchor="middle">Give up</text>
+<rect x="510" y="794" width="410" height="32" rx="4" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+<text x="520" y="815" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Japan</text>
+<text x="910" y="815" font-size="11" font-weight="400" fill="#1f2937" text-anchor="end">~9,700 km  ←</text>
+<rect x="510" y="832" width="410" height="32" rx="4" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+<text x="520" y="853" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Germany</text>
+<text x="910" y="853" font-size="11" font-weight="400" fill="#1f2937" text-anchor="end">~880 km  ↗</text>
+<rect x="510" y="870" width="410" height="32" rx="4" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="520" y="891" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">Spain</text>
+<text x="910" y="891" font-size="11" font-weight="400" fill="#1f2937" text-anchor="end">~1,050 km  ↑</text>
+<text x="510" y="920" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">Closest guess first; range color matches the globe</text>
+<text x="1030" y="490" font-size="14" font-weight="700" fill="#1f2937" text-anchor="start">6  Round over / Give up</text>
+<rect x="1030" y="500" width="470" height="430" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<rect x="1030" y="500" width="470" height="28" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<rect x="1030" y="520" width="470" height="8" rx="0" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="0"/>
+<circle cx="1046" cy="514" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="1060" cy="514" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="1074" cy="514" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<rect x="1100" y="506" width="380" height="17" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="1110" y="518" font-size="10" font-weight="400" fill="#64748b" text-anchor="start">https://cop4331-countryguesser.com/game</text>
+<line x1="1030" y1="528" x2="1500" y2="528" stroke="#475569" stroke-width="1"/>
+<circle cx="1265" cy="656" r="68" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<ellipse cx="1265" cy="656" rx="30.6" ry="68" fill="none" stroke="#94a3b8" stroke-width="1"/>
+<ellipse cx="1265" cy="656" rx="68" ry="23.799999999999997" fill="none" stroke="#94a3b8" stroke-width="1"/>
+<line x1="1197" y1="656" x2="1333" y2="656" stroke="#94a3b8" stroke-width="1"/>
+<ellipse cx="1241.2" cy="642.4" rx="13.600000000000001" ry="10.880000000000003" fill="#cbd5e1" stroke="#475569" stroke-width="1"/>
+<ellipse cx="1278.6" cy="666.2" rx="11.56" ry="9.248000000000001" fill="#94a3b8" stroke="#475569" stroke-width="1"/>
+<ellipse cx="1268.4" cy="625.4" rx="8.84" ry="7.072" fill="#e2e8f0" stroke="#475569" stroke-width="1"/>
+<rect x="1115" y="542" width="300" height="36" rx="6" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="1265" y="565" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">You found France!  +90 points</text>
+<rect x="1180" y="742" width="170" height="32" rx="5" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="1265.0" y="762.0" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle">Play again</text>
+<text x="1265" y="790" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="middle" font-style="italic">Answer is highlighted green on the globe</text>
+<rect x="1125" y="804" width="280" height="100" rx="8" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+<text x="1265" y="826" font-size="12" font-weight="700" fill="#1f2937" text-anchor="middle">Give up this round?</text>
+<text x="1265" y="844" font-size="9" font-weight="400" fill="#64748b" text-anchor="middle">Ends the round with 0 points and reveals the country.</text>
+<rect x="1142" y="862" width="120" height="28" rx="5" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1202.0" y="880.0" font-size="10.5" font-weight="600" fill="#1f2937" text-anchor="middle">Keep guessing</text>
+<rect x="1270" y="862" width="120" height="28" rx="5" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+<text x="1330.0" y="880.0" font-size="10.5" font-weight="600" fill="#ffffff" text-anchor="middle">Give up round</text>
+<text x="1530" y="490" font-size="14" font-weight="700" fill="#1f2937" text-anchor="start">7  Leaderboard</text>
+<rect x="1530" y="500" width="470" height="430" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<rect x="1530" y="500" width="470" height="28" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<rect x="1530" y="520" width="470" height="8" rx="0" fill="#f1f5f9" stroke="#f1f5f9" stroke-width="0"/>
+<circle cx="1546" cy="514" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="1560" cy="514" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<circle cx="1574" cy="514" r="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+<rect x="1600" y="506" width="380" height="17" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="1610" y="518" font-size="10" font-weight="400" fill="#64748b" text-anchor="start">https://cop4331-countryguesser.com/leaderboard</text>
+<line x1="1530" y1="528" x2="2000" y2="528" stroke="#475569" stroke-width="1"/>
+<text x="1554" y="564" font-size="10" font-weight="600" fill="#64748b" text-anchor="start">THE WORLD&#x27;S TOP EXPLORERS</text>
+<text x="1554" y="586" font-size="17" font-weight="700" fill="#1f2937" text-anchor="start">Leaderboard</text>
+<rect x="1870" y="564" width="106" height="26" rx="5" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="1923.0" y="581.0" font-size="10.5" font-weight="600" fill="#1f2937" text-anchor="middle">Back to game</text>
+<rect x="1554" y="606" width="422" height="26" rx="4" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+<text x="1568" y="624" font-size="11" font-weight="700" fill="#1f2937" text-anchor="start">Rank</text>
+<text x="1644" y="624" font-size="11" font-weight="700" fill="#1f2937" text-anchor="start">Player</text>
+<text x="1962" y="624" font-size="11" font-weight="700" fill="#1f2937" text-anchor="end">Points</text>
+<rect x="1554" y="638" width="422" height="34" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="1568" y="660" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">1</text>
+<text x="1644" y="660" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">Ada Lovelace</text>
+<text x="1962" y="660" font-size="11" font-weight="400" fill="#1f2937" text-anchor="end">540</text>
+<rect x="1554" y="678" width="422" height="34" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="1568" y="700" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">2</text>
+<text x="1644" y="700" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">Grace Hopper</text>
+<text x="1962" y="700" font-size="11" font-weight="400" fill="#1f2937" text-anchor="end">480</text>
+<rect x="1554" y="718" width="422" height="34" rx="4" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+<text x="1568" y="740" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">3</text>
+<text x="1644" y="740" font-size="11" font-weight="600" fill="#1f2937" text-anchor="start">You  (highlighted)</text>
+<text x="1962" y="740" font-size="11" font-weight="400" fill="#1f2937" text-anchor="end">320</text>
+<rect x="1554" y="758" width="422" height="34" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="1568" y="780" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">4</text>
+<text x="1644" y="780" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">Alan Turing</text>
+<text x="1962" y="780" font-size="11" font-weight="400" fill="#1f2937" text-anchor="end">290</text>
+<rect x="1554" y="798" width="422" height="34" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+<text x="1568" y="820" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">5</text>
+<text x="1644" y="820" font-size="11" font-weight="400" fill="#1f2937" text-anchor="start">Linus T.</text>
+<text x="1962" y="820" font-size="11" font-weight="400" fill="#1f2937" text-anchor="end">210</text>
+<text x="1620" y="864" font-size="11" font-weight="400" fill="#64748b" text-anchor="start">‹ Prev</text>
+<text x="1765.0" y="864" font-size="11" font-weight="400" fill="#64748b" text-anchor="middle">Page 1 of 3</text>
+<text x="1910" y="864" font-size="11" font-weight="400" fill="#64748b" text-anchor="end">Next ›</text>
+<text x="1765.0" y="900" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="middle" font-style="italic">20 players per page, ranked by total points</text>
+</svg>
