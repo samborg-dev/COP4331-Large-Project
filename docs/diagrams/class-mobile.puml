@@ -41,6 +41,7 @@ package "api" {
     + startGame(): Future<Game>
     + getGame(gameId): Future<Game>
     + guess(gameId, countryId): Future<GuessResult>
+    + giveUp(gameId): Future<void>
     + leaderboard(page, limit): Future<LeaderboardPage>
     - _request(method, route, body, auth)
   }
@@ -59,10 +60,13 @@ package "api" {
     + status: String
     + pointsEarned: int
     + answer: String?
+    + surrendered: bool
   }
   class Guess {
     + country: String
     + range: String
+    + distance: int?
+    + direction: String?
   }
   class GuessResult {
     + country: String
@@ -70,6 +74,9 @@ package "api" {
     + solved: bool
     + guessesUsed: int
     + pointsEarned: int?
+    + distance: int?
+    + direction: String?
+    + toGuess(): Guess
   }
   class LeaderboardPage {
     + page: int
@@ -106,12 +113,38 @@ package "screens" {
     - _selected: Country?
     - _newRound()
     - _onSearchChanged(text)
+    - _onEnter()
     - _submitGuess()
+    - _confirmGiveUp()
     - _revealAnswer(gameId)
   }
   class LeaderboardScreen <<StatefulWidget>> {
     - _data: LeaderboardPage?
     - _load(page)
+  }
+}
+
+package "globe" {
+  class CountryGlobe <<StatefulWidget>> {
+    + guesses: List<Guess>
+    + answer: String?
+    + focusCountry: String?
+    + roundId: String?
+    - _focus(name)
+    - _onScaleUpdate(details): spin and zoom
+  }
+  class CountryShape {
+    + name: String
+    + rings: List<Float32List>
+    + center: List<double>
+  }
+  class GlobeData {
+    + countries: Map<String, CountryShape>
+    + {static} load(): Future<GlobeData>
+  }
+  class CountryColors <<functions>> {
+    + guessColor(range): Color
+    + countryKey(name): String
   }
 }
 
@@ -158,4 +191,8 @@ Game "1" *-- "0..*" Guess
 LeaderboardPage "1" *-- "0..*" LeaderboardEntry
 GameScreen o-- Game
 GameScreen o-- "0..*" Country : suggestions
+GameScreen --> CountryGlobe
+CountryGlobe ..> GlobeData : shapes from assets/countries.json
+GlobeData "1" *-- "0..*" CountryShape
+CountryGlobe ..> CountryColors
 @enduml
