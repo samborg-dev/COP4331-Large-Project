@@ -899,3 +899,19 @@ body:has(.help-dialog[open]) {
 
 .guess-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .guess-actions .give-up-link { margin: 0; }
+@media (min-width: 601px) {
+  .preview-page { padding-top: 12px; padding-bottom: 16px; }
+  .preview-header { margin-bottom: 6px; }
+  .game-search-area > .preview-kicker { margin-bottom: 6px; }
+  .game-instructions { font-size: 12px; margin: 2px 0 8px; }
+  .country-search { margin-top: 8px; }
+  .map-space { padding: 12px 0; }
+  .map-space:not(.round-complete) .game-globe {
+    --globe-size: min(100%, clamp(320px, calc(100svh - 360px), 680px));
+    min-height: 0;
+  }
+  .map-space:not(.round-complete) .globe-map {
+    height: clamp(320px, calc(100svh - 360px), 680px);
+  }
+}
+
