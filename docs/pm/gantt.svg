@@ -2,7 +2,7 @@
 <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#f1f5f9"/><line x1="0" y1="0" x2="0" y2="6" stroke="#94a3b8" stroke-width="2"/></pattern></defs>
 <rect width="1244" height="1510" fill="#ffffff"/>
 <text x="24" y="46" font-size="20" font-weight="700" fill="#1e293b">Country Distance Guessing Game: COP4331 Large Project</text>
-<text x="24" y="66" font-size="12" fill="#64748b">Team 18 · Oct 26 – Nov 22, 2026 · due Sun Nov 15, 11:59 pm · status as of Nov 5</text>
+<text x="24" y="66" font-size="12" fill="#64748b">Team 18 · Oct 26 – Nov 22, 2026 · due Sun Nov 15, 11:59 pm · status as of Nov 15</text>
 <rect x="356" y="80" width="160" height="22" fill="#e2e8f0"/>
 <text x="436" y="95" font-size="11" font-weight="600" text-anchor="middle" fill="#1e293b">P0 Foundations</text>
 <rect x="516" y="80" width="128" height="22" fill="#ddd6fe"/>
@@ -90,50 +90,52 @@
 <text x="34" y="189" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S1</tspan>  Push repo, protect main, issue board</text>
 <line x1="24" y1="198" x2="1220" y2="198" stroke="#f1f5f9"/>
 <rect x="358" y="177" width="60" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
-<rect x="358" y="177" width="36" height="16" rx="4" fill="#7c3aed"/>
+<rect x="358" y="177" width="60" height="16" rx="4" fill="#7c3aed"/>
 <text x="424" y="189" font-size="10" fill="#475569">Oct 27–28</text>
 <text x="34" y="215" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S2</tspan>  Droplet, domain, DNS, HTTPS</text>
 <line x1="24" y1="224" x2="1220" y2="224" stroke="#f1f5f9"/>
 <rect x="358" y="203" width="124" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
-<rect x="358" y="203" width="49.6" height="16" rx="4" fill="#7c3aed"/>
+<rect x="358" y="203" width="124" height="16" rx="4" fill="#7c3aed"/>
 <text x="488" y="215" font-size="10" fill="#475569">Oct 27–30</text>
 <text x="34" y="241" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S3</tspan>  nginx + pm2 deploy, deploy.md</text>
 <line x1="24" y1="250" x2="1220" y2="250" stroke="#f1f5f9"/>
 <rect x="486" y="229" width="92" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
-<rect x="486" y="229" width="36.8" height="16" rx="4" fill="#7c3aed"/>
+<rect x="486" y="229" width="92" height="16" rx="4" fill="#7c3aed"/>
 <text x="584" y="241" font-size="10" fill="#475569">Oct 31 – Nov 2</text>
 <text x="34" y="267" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S4</tspan>  CI on PRs (typecheck/build/test)</text>
 <line x1="24" y1="276" x2="1220" y2="276" stroke="#f1f5f9"/>
 <rect x="518" y="255" width="92" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
-<rect x="518" y="255" width="64.4" height="16" rx="4" fill="#7c3aed"/>
+<rect x="518" y="255" width="92" height="16" rx="4" fill="#7c3aed"/>
 <text x="616" y="267" font-size="10" fill="#475569">Nov 1–3</text>
 <text x="34" y="293" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S5</tspan>  Use case diagram</text>
 <line x1="24" y1="302" x2="1220" y2="302" stroke="#f1f5f9"/>
 <rect x="518" y="281" width="124" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
-<rect x="518" y="281" width="111.6" height="16" rx="4" fill="#7c3aed"/>
+<rect x="518" y="281" width="124" height="16" rx="4" fill="#7c3aed"/>
 <text x="648" y="293" font-size="10" fill="#475569">Nov 1–4</text>
 <text x="34" y="319" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S6</tspan>  Sequence diagram (register/verify)</text>
 <line x1="24" y1="328" x2="1220" y2="328" stroke="#f1f5f9"/>
 <rect x="646" y="307" width="124" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
-<rect x="646" y="307" width="49.6" height="16" rx="4" fill="#7c3aed"/>
+<rect x="646" y="307" width="124" height="16" rx="4" fill="#7c3aed"/>
 <text x="776" y="319" font-size="10" fill="#475569">Nov 5–8</text>
 <text x="34" y="345" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S7</tspan>  Slide deck</text>
 <line x1="24" y1="354" x2="1220" y2="354" stroke="#f1f5f9"/>
 <rect x="678" y="333" width="252" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<rect x="678" y="333" width="252" height="16" rx="4" fill="#7c3aed"/>
 <text x="936" y="345" font-size="10" fill="#475569">Nov 6–13</text>
 <text x="34" y="371" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S8</tspan>  Rehearsals, USB, campus domain check</text>
 <line x1="24" y1="380" x2="1220" y2="380" stroke="#f1f5f9"/>
 <rect x="870" y="359" width="124" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
+<rect x="870" y="359" width="124" height="16" rx="4" fill="#7c3aed"/>
 <text x="1000" y="371" font-size="10" fill="#475569">Nov 12–15</text>
 <text x="34" y="397" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">S9</tspan>  Standups, Gantt upkeep, commit checks</text>
 <line x1="24" y1="406" x2="1220" y2="406" stroke="#f1f5f9"/>
 <rect x="358" y="385" width="636" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
-<rect x="358" y="385" width="254.4" height="16" rx="4" fill="#7c3aed"/>
+<rect x="358" y="385" width="636" height="16" rx="4" fill="#7c3aed"/>
 <text x="1000" y="397" font-size="10" fill="#475569">Oct 27 – Nov 15</text>
 <text x="34" y="423" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B2</tspan>  Email provider + sendMail()</text>
 <line x1="24" y1="432" x2="1220" y2="432" stroke="#f1f5f9"/>
 <rect x="486" y="411" width="92" height="16" rx="4" fill="#7c3aed" fill-opacity="0.28" stroke="#7c3aed"/>
-<rect x="486" y="411" width="64.4" height="16" rx="4" fill="#7c3aed"/>
+<rect x="486" y="411" width="92" height="16" rx="4" fill="#7c3aed"/>
 <text x="584" y="423" font-size="10" fill="#475569">Oct 31 – Nov 2</text>
 <rect x="24" y="433" width="292" height="24" rx="3" fill="#0891b2"/>
 <text x="34" y="449" font-size="12" font-weight="700" fill="#ffffff">Noah: Database + Search</text>
@@ -141,30 +143,37 @@
 <text x="34" y="475" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N1</tspan>  Atlas cluster, app user, allowlist</text>
 <line x1="24" y1="484" x2="1220" y2="484" stroke="#f1f5f9"/>
 <rect x="358" y="463" width="92" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<rect x="358" y="463" width="92" height="16" rx="4" fill="#0891b2"/>
 <text x="456" y="475" font-size="10" fill="#475569">Oct 27–29</text>
 <text x="34" y="501" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N2</tspan>  Country dataset + seed script</text>
 <line x1="24" y1="510" x2="1220" y2="510" stroke="#f1f5f9"/>
 <rect x="454" y="489" width="124" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<rect x="454" y="489" width="124" height="16" rx="4" fill="#0891b2"/>
 <text x="584" y="501" font-size="10" fill="#475569">Oct 30 – Nov 2</text>
 <text x="34" y="527" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N3</tspan>  Data model doc + indexes</text>
 <line x1="24" y1="536" x2="1220" y2="536" stroke="#f1f5f9"/>
 <rect x="454" y="515" width="156" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<rect x="454" y="515" width="156" height="16" rx="4" fill="#0891b2"/>
 <text x="616" y="527" font-size="10" fill="#475569">Oct 30 – Nov 3</text>
 <text x="34" y="553" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N4</tspan>  Country search endpoint</text>
 <line x1="24" y1="562" x2="1220" y2="562" stroke="#f1f5f9"/>
 <rect x="582" y="541" width="92" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<rect x="582" y="541" width="92" height="16" rx="4" fill="#0891b2"/>
 <text x="680" y="553" font-size="10" fill="#475569">Nov 3–5</text>
 <text x="34" y="579" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N5</tspan>  ERD</text>
 <line x1="24" y1="588" x2="1220" y2="588" stroke="#f1f5f9"/>
 <rect x="614" y="567" width="156" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<rect x="614" y="567" width="156" height="16" rx="4" fill="#0891b2"/>
 <text x="776" y="579" font-size="10" fill="#475569">Nov 4–8</text>
 <text x="34" y="605" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N6</tspan>  OpenAPI spec + SwaggerHub live</text>
 <line x1="24" y1="614" x2="1220" y2="614" stroke="#f1f5f9"/>
 <rect x="678" y="593" width="156" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<rect x="678" y="593" width="156" height="16" rx="4" fill="#0891b2"/>
 <text x="840" y="605" font-size="10" fill="#475569">Nov 6–10</text>
 <text x="34" y="631" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">N7</tspan>  Search integration tests</text>
 <line x1="24" y1="640" x2="1220" y2="640" stroke="#f1f5f9"/>
 <rect x="678" y="619" width="188" height="16" rx="4" fill="#0891b2" fill-opacity="0.28" stroke="#0891b2"/>
+<rect x="678" y="619" width="188" height="16" rx="4" fill="#0891b2"/>
 <text x="872" y="631" font-size="10" fill="#475569">Nov 6–11</text>
 <rect x="24" y="641" width="292" height="24" rx="3" fill="#ea580c"/>
 <text x="34" y="657" font-size="12" font-weight="700" fill="#ffffff">Sebastian: API + Auth</text>
@@ -172,26 +181,32 @@
 <text x="34" y="683" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B1</tspan>  API contract + shared zod schemas</text>
 <line x1="24" y1="692" x2="1220" y2="692" stroke="#f1f5f9"/>
 <rect x="358" y="671" width="124" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<rect x="358" y="671" width="124" height="16" rx="4" fill="#ea580c"/>
 <text x="488" y="683" font-size="10" fill="#475569">Oct 27–30</text>
 <text x="34" y="709" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B3</tspan>  Register, verify, login, JWT</text>
 <line x1="24" y1="718" x2="1220" y2="718" stroke="#f1f5f9"/>
 <rect x="486" y="697" width="156" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<rect x="486" y="697" width="156" height="16" rx="4" fill="#ea580c"/>
 <text x="648" y="709" font-size="10" fill="#475569">Oct 31 – Nov 4</text>
 <text x="34" y="735" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B4</tspan>  Forgot / reset password</text>
 <line x1="24" y1="744" x2="1220" y2="744" stroke="#f1f5f9"/>
 <rect x="582" y="723" width="124" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<rect x="582" y="723" width="124" height="16" rx="4" fill="#ea580c"/>
 <text x="712" y="735" font-size="10" fill="#475569">Nov 3–6</text>
 <text x="34" y="761" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B5</tspan>  Game start + guess + scoring</text>
 <line x1="24" y1="770" x2="1220" y2="770" stroke="#f1f5f9"/>
 <rect x="646" y="749" width="124" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<rect x="646" y="749" width="124" height="16" rx="4" fill="#ea580c"/>
 <text x="776" y="761" font-size="10" fill="#475569">Nov 5–8</text>
 <text x="34" y="787" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B6</tspan>  API tests (Vitest + supertest)</text>
 <line x1="24" y1="796" x2="1220" y2="796" stroke="#f1f5f9"/>
 <rect x="774" y="775" width="124" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<rect x="774" y="775" width="124" height="16" rx="4" fill="#ea580c"/>
 <text x="904" y="787" font-size="10" fill="#475569">Nov 9–12</text>
 <text x="34" y="813" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">B7</tspan>  Rate limits, errors, remove demo</text>
 <line x1="24" y1="822" x2="1220" y2="822" stroke="#f1f5f9"/>
 <rect x="774" y="801" width="92" height="16" rx="4" fill="#ea580c" fill-opacity="0.28" stroke="#ea580c"/>
+<rect x="774" y="801" width="92" height="16" rx="4" fill="#ea580c"/>
 <text x="872" y="813" font-size="10" fill="#475569">Nov 9–11</text>
 <rect x="24" y="823" width="292" height="24" rx="3" fill="#2563eb"/>
 <text x="34" y="839" font-size="12" font-weight="700" fill="#ffffff">John: Web (React)</text>
@@ -199,26 +214,32 @@
 <text x="34" y="865" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J1</tspan>  Figma web prototype + design tokens</text>
 <line x1="24" y1="874" x2="1220" y2="874" stroke="#f1f5f9"/>
 <rect x="358" y="853" width="156" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<rect x="358" y="853" width="156" height="16" rx="4" fill="#2563eb"/>
 <text x="520" y="865" font-size="10" fill="#475569">Oct 27–31</text>
 <text x="34" y="891" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J2</tspan>  Auth pages + protected routes</text>
 <line x1="24" y1="900" x2="1220" y2="900" stroke="#f1f5f9"/>
 <rect x="518" y="879" width="156" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<rect x="518" y="879" width="156" height="16" rx="4" fill="#2563eb"/>
 <text x="680" y="891" font-size="10" fill="#475569">Nov 1–5</text>
 <text x="34" y="917" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J3</tspan>  Game page (autocomplete, guesses)</text>
 <line x1="24" y1="926" x2="1220" y2="926" stroke="#f1f5f9"/>
 <rect x="678" y="905" width="156" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<rect x="678" y="905" width="156" height="16" rx="4" fill="#2563eb"/>
 <text x="840" y="917" font-size="10" fill="#475569">Nov 6–10</text>
 <text x="34" y="943" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J4</tspan>  Leaderboard (paginated) + header</text>
 <line x1="24" y1="952" x2="1220" y2="952" stroke="#f1f5f9"/>
 <rect x="774" y="931" width="92" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<rect x="774" y="931" width="92" height="16" rx="4" fill="#2563eb"/>
 <text x="872" y="943" font-size="10" fill="#475569">Nov 9–11</text>
 <text x="34" y="969" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J5</tspan>  Responsive, a11y, component tests</text>
 <line x1="24" y1="978" x2="1220" y2="978" stroke="#f1f5f9"/>
 <rect x="806" y="957" width="92" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<rect x="806" y="957" width="92" height="16" rx="4" fill="#2563eb"/>
 <text x="904" y="969" font-size="10" fill="#475569">Nov 10–12</text>
 <text x="34" y="995" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">J6</tspan>  Activity diagram (game round)</text>
 <line x1="24" y1="1004" x2="1220" y2="1004" stroke="#f1f5f9"/>
 <rect x="774" y="983" width="124" height="16" rx="4" fill="#2563eb" fill-opacity="0.28" stroke="#2563eb"/>
+<rect x="774" y="983" width="124" height="16" rx="4" fill="#2563eb"/>
 <text x="904" y="995" font-size="10" fill="#475569">Nov 9–12</text>
 <rect x="24" y="1005" width="292" height="24" rx="3" fill="#db2777"/>
 <text x="34" y="1021" font-size="12" font-weight="700" fill="#ffffff">Arwa: Mobile (Flutter) + API</text>
@@ -226,30 +247,37 @@
 <text x="34" y="1047" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A1</tspan>  Flutter SDK + emulator + scaffold</text>
 <line x1="24" y1="1056" x2="1220" y2="1056" stroke="#f1f5f9"/>
 <rect x="358" y="1035" width="124" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<rect x="358" y="1035" width="124" height="16" rx="4" fill="#db2777"/>
 <text x="488" y="1047" font-size="10" fill="#475569">Oct 27–30</text>
 <text x="34" y="1073" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A2</tspan>  Figma mobile prototype</text>
 <line x1="24" y1="1082" x2="1220" y2="1082" stroke="#f1f5f9"/>
 <rect x="390" y="1061" width="156" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<rect x="390" y="1061" width="156" height="16" rx="4" fill="#db2777"/>
 <text x="552" y="1073" font-size="10" fill="#475569">Oct 28 – Nov 1</text>
 <text x="34" y="1099" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A3</tspan>  API: /users/me + /leaderboard</text>
 <line x1="24" y1="1108" x2="1220" y2="1108" stroke="#f1f5f9"/>
 <rect x="646" y="1087" width="124" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<rect x="646" y="1087" width="124" height="16" rx="4" fill="#db2777"/>
 <text x="776" y="1099" font-size="10" fill="#475569">Nov 5–8</text>
 <text x="34" y="1125" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A4</tspan>  Mobile auth screens + token storage</text>
 <line x1="24" y1="1134" x2="1220" y2="1134" stroke="#f1f5f9"/>
 <rect x="486" y="1113" width="188" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<rect x="486" y="1113" width="188" height="16" rx="4" fill="#db2777"/>
 <text x="680" y="1125" font-size="10" fill="#475569">Oct 31 – Nov 5</text>
 <text x="34" y="1151" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A5</tspan>  Mobile game screen</text>
 <line x1="24" y1="1160" x2="1220" y2="1160" stroke="#f1f5f9"/>
 <rect x="678" y="1139" width="156" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<rect x="678" y="1139" width="156" height="16" rx="4" fill="#db2777"/>
 <text x="840" y="1151" font-size="10" fill="#475569">Nov 6–10</text>
 <text x="34" y="1177" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A6</tspan>  Mobile leaderboard + class diagram</text>
 <line x1="24" y1="1186" x2="1220" y2="1186" stroke="#f1f5f9"/>
 <rect x="774" y="1165" width="124" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<rect x="774" y="1165" width="124" height="16" rx="4" fill="#db2777"/>
 <text x="904" y="1177" font-size="10" fill="#475569">Nov 9–12</text>
 <text x="34" y="1203" font-size="12" fill="#1e293b"><tspan fill="#94a3b8">A7</tspan>  Widget tests + release APK</text>
 <line x1="24" y1="1212" x2="1220" y2="1212" stroke="#f1f5f9"/>
 <rect x="838" y="1191" width="92" height="16" rx="4" fill="#db2777" fill-opacity="0.28" stroke="#db2777"/>
+<rect x="838" y="1191" width="92" height="16" rx="4" fill="#db2777"/>
 <text x="936" y="1203" font-size="10" fill="#475569">Nov 11–13</text>
 <rect x="24" y="1213" width="292" height="24" rx="3" fill="#1e293b"/>
 <text x="34" y="1229" font-size="12" font-weight="700" fill="#ffffff">Team milestones</text>
