@@ -36,6 +36,7 @@ export function CountrySearch({
     (country) => country.name.trim().toLowerCase() === query.trim().toLowerCase(),
   );
   const readyCountry = selected ?? exactMatch;
+
   useImperativeHandle(inputRef, () => inputElement.current!);
   useEffect(() => {
     const controller = new AbortController();
@@ -61,7 +62,7 @@ export function CountrySearch({
         setActive(-1);
         setMessage(
           parsed.data.length
-            ? `${parsed.data.length} countries found.`
+            ? `${parsed.data.length} ${parsed.data.length === 1 ? "country" : "countries"} found.`
             : "No countries found. Try another name.",
         );
       } catch (error) {
@@ -122,7 +123,10 @@ export function CountrySearch({
       if (selected) onSelect?.(selected);
       else if (!loading) {
         const suggestion = active >= 0 ? results[active] : exactMatch ?? results[0];
-        if (suggestion) choose(suggestion);
+        if (suggestion) {
+          choose(suggestion);
+          if (results.length === 1) onSelect?.(suggestion);
+        }
       }
     }
   }
@@ -136,7 +140,21 @@ export function CountrySearch({
         }
       }}
     >
-      <label htmlFor={`${listId}-input`}>Your next guess</label>
+      <div className="country-search-heading">
+        <label htmlFor={`${listId}-input`}>Your next guess</label>
+        <p
+          className="search-status"
+          id={`${listId}-status`}
+          role="status"
+          aria-busy={loading}
+        >
+          {!canSearch && query.trim()
+            ? "Sign in to search countries."
+            : loading
+              ? ""
+              : message}
+        </p>
+      </div>
       <div className="preview-search">
         <input
           ref={inputElement}
@@ -226,18 +244,6 @@ export function CountrySearch({
           ))}
         </ul>
       )}
-      <p
-        className="search-status"
-        id={`${listId}-status`}
-        role="status"
-        aria-busy={loading}
-      >
-        {!canSearch && query.trim()
-          ? "Sign in to search countries."
-          : loading
-            ? ""
-            : message}
-      </p>
     </div>
   );
 }

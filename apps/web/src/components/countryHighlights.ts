@@ -1,4 +1,14 @@
 import type { Guess } from "../round";
+import type { DistanceRange } from "@cop4331/shared";
+
+export const distanceColors: Record<DistanceRange, string> = {
+  "< 500 km": "#e62932",
+  "500–1,500 km": "#d9684f",
+  "1,500–3,000 km": "#d5c56d",
+  "3,000–6,000 km": "#80a9d4",
+  "> 6,000 km": "#9b72d2",
+};
+export const correctCountryColor = "#66d99a";
 
 const aliases: Record<string, string> = {
   "united states": "united states of america", usa: "united states of america",
@@ -21,14 +31,8 @@ export function countryKey(name: string) {
 }
 
 export function guessColor(guess: Guess) {
-  if (guess.correct || guess.range === "Correct") return "#66d99a";
-  return {
-    "< 500 km": "#e62932",
-    "500–1,500 km": "#d9684f",
-    "1,500–3,000 km": "#d5c56d",
-    "3,000–6,000 km": "#80a9d4",
-    "> 6,000 km": "#747fc5",
-  }[guess.range];
+  if (guess.correct || guess.range === "Correct") return correctCountryColor;
+  return distanceColors[guess.range];
 }
 
 export function withRevealedAnswer(guesses: Guess[], answer?: string): Guess[] {

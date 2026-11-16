@@ -101,9 +101,9 @@ export function compareGuesses(a: Guess, b: Guess) {
 const arrows: Record<GuessDirection, string> = {
   N: "↑", NE: "↗", E: "→", SE: "↘", S: "↓", SW: "↙", W: "←", NW: "↖", Correct: "",
 };
-export function guessClue(guess: Guess) {
+export function guessClue(guess: Guess, { showDirection = true }: { showDirection?: boolean } = {}) {
   if (guess.correct || guess.range === "Correct") return "Correct country";
   const distance = guess.distance === undefined ? guess.range : `~${guess.distance.toLocaleString("en-US")} km`;
-  const arrow = guess.direction ? arrows[guess.direction] : "";
+  const arrow = showDirection && guess.direction ? arrows[guess.direction] : "";
   return arrow ? `${distance} ${arrow}` : distance;
 }
