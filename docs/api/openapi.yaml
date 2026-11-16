@@ -1,0 +1,269 @@
+openapi: 3.0.3
+info:
+  title: Country Distance Guessing Game API
+  version: 1.0.0
+  description: |
+    REST API for the Country Distance Guessing Game (web + Flutter mobile).
+    The server secretly picks a country; the player searches for countries and
+    guesses, and the server answers each guess with a distance range.
+
+    This spec documents the two endpoints demonstrated in the SwaggerHub demo:
+
+    1. `GET /api/countries/search`: server-side, case-insensitive partial-match search.
+    2. `POST /api/games/{id}/guesses`: submit a guess and get distance feedback.
+
+    **Authorization:** both endpoints need a JWT. Log in with
+    `POST /api/auth/login` (the web or mobile app does this), copy the
+    `accessToken`, click **Authorize** and paste it. The token expires after 24 hours.
+    The other endpoints (register, verify-email, password reset, leaderboard,
+    rounds) are described in `docs/api-contract.md`.
+servers:
+  - url: https://cop4331-countryguesser.com
+    description: Production (DigitalOcean, nginx + pm2)
+  - url: http://localhost:5000
+    description: Local development
+tags:
+  - name: Countries
+  - name: Games
+paths:
+  /api/countries/search:
+    get:
+      tags: [Countries]
+      operationId: searchCountries
+      summary: Search countries by partial name
+      description: |
+        Returns countries whose name contains the query anywhere, ignoring case,
+        so `fra` finds France and `afric` finds Central African Republic. The match
+        runs on the server on every request, and regex characters in `q` are matched
+        literally. Results are capped at `limit`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Part of a country name (case-insensitive).
+          schema:
+            type: string
+            minLength: 1
+          example: fra
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of results (1 to 50).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Matching countries. An empty array means nothing matched.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Country'
+              examples:
+                partialMatch:
+                  summary: q=fra
+                  value:
+                    - id: 6aed5e40d455f880d20e4667
+                      name: France
+                      iso2: FR
+                      iso3: FR
+                      continent: ''
+                noMatch:
+                  summary: q=atlantis
+                  value: []
+        '400':
+          description: The `q` parameter is missing or empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Search query parameter "q" is required
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /api/games/{id}/guesses:
+    post:
+      tags: [Games]
+      operationId: submitGuess
+      summary: Submit a guess for an active round
+      description: |
+        Guess a country (use an `id` from the search endpoint). The server computes
+        the great-circle (haversine) distance to the secret country and returns a
+        range, the rounded distance and a compass direction. The target is never
+        revealed while the round is active. A correct guess scores
+        `max(10, 100 - 10 x (guesses - 1))` points, added to the player's total on the
+        server. The round is lost after 10 wrong guesses.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The `gameId` returned by `POST /api/games`.
+          schema:
+            type: string
+          example: 6af8c654db2afb40c3cf70a8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuessRequest'
+            example:
+              countryId: 6aed5e40d455f880d20e4667
+      responses:
+        '200':
+          description: Feedback for the guess.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuessResponse'
+              examples:
+                wrongGuess:
+                  summary: Wrong guess
+                  value:
+                    country: Japan
+                    range: '> 6,000 km'
+                    distance: 9700
+                    direction: W
+                    solved: false
+                    guessesUsed: 1
+                correctGuess:
+                  summary: Correct guess on the first try
+                  value:
+                    country: France
+                    range: Correct
+                    distance: 0
+                    direction: Correct
+                    solved: true
+                    guessesUsed: 1
+                    pointsEarned: 100
+        '400':
+          description: The round is already finished, or the guess has no valid country.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Game is already finished
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: The round belongs to another player.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Cannot guess on another user's game
+        '404':
+          description: Unknown round or unknown country.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                game:
+                  value:
+                    error: Game not found
+                country:
+                  value:
+                    error: Guessed country not found
+        '500':
+          $ref: '#/components/responses/ServerError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Unauthorized:
+      description: Missing, malformed, tampered or expired access token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Invalid or expired access token
+    ServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Internal server error
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Human-readable message.
+    Country:
+      type: object
+      required: [id, name, iso2, iso3, continent]
+      properties:
+        id:
+          type: string
+          description: Use this as `countryId` when guessing.
+        name:
+          type: string
+        iso2:
+          type: string
+        iso3:
+          type: string
+        continent:
+          type: string
+    GuessRequest:
+      type: object
+      required: [countryId]
+      properties:
+        countryId:
+          type: string
+          description: The `id` of a country from the search endpoint.
+    GuessResponse:
+      type: object
+      required: [country, range, distance, direction, solved, guessesUsed]
+      properties:
+        country:
+          type: string
+          example: France
+        range:
+          type: string
+          description: Distance bucket, or `Correct` when solved.
+          enum:
+            - '< 500 km'
+            - 500–1,500 km
+            - 1,500–3,000 km
+            - 3,000–6,000 km
+            - '> 6,000 km'
+            - Correct
+        distance:
+          type: integer
+          description: Kilometres to the secret country, rounded to the nearest 10.
+          example: 1550
+        direction:
+          type: string
+          description: Compass direction from the guess toward the secret country, or `Correct`.
+          enum: [N, NE, E, SE, S, SW, W, NW, Correct]
+        solved:
+          type: boolean
+        guessesUsed:
+          type: integer
+          minimum: 1
+          maximum: 10
+        pointsEarned:
+          type: integer
+          description: Only present when `solved` is true.
+          example: 90
